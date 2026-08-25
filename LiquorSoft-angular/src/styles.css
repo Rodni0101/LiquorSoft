@@ -1,1 +1,67 @@
-/* You can add global styles to this file, and also import other style files */
+/* =========================================================
+   LIQURSOFT - ESTILOS GLOBALES
+   ========================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+
+  background: #070b14;
+
+  overflow-x: hidden;
+}
+
+body {
+  width: 100%;
+  min-height: 100vh;
+
+  margin: 0;
+  padding: 0;
+
+  background: #070b14;
+
+  color: #f8fafc;
+
+  overflow-x: hidden;
+}
+
+app-root {
+  display: block;
+
+  width: 100%;
+  min-height: 100vh;
+
+  margin: 0;
+  padding: 0;
+}
+
+/* Evita espacios inesperados */
+img,
+svg,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+/* Enlaces */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Botones e inputs */
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}

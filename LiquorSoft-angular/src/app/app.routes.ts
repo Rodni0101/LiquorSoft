@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { permissionGuard } from './permission.guard';
 
 export const routes: Routes = [
 
@@ -6,6 +7,13 @@ export const routes: Routes = [
     path: '',
     redirectTo: 'inicio',
     pathMatch: 'full'
+  },
+
+  {
+    path: 'catalogo',
+    loadComponent: () =>
+      import('./pages/catalogo/catalogo')
+        .then(m => m.Catalogo)
   },
 
   {
@@ -31,6 +39,7 @@ export const routes: Routes = [
 
   {
     path: 'dashboard',
+    canActivate: [permissionGuard], data: { permission: 'dashboard' },
     loadComponent: () =>
       import('./pages/dashboard/dashboard')
         .then(m => m.Dashboard)
@@ -38,6 +47,7 @@ export const routes: Routes = [
 
   {
     path: 'productos',
+    canActivate: [permissionGuard], data: { permission: 'productos' },
     loadComponent: () =>
       import('./pages/productos/productos')
         .then(m => m.Productos)
@@ -45,6 +55,7 @@ export const routes: Routes = [
 
   {
     path: 'inventario',
+    canActivate: [permissionGuard], data: { permission: 'inventario' },
     loadComponent: () =>
       import('./pages/inventario/inventario')
         .then(m => m.Inventario)
@@ -52,6 +63,7 @@ export const routes: Routes = [
 
   {
     path: 'ventas',
+    canActivate: [permissionGuard], data: { permission: 'ventas' },
     loadComponent: () =>
       import('./pages/ventas/ventas')
         .then(m => m.Ventas)

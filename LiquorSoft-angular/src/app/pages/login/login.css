@@ -263,6 +263,17 @@
   margin-bottom: 20px;
 }
 
+.login-error {
+  margin: 0 0 14px;
+  color: #fca5a5;
+  font-size: 0.8rem;
+}
+
+.login-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .form-group label {
   display: block;
 
@@ -382,6 +393,16 @@
 
 .form-options a:hover {
   color: #c4b5fd;
+}
+
+.form-options .text-link {
+  padding: 0;
+  border: 0;
+  color: #a78bfa;
+  background: transparent;
+  font-size: inherit;
+  cursor: not-allowed;
+  opacity: .7;
 }
 
 

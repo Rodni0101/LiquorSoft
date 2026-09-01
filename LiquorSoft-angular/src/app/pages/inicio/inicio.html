@@ -1,180 +1,21 @@
-<!doctype html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <title>LiquorSoft</title>
-
-  </head>
-
-  <body>
-    <!-- =========================
-         NAVEGACIÓN
-    ========================== -->
-
-    <header class="navbar">
-      <div class="logo">Liquor<span>Soft</span></div>
-
-      <nav class="nav-links">
-        <a routerLink="/LiquorSoft-angular/src/app/pages/inicio/inicio.html">Inicio</a>
-        <a routerLink="">Productos</a>
-        <a routerLink="">Nosotros</a>
-        <a routerLink="">Contacto</a>
-      </nav>
-
-      <div class="nav-buttons">
-        <a routerLink="/login" class="btn btn-login"> Iniciar sesión </a>
-
-        <a routerLink="/register" class="btn btn-register"> Registrarse </a>
-      </div>
-    </header>
-
-    <!-- =========================
-         HERO
-    ========================== -->
-
-    <main>
-      <section class="hero">
-        <div class="hero-content">
-          <span class="hero-tag"> GESTIÓN INTELIGENTE </span>
-
-          <h1>
-            Administra tu licorera
-            <span>de forma sencilla.</span>
-          </h1>
-
-          <p>
-            LiquorSoft es una plataforma diseñada para administrar productos, inventario, ventas y
-            usuarios desde un solo lugar.
-          </p>
-
-          <div class="hero-buttons">
-            <a href="#" class="btn btn-primary"> Comenzar ahora </a>
-
-            <a href="#" class="btn btn-outline"> Conocer más </a>
-          </div>
-        </div>
-
-        <!-- Panel visual -->
-
-        <div class="hero-panel">
-          <div class="panel-header">
-            <div>
-              <span>LiquorSoft</span>
-              <strong>Dashboard</strong>
-            </div>
-
-            <div class="status">● Sistema activo</div>
-          </div>
-
-          <div class="dashboard-preview">
-            <div class="preview-card">
-              <span>Productos</span>
-
-              <strong>248</strong>
-
-              <small> Registrados </small>
-            </div>
-
-            <div class="preview-card">
-              <span>Ventas</span>
-
-              <strong>$2.8M</strong>
-
-              <small> Este mes </small>
-            </div>
-
-            <div class="preview-card">
-              <span>Inventario</span>
-
-              <strong>92%</strong>
-
-              <small> Disponible </small>
-            </div>
-          </div>
-
-          <div class="preview-table">
-            <div class="table-title">Productos recientes</div>
-
-            <div class="table-row">
-              <span>Ron Medellín</span>
-              <strong>$45.000</strong>
-            </div>
-
-            <div class="table-row">
-              <span>Whisky</span>
-              <strong>$120.000</strong>
-            </div>
-
-            <div class="table-row">
-              <span>Vino Tinto</span>
-              <strong>$65.000</strong>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- =========================
-             CARACTERÍSTICAS
-        ========================== -->
-
-      <section class="features">
-        <div class="section-header">
-          <span> LIQURSOFT </span>
-
-          <h2>Todo lo que necesitas</h2>
-
-          <p>Mantén el control de tu negocio desde una plataforma sencilla y organizada.</p>
-        </div>
-
-        <div class="features-grid">
-          <article class="feature-card">
-            <div class="feature-icon">📦</div>
-
-            <h3>Inventario</h3>
-
-            <p>Controla tus productos, existencias y categorías fácilmente.</p>
-          </article>
-
-          <article class="feature-card">
-            <div class="feature-icon">🛒</div>
-
-            <h3>Ventas</h3>
-
-            <p>Registra y administra las ventas de tu negocio.</p>
-          </article>
-
-          <article class="feature-card">
-            <div class="feature-icon">📊</div>
-
-            <h3>Estadísticas</h3>
-
-            <p>Consulta información importante para tomar mejores decisiones.</p>
-          </article>
-
-          <article class="feature-card">
-            <div class="feature-icon">🔐</div>
-
-            <h3>Seguridad</h3>
-
-            <p>Gestiona usuarios y controla el acceso al sistema.</p>
-          </article>
-        </div>
-      </section>
-    </main>
-
-    <!-- =========================
-         FOOTER
-    ========================== -->
-
-    <footer class="footer">
-      <div class="logo">Liquor<span>Soft</span></div>
-
-      <p>Sistema de gestión para licorerías.</p>
-
-      <span> © 2026 LiquorSoft </span>
-    </footer>
-  </body>
-</html>
-
+<div class="home-page">
+  <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
+  <header class="navbar">
+    <a routerLink="/inicio" class="logo" aria-label="LiquorSoft, inicio">Liquor<span>Soft</span></a>
+    <button class="menu-toggle" type="button" aria-controls="main-navigation" [attr.aria-expanded]="menuOpen" (click)="menuOpen = !menuOpen"><span aria-hidden="true">☰</span><span class="sr-only">Abrir menú</span></button>
+    <nav id="main-navigation" class="nav-links" [class.open]="menuOpen" aria-label="Navegación principal">
+      <a routerLink="/inicio" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="menuOpen = false">Inicio</a>
+      <a href="#productos" (click)="menuOpen = false">Productos</a><a href="#contacto" (click)="menuOpen = false">Contacto</a>
+    </nav>
+    <div class="nav-buttons">@if (!auth.user()) { <a routerLink="/login" class="btn btn-login">Iniciar sesión</a><a routerLink="/register" class="btn btn-register">Crear cuenta</a> } @else { <a routerLink="/dashboard" class="btn btn-login">Dashboard</a><button type="button" class="btn btn-register" (click)="auth.logout()">Cerrar sesión</button> }</div>
+  </header>
+  <main id="contenido" tabindex="-1">
+    <section class="hero" id="inicio" aria-labelledby="hero-title" appReveal>
+      <div class="hero-content"><span class="eyebrow">GESTIÓN INTELIGENTE</span><h1 id="hero-title">Administra tu licorera <span>con claridad.</span></h1><p>Productos, inventario y ventas en un solo lugar para que tomes mejores decisiones cada día.</p><div class="hero-buttons"><a routerLink="/catalogo" class="btn btn-primary">Explorar catálogo</a><a routerLink="/register" class="btn btn-outline">Comenzar ahora</a></div></div>
+      <aside class="hero-panel" appReveal aria-label="Resumen del catálogo"><div class="panel-header"><div><span>LIQURSOFT</span><strong>Resumen en vivo</strong></div><span class="status"><i aria-hidden="true"></i> Conectado</span></div><div class="dashboard-preview"><div class="preview-card"><span>Productos</span><strong>{{ summaryLoading ? '…' : summaryError ? 'No disponible' : summary?.products }}</strong><small>En catálogo</small></div><div class="preview-card"><span>Ventas del mes</span><strong>{{ summaryLoading ? '…' : summaryError ? 'No disponible' : formatPrice(summary?.monthlySales ?? 0) }}</strong><small>Acumulado</small></div><div class="preview-card"><span>Disponibilidad</span><strong>{{ summaryLoading ? '…' : summaryError ? 'No disponible' : (summary?.availability ?? 0) + '%' }}</strong><small>Stock saludable</small></div></div><div class="preview-table"><h2>Productos recientes</h2>@if (productsLoading) { <p class="muted">Cargando productos…</p> } @if (!productsLoading && productsError) { <p class="muted">No fue posible cargar los productos.</p> } @for (product of products.slice(0, 3); track product.name) { <div class="table-row"><span>{{ product.icon }} {{ product.name }}</span><strong>{{ formatPrice(product.price) }}</strong></div> } @if (!productsLoading && !productsError && !products.length) { <p class="muted">No hay productos disponibles.</p> }</div></aside>
+    </section>
+    <section class="products-live" id="productos" aria-labelledby="products-live-title" appReveal><div class="section-header"><span class="eyebrow">DATOS EN VIVO</span><h2 id="products-live-title">Productos del catálogo</h2><p>Información cargada directamente desde la base de datos.</p></div>@if (productsLoading) { <p class="muted live-state" role="status">Cargando productos…</p> } @if (!productsLoading && productsError) { <p class="muted live-state" role="alert">No fue posible cargar los productos.</p> } @if (!productsLoading && !productsError && products.length) { <div class="live-table-wrap"><table><caption class="sr-only">Productos disponibles en LiquorSoft</caption><thead><tr><th scope="col">Producto</th><th scope="col">Categoría</th><th scope="col">Precio</th><th scope="col">Stock</th></tr></thead><tbody>@for (product of products; track product.name) { <tr><td>{{ product.icon }} {{ product.name }}</td><td>{{ product.category }}</td><td>{{ formatPrice(product.price) }}</td><td>{{ product.stock ?? '—' }} und.</td></tr> }</tbody></table></div> } @if (!productsLoading && !productsError && !products.length) { <p class="muted live-state">No hay productos disponibles.</p> }</section>
+    <section class="contact" id="contacto" aria-labelledby="contact-title" appReveal><div class="section-header"><span class="eyebrow">HABLEMOS</span><h2 id="contact-title">Contacto</h2><p>Configura estos datos para que tus clientes sepan cómo encontrarte.</p></div><div class="contact-grid"><article><span aria-hidden="true">☎</span><h3>Teléfono</h3><p>Pendiente de configurar</p></article><article><span aria-hidden="true">✉</span><h3>Correo</h3><p>Pendiente de configurar</p></article><article><span aria-hidden="true">⌂</span><h3>Dirección y horario</h3><p>Pendiente de configurar</p></article></div></section>
+  </main>
+  <footer class="footer" id="contacto"><a routerLink="/inicio" class="logo">Liquor<span>Soft</span></a><p>Sistema de gestión para licorerías.</p><span>© 2026 LiquorSoft</span></footer>
+</div>

@@ -17,29 +17,30 @@
         <p>Ingresa a tu cuenta para continuar.</p>
       </div>
 
-      <form>
+      <form [formGroup]="loginForm" (ngSubmit)="submit()" novalidate>
         <div class="form-group">
           <label for="email"> Correo electrónico </label>
 
-          <input type="email" id="email" placeholder="correo@ejemplo.com" />
+          <input type="email" id="email" formControlName="correo" placeholder="correo@ejemplo.com" autocomplete="email" />
         </div>
 
         <div class="form-group">
           <label for="password"> Contraseña </label>
 
-          <input type="password" id="password" placeholder="••••••••" />
+          <input type="password" id="password" formControlName="password" placeholder="••••••••" autocomplete="current-password" />
         </div>
 
         <div class="form-options">
           <label class="remember">
-            <input type="checkbox" />
+            <input type="checkbox" formControlName="remember" />
             <span>Recordarme</span>
           </label>
 
-          <a href="#"> ¿Olvidaste tu contraseña? </a>
+          <button type="button" class="text-link" disabled title="Recuperación de contraseña disponible próximamente">¿Olvidaste tu contraseña?</button>
         </div>
 
-        <button type="submit" class="login-button">Iniciar sesión</button>
+        @if (errorMessage) { <p class="login-error" role="alert">{{ errorMessage }}</p> }
+        <button type="submit" class="login-button" [disabled]="submitting">{{ submitting ? 'Ingresando…' : 'Iniciar sesión' }}</button>
       </form>
 
       <div class="login-divider">

@@ -1,0 +1,6 @@
+:host { display:block; min-height:100vh; }
+.placeholder-page { max-width:760px; padding:clamp(2rem,6vw,5rem); }
+.placeholder-page h1 { margin:.6rem 0; font-size:clamp(2rem,5vw,3rem); }
+.placeholder-page p { max-width:600px; color:#94a3b8; line-height:1.7; }
+:host-context([data-theme='light']) .placeholder-page { color:#172033; }
+:host-context([data-theme='light']) .placeholder-page p { color:#536176; }

@@ -118,6 +118,26 @@ body {
   box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12), 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
+.form-group input[aria-invalid="true"] {
+  border-color: #f87171;
+}
+
+.field-error {
+  display: block;
+  margin-top: 5px;
+  color: #fca5a5;
+  font-size: 0.72rem;
+}
+
+.form-message {
+  margin: 0 0 14px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.form-message.error { color: #fca5a5; }
+.form-message.success { color: #86efac; }
+
 /* Checkbox de términos */
 .form-checkbox {
   display: flex;
@@ -161,6 +181,11 @@ body {
 .btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 16px 40px rgba(124, 58, 237, 0.42);
+}
+.btn:disabled, .google-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
 }
 .btn-block {
   width: 100%;

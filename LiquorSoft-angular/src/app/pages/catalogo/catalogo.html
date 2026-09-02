@@ -1,11 +1,21 @@
 <div class="catalog-page">
   <header class="catalog-navbar">
-    <a routerLink="/catalogo" class="logo" aria-label="LiquorSoft, catálogo principal">Liquor<span>Soft</span></a>
+    <a routerLink="/catalogo" class="logo" aria-label="LiquorSoft, catálogo principal"
+      >Liquor<span>Soft</span></a
+    >
     <nav aria-label="Navegación principal">
       <a routerLink="/catalogo" class="active">Catálogo</a>
       <a routerLink="/inicio">Conoce LiquorSoft</a>
     </nav>
-    <div class="nav-actions">@if (!auth.user()) { <a routerLink="/login" class="login-link">Iniciar sesión</a><a routerLink="/register" class="register-link">Regístrate</a> } @else { <a routerLink="/dashboard" class="login-link">Dashboard</a><button type="button" class="register-link" (click)="auth.logout()">Cerrar sesión</button> }</div>
+    <div class="nav-actions">
+      @if (!auth.user()) {
+        <a routerLink="/login" class="login-link">Iniciar sesión</a
+        ><a routerLink="/register" class="register-link">Regístrate</a>
+      } @else {
+        <a routerLink="/dashboard" class="login-link">Dashboard</a
+        ><button type="button" class="register-link" (click)="auth.logout()">Cerrar sesión</button>
+      }
+    </div>
   </header>
 
   <main>
@@ -15,26 +25,47 @@
         <h1>Encuentra algo <span>especial.</span></h1>
         <p>Explora nuestra selección de licores, vinos, cervezas y mixers para cada ocasión.</p>
       </div>
-      <div class="hero-badge" aria-hidden="true"><span>✦</span><small>Calidad<br />para compartir</small></div>
+      <div class="hero-badge" aria-hidden="true">
+        <span>✦</span><small>Calidad<br />para compartir</small>
+      </div>
     </section>
 
     <section class="catalog-toolbar" aria-label="Filtros del catálogo">
       <div class="categories" role="group" aria-label="Categorías">
         @for (category of categories; track category) {
-          <button type="button" [class.selected]="selectedCategory() === category" (click)="selectCategory(category)">{{ category }}</button>
+          <button
+            type="button"
+            [class.selected]="selectedCategory() === category"
+            (click)="selectCategory(category)"
+          >
+            {{ category }}
+          </button>
         }
       </div>
       <label class="search-box">
         <span aria-hidden="true">⌕</span>
-        <input type="search" placeholder="Buscar productos" [value]="searchTerm()" (input)="updateSearch($event)" aria-label="Buscar productos" />
+        <input
+          type="search"
+          placeholder="Buscar productos"
+          [value]="searchTerm()"
+          (input)="updateSearch($event)"
+          aria-label="Buscar productos"
+        />
       </label>
     </section>
-    @if (errorMessage) { <p class="catalog-notice" role="status">{{ errorMessage }}</p> }
-    @if (loading) { <p class="catalog-notice" role="status" aria-live="polite">Cargando productos…</p> }
+    @if (errorMessage) {
+      <p class="catalog-notice" role="status">{{ errorMessage }}</p>
+    }
+    @if (loading) {
+      <p class="catalog-notice" role="status" aria-live="polite">Cargando productos…</p>
+    }
 
     <section class="product-section" aria-labelledby="products-title">
       <div class="section-heading">
-        <div><span class="eyebrow">NUESTRA SELECCIÓN</span><h2 id="products-title">Productos destacados</h2></div>
+        <div>
+          <span class="eyebrow">NUESTRA SELECCIÓN</span>
+          <h2 id="products-title">Productos destacados</h2>
+        </div>
         <span class="result-count">{{ filteredProducts().length }} productos</span>
       </div>
 
@@ -42,21 +73,39 @@
         <div class="product-grid">
           @for (product of filteredProducts(); track product.name) {
             <article class="product-card">
-              <div class="product-image"><span>{{ product.icon }}</span>@if (product.featured) { <b>Destacado</b> }</div>
+              <div class="product-image">
+                <span>{{ product.icon }}</span>
+                @if (product.featured) {
+                  <b>Destacado</b>
+                }
+              </div>
               <div class="product-content">
                 <span class="product-category">{{ product.category }}</span>
                 <h3>{{ product.name }}</h3>
                 <p>{{ product.description }}</p>
-                <div class="product-footer"><strong>{{ formatPrice(product.price) }}</strong><button type="button" aria-label="Ver {{ product.name }}">Ver detalle <span>→</span></button></div>
+                <div class="product-footer">
+                  <strong>{{ formatPrice(product.price) }}</strong
+                  ><button type="button" aria-label="Ver {{ product.name }}">
+                    Ver detalle <span>→</span>
+                  </button>
+                </div>
               </div>
             </article>
           }
         </div>
       } @else {
-        <div class="empty-state"><span>⌕</span><h3>No encontramos productos</h3><p>Prueba con otra búsqueda o categoría.</p></div>
+        <div class="empty-state">
+          <span>⌕</span>
+          <h3>No encontramos productos</h3>
+          <p>Prueba con otra búsqueda o categoría.</p>
+        </div>
       }
     </section>
   </main>
 
-  <footer class="catalog-footer"><span class="logo">Liquor<span>Soft</span></span><p>Una selección para disfrutar buenos momentos.</p><span>© 2026 LiquorSoft</span></footer>
+  <footer class="catalog-footer">
+    <span class="logo">Liquor<span>Soft</span></span>
+    <p>Una selección para disfrutar buenos momentos.</p>
+    <span>© 2026 LiquorSoft</span>
+  </footer>
 </div>

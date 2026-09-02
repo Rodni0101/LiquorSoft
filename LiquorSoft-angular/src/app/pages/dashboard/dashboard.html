@@ -1,1 +1,101 @@
-<app-admin-shell><section class="dashboard-main"><header class="topbar"><div><span class="eyebrow">PANEL DE CONTROL</span><h1>Resumen del negocio</h1><p>Consulta el estado actual de tu licorera.</p></div><span class="live-dot">● Datos en vivo</span></header>@if (loading) { <div class="state-card" role="status">Cargando métricas…</div> } @if (errorMessage) { <div class="state-card error" role="alert">{{ errorMessage }}</div> } @if (data; as dashboard) {<section class="metrics-grid" aria-label="Métricas principales"><article class="metric-card accent"><span class="metric-icon">▣</span><small>Productos activos</small><strong>{{ dashboard.stats.totalProducts }}</strong><em>En catálogo</em></article><article class="metric-card"><span class="metric-icon green">✓</span><small>Productos disponibles</small><strong>{{ dashboard.stats.availableProducts }}</strong><em>Sobre el mínimo</em></article><article class="metric-card"><span class="metric-icon blue">◫</span><small>Unidades en stock</small><strong>{{ dashboard.stats.totalUnits }}</strong><em>Disponibles</em></article><article class="metric-card"><span class="metric-icon blue">$</span><small>Valor inventario</small><strong>{{ formatPrice(dashboard.stats.inventoryValue) }}</strong><em>Valor total</em></article><article class="metric-card"><span class="metric-icon red">!</span><small>Stock bajo</small><strong>{{ dashboard.stats.lowStock }}</strong><em>Requieren atención</em></article><article class="metric-card"><span class="metric-icon red">∅</span><small>Agotados</small><strong>{{ dashboard.stats.outOfStock }}</strong><em>Sin existencias</em></article><article class="metric-card"><span class="metric-icon green">↗</span><small>Ventas del mes</small><strong>{{ dashboard.stats.salesThisMonth }}</strong><em>{{ formatPrice(dashboard.stats.revenueThisMonth) }}</em></article><article class="metric-card"><span class="metric-icon">♙</span><small>Usuarios activos</small><strong>{{ dashboard.stats.activeUsers }}</strong><em>Con acceso al sistema</em></article></section><section class="content-grid"><article class="panel recent-panel"><div class="panel-heading"><div><span class="eyebrow">INVENTARIO</span><h2>Productos recientes</h2></div><a routerLink="/productos">Ver todos →</a></div><div class="product-list">@for (product of dashboard.recentProducts; track product.name) {<div class="product-row"><span class="product-avatar">🍾</span><div><strong>{{ product.name }}</strong><small>{{ product.category }}</small></div><span class="stock" [class.low]="product.stock <= 5">{{ product.stock }} und.</span><b>{{ formatPrice(product.price) }}</b></div>}</div></article><article class="panel sales-panel"><div class="panel-heading"><div><span class="eyebrow">VENTAS</span><h2>Hoy</h2></div><span class="sales-icon">↗</span></div><strong class="sales-total">{{ formatPrice(dashboard.stats.revenueToday) }}</strong><p>{{ dashboard.stats.salesToday }} ventas registradas hoy</p><div class="sales-bar"><span [style.width.%]="dashboard.stats.salesToday ? 72 : 4"></span></div><small>Acumulado del día</small></article></section>}</section></app-admin-shell>
+<app-admin-shell
+  ><section class="dashboard-main">
+    <header class="topbar">
+      <div>
+        <span class="eyebrow">PANEL DE CONTROL</span>
+        <h1>Resumen del negocio</h1>
+        <p>Consulta el estado actual de tu licorera.</p>
+      </div>
+      <span class="live-dot">● Datos en vivo</span>
+    </header>
+    @if (loading) {
+      <div class="state-card" role="status">Cargando métricas…</div>
+    }
+    @if (errorMessage) {
+      <div class="state-card error" role="alert">{{ errorMessage }}</div>
+    }
+    @if (data; as dashboard) {
+      <section class="metrics-grid" aria-label="Métricas principales">
+        <article class="metric-card accent">
+          <span class="metric-icon">▣</span><small>Productos activos</small
+          ><strong>{{ dashboard.stats.totalProducts }}</strong
+          ><em>En catálogo</em>
+        </article>
+        <article class="metric-card">
+          <span class="metric-icon green">✓</span><small>Productos disponibles</small
+          ><strong>{{ dashboard.stats.availableProducts }}</strong
+          ><em>Sobre el mínimo</em>
+        </article>
+        <article class="metric-card">
+          <span class="metric-icon blue">◫</span><small>Unidades en stock</small
+          ><strong>{{ dashboard.stats.totalUnits }}</strong
+          ><em>Disponibles</em>
+        </article>
+        <article class="metric-card">
+          <span class="metric-icon blue">$</span><small>Valor inventario</small
+          ><strong>{{ formatPrice(dashboard.stats.inventoryValue) }}</strong
+          ><em>Valor total</em>
+        </article>
+        <article class="metric-card">
+          <span class="metric-icon red">!</span><small>Stock bajo</small
+          ><strong>{{ dashboard.stats.lowStock }}</strong
+          ><em>Requieren atención</em>
+        </article>
+        <article class="metric-card">
+          <span class="metric-icon red">∅</span><small>Agotados</small
+          ><strong>{{ dashboard.stats.outOfStock }}</strong
+          ><em>Sin existencias</em>
+        </article>
+        <article class="metric-card">
+          <span class="metric-icon green">↗</span><small>Ventas del mes</small
+          ><strong>{{ dashboard.stats.salesThisMonth }}</strong
+          ><em>{{ formatPrice(dashboard.stats.revenueThisMonth) }}</em>
+        </article>
+        <article class="metric-card">
+          <span class="metric-icon">♙</span><small>Usuarios activos</small
+          ><strong>{{ dashboard.stats.activeUsers }}</strong
+          ><em>Con acceso al sistema</em>
+        </article>
+      </section>
+      <section class="content-grid">
+        <article class="panel recent-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="eyebrow">INVENTARIO</span>
+              <h2>Productos recientes</h2>
+            </div>
+            <a routerLink="/productos">Ver todos →</a>
+          </div>
+          <div class="product-list">
+            @for (product of dashboard.recentProducts; track product.name) {
+              <div class="product-row">
+                <span class="product-avatar">🍾</span>
+                <div>
+                  <strong>{{ product.name }}</strong
+                  ><small>{{ product.category }}</small>
+                </div>
+                <span class="stock" [class.low]="product.stock <= 5">{{ product.stock }} und.</span
+                ><b>{{ formatPrice(product.price) }}</b>
+              </div>
+            }
+          </div>
+        </article>
+        <article class="panel sales-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="eyebrow">VENTAS</span>
+              <h2>Hoy</h2>
+            </div>
+            <span class="sales-icon">↗</span>
+          </div>
+          <strong class="sales-total">{{ formatPrice(dashboard.stats.revenueToday) }}</strong>
+          <p>{{ dashboard.stats.salesToday }} ventas registradas hoy</p>
+          <div class="sales-bar">
+            <span [style.width.%]="dashboard.stats.salesToday ? 72 : 4"></span>
+          </div>
+          <small>Acumulado del día</small>
+        </article>
+      </section>
+    }
+  </section></app-admin-shell
+>

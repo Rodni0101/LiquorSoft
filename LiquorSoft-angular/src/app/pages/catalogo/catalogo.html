@@ -60,6 +60,14 @@
       <p class="catalog-notice" role="status" aria-live="polite">Cargando productos…</p>
     }
 
+    <aside id="carrito" class="cart-panel" aria-labelledby="cart-title">
+      <div class="section-heading"><div><span class="eyebrow">TU SELECCIÓN</span><h2 id="cart-title">Carrito <span>({{ cart.count() }})</span></h2></div></div>
+      @if (cart.items().length) {
+        <div class="cart-items">@for (item of cart.items(); track item.id || item.name) {<div class="cart-item"><span class="cart-item-icon">{{ item.icon }}</span><div><strong>{{ item.name }}</strong><small>{{ formatPrice(item.price) }} · {{ item.quantity }} ud.</small></div><div class="cart-item-actions"><button type="button" (click)="cart.decrease(item)" aria-label="Restar una unidad">−</button><b>{{ item.quantity }}</b><button type="button" (click)="cart.add({id: item.id, name: item.name, price: item.price, icon: item.icon})" aria-label="Agregar una unidad">+</button><button type="button" (click)="cart.remove(item)" aria-label="Eliminar producto">×</button></div><strong>{{ formatPrice(item.price * item.quantity) }}</strong></div>}</div>
+        <div class="cart-summary"><span>Total</span><strong>{{ formatPrice(cart.total()) }}</strong><div><a routerLink="/catalogo">Seguir comprando</a><button type="button" class="register-link">Finalizar compra</button></div></div>
+      } @else { <p class="catalog-notice">Tu carrito está vacío. Agrega una selección para comenzar.</p> }
+    </aside>
+
     <section class="product-section" aria-labelledby="products-title">
       <div class="section-heading">
         <div>
@@ -85,8 +93,8 @@
                 <p>{{ product.description }}</p>
                 <div class="product-footer">
                   <strong>{{ formatPrice(product.price) }}</strong
-                  ><button type="button" aria-label="Ver {{ product.name }}">
-                    Ver detalle <span>→</span>
+                  ><button type="button" (click)="addToCart(product)" aria-label="Agregar {{ product.name }} al carrito">
+                    Agregar <span>+</span>
                   </button>
                 </div>
               </div>

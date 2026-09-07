@@ -1,9 +1,11 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../auth.service';
+import { CartService } from '../../cart.service';
 
 interface CatalogProduct {
+  id?: number;
   name: string;
   category: string;
   description: string;
@@ -22,8 +24,10 @@ interface CatalogProduct {
 })
 export class Catalogo implements OnInit {
   private readonly http = inject(HttpClient);
+  private readonly route = inject(ActivatedRoute);
   protected readonly auth = inject(AuthService);
-  protected readonly categories = ['Todos', 'Licores', 'Vinos', 'Cervezas', 'Mixers'];
+  protected readonly cart = inject(CartService);
+  protected categories = ['Todos'];
   protected readonly selectedCategory = signal('Todos');
   protected readonly searchTerm = signal('');
 
@@ -33,7 +37,15 @@ export class Catalogo implements OnInit {
 
   ngOnInit(): void {
     this.http.get<{ products: CatalogProduct[] }>('/api/products.php').subscribe({
-      next: (response) => { this.products.set(response.products); this.loading = false; },
+      next: (response) => {
+        this.products.set(response.products);
+        this.categories = ['Todos', ...new Set(response.products.map(product => product.category))];
+        const params = this.route.snapshot.queryParamMap;
+        const category = params.get('category'); const search = params.get('search');
+        if (category && this.categories.includes(category)) this.selectedCategory.set(category);
+        if (search) this.searchTerm.set(search);
+        this.loading = false;
+      },
       error: () => { this.errorMessage = 'No fue posible cargar el catálogo. Verifica la conexión con la base de datos.'; this.loading = false; },
     });
   }
@@ -58,5 +70,9 @@ export class Catalogo implements OnInit {
 
   protected formatPrice(price: number): string {
     return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(price);
+  }
+
+  protected addToCart(product: CatalogProduct): void {
+    this.cart.add({ id: product.id, name: product.name, price: product.price, icon: product.icon });
   }
 }

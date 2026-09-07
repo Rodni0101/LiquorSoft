@@ -1,0 +1,37 @@
+[33mcommit 72f80faeb73418835080f08b899606e9d5587e16[m
+Author: Nela-21 <gineladofia21@gmail.com>
+Date:   Mon Sep 7 13:40:58 2026 -0500
+
+    Ginela arreglos
+
+ .../cache/22.1.5/LiquorSoft-angular/.tsbuildinfo   |     1 [32m+[m
+ .../vite/deps/@angular_common.js                   |     4 [32m+[m
+ .../vite/deps/@angular_common_http.js              |     2 [32m+[m
+ .../LiquorSoft-angular/vite/deps/@angular_core.js  |     2 [32m+[m
+ .../LiquorSoft-angular/vite/deps/@angular_forms.js |  5201 [32m+++++[m
+ .../vite/deps/@angular_forms.js.map                |     1 [32m+[m
+ .../vite/deps/@angular_platform-browser.js         |     3 [32m+[m
+ .../vite/deps/@angular_router.js                   |  5094 [32m+++++[m
+ .../vite/deps/@angular_router.js.map               |     1 [32m+[m
+ .../LiquorSoft-angular/vite/deps/_metadata.json    |    90 [32m+[m
+ .../vite/deps/_xhr-chunk-BRM7r_Cm.js               |   183 [32m+[m
+ .../vite/deps/_xhr-chunk-BRM7r_Cm.js.map           |     1 [32m+[m
+ .../vite/deps/common-CoGJz4XE.js                   |  4232 [32m++++[m
+ .../vite/deps/common-CoGJz4XE.js.map               |     1 [32m+[m
+ .../LiquorSoft-angular/vite/deps/core-DMlD5wbY.js  | 22728 [32m+++++++++++++++++++[m
+ .../vite/deps/core-DMlD5wbY.js.map                 |     1 [32m+[m
+ .../LiquorSoft-angular/vite/deps/esm5-1bPjeIHk.js  |   691 [32m+[m
+ .../vite/deps/esm5-1bPjeIHk.js.map                 |     1 [32m+[m
+ .../LiquorSoft-angular/vite/deps/http-DqHJDlTZ.js  |  2195 [32m++[m
+ .../vite/deps/http-DqHJDlTZ.js.map                 |     1 [32m+[m
+ .../vite/deps/operators-cDZ5DjJy.js                |    16 [32m+[m
+ .../vite/deps/operators-cDZ5DjJy.js.map            |     1 [32m+[m
+ .../LiquorSoft-angular/vite/deps/package.json      |     3 [32m+[m
+ .../vite/deps/platform-browser-xqGDHdGe.js         |  1331 [32m++[m
+ .../vite/deps/platform-browser-xqGDHdGe.js.map     |     1 [32m+[m
+ .../22.1.5/LiquorSoft-angular/vite/deps/rxjs.js    |     3 [32m+[m
+ .../LiquorSoft-angular/vite/deps/rxjs_operators.js |     3 [32m+[m
+ .../vite/deps/zipWith-DkrnN79P.js                  |  4071 [32m++++[m
+ .../vite/deps/zipWith-DkrnN79P.js.map              |     1 [32m+[m
+ .gitignore                                         |     1 [32m+[m
+ 30 files changed, 45864 insertions(+)

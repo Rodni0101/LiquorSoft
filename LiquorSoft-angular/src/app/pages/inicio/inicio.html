@@ -32,8 +32,8 @@
         <a routerLink="/login" class="btn btn-login">Iniciar sesión</a
         ><a routerLink="/register" class="btn btn-register">Crear cuenta</a>
       } @else {
-        <a routerLink="/dashboard" class="btn btn-login">Dashboard</a
-        ><button type="button" class="btn btn-register" (click)="auth.logout()">
+        @if (auth.can('dashboard')) { <a routerLink="/dashboard" class="btn btn-login">Dashboard</a> }
+        <button type="button" class="btn btn-register" (click)="auth.logout()">
           Cerrar sesión
         </button>
       }

@@ -12,8 +12,8 @@
         <a routerLink="/login" class="login-link">Iniciar sesión</a
         ><a routerLink="/register" class="register-link">Regístrate</a>
       } @else {
-        <a routerLink="/dashboard" class="login-link">Dashboard</a
-        ><button type="button" class="register-link" (click)="auth.logout()">Cerrar sesión</button>
+        @if (auth.can('dashboard')) { <a routerLink="/dashboard" class="login-link">Dashboard</a> }
+        <button type="button" class="register-link" (click)="auth.logout()">Cerrar sesión</button>
       }
     </div>
   </header>

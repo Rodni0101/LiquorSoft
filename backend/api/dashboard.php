@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 }
 
 $connection = databaseConnection();
-requireRole($connection, ['Administrador', 'Supervisor', 'Vendedor', 'Bodega']);
+requireRole($connection, ['Administrador']);
 
 function dashboardQuery(mysqli $connection, string $sql): mysqli_result
 {

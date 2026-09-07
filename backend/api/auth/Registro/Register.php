@@ -53,7 +53,7 @@ if ($connection->connect_errno) {
 $connection->set_charset('utf8mb4');
 
 $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-$roleResult = $connection->query('SELECT id FROM roles ORDER BY id ASC LIMIT 1');
+$roleResult = $connection->query("SELECT id FROM roles WHERE LOWER(TRIM(nombre)) <> 'administrador' ORDER BY id ASC LIMIT 1");
 if (!$roleResult || !$roleResult->num_rows) {
     error_log('LiquorSoft register failed: no existe un rol disponible en la tabla roles.');
     $connection->close();

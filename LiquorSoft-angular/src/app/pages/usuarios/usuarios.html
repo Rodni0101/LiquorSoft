@@ -1,0 +1,7 @@
+<app-admin-shell>
+  <section class="users-page">
+    <header class="page-heading"><div><span class="eyebrow">CONTROL DE ACCESO</span><h1>Usuarios</h1><p>Administra las cuentas autorizadas para operar LiquorSoft.</p></div><a routerLink="/register" class="primary-action">＋ Nueva cuenta</a></header>
+    @if (errorMessage) { <p class="notice error" role="alert">{{ errorMessage }}</p> }
+    <section class="panel"><div class="panel-heading"><div><span class="eyebrow">CUENTAS</span><h2>Accesos registrados</h2></div><span class="record-count">{{ users.length }} cuentas</span></div>@if (loading) { <p class="empty-state" role="status">Cargando usuarios…</p> } @else if (!users.length) { <p class="empty-state">No hay cuentas registradas.</p> } @else { <div class="table-wrap"><table><thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th></tr></thead><tbody>@for (user of users; track user.id) { <tr><td><strong>{{ user.name }}</strong></td><td>{{ user.email }}</td><td>{{ user.role }}</td><td><span class="status" [class.inactive]="!user.active">{{ user.active ? 'Activo' : 'Inactivo' }}</span></td></tr> }</tbody></table></div> }</section>
+  </section>
+</app-admin-shell>

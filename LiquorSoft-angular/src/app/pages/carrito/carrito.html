@@ -1,0 +1,29 @@
+<div class="purchase-page">
+  <header class="purchase-navbar">
+    <a routerLink="/inicio" class="logo">Liquor<span>Soft</span></a>
+    <nav><a routerLink="/inicio">Inicio</a><a routerLink="/catalogo">Catálogo</a><a routerLink="/carrito" class="active">Carrito ({{ cart.count() }})</a></nav>
+    <a routerLink="/catalogo" class="nav-action">Seguir comprando</a>
+  </header>
+  <main class="purchase-main">
+    <nav class="breadcrumbs" aria-label="Ruta de navegación"><a routerLink="/inicio">Inicio</a><span>/</span><strong>Carrito</strong></nav>
+    <div class="purchase-heading"><span class="eyebrow">TU SELECCIÓN</span><h1>Revisa tu carrito</h1><p>Confirma cantidades y productos antes de continuar.</p></div>
+    @if (cart.items().length) {
+      <div class="cart-layout">
+        <section class="purchase-card">
+          <div class="card-title"><h2>Productos</h2><span>{{ cart.count() }} artículos</span></div>
+          @for (item of cart.items(); track item.id || item.name) {
+            <article class="full-cart-item">
+              <span class="product-icon">{{ item.icon }}</span><div class="item-details"><strong>{{ item.name }}</strong><small>{{ formatPrice(item.price) }} por unidad</small></div>
+              <div class="quantity-controls"><button type="button" (click)="cart.decrease(item)" aria-label="Disminuir cantidad">−</button><strong>{{ item.quantity }}</strong><button type="button" [disabled]="item.stock !== undefined && item.quantity >= item.stock" (click)="cart.add({id:item.id,name:item.name,price:item.price,icon:item.icon,stock:item.stock})" aria-label="Aumentar cantidad">+</button></div>
+              <strong class="item-subtotal">{{ formatPrice(item.price * item.quantity) }}</strong><button type="button" class="remove-item" (click)="cart.remove(item)" aria-label="Eliminar producto">×</button>
+            </article>
+          }
+          <button type="button" class="clear-link" (click)="cart.clear()">Vaciar carrito</button>
+        </section>
+        <aside class="purchase-card order-summary"><span class="eyebrow">RESUMEN</span><h2>Tu pedido</h2><div class="summary-line"><span>Artículos</span><strong>{{ cart.count() }}</strong></div><div class="summary-line"><span>Subtotal</span><strong>{{ formatPrice(cart.total()) }}</strong></div><div class="summary-total"><span>Total</span><strong>{{ formatPrice(cart.total()) }}</strong></div><button type="button" class="primary-action" (click)="goToCheckout()">Continuar al checkout</button><a routerLink="/catalogo" class="secondary-action">Continuar comprando</a></aside>
+      </div>
+    } @else {
+      <section class="empty-cart purchase-card"><span class="empty-icon">🛒</span><h2>Tu carrito está vacío</h2><p>Explora el catálogo y agrega tus productos favoritos.</p><a routerLink="/catalogo" class="primary-action">Explorar productos</a></section>
+    }
+  </main>
+</div>

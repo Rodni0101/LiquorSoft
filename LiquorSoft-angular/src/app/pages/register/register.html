@@ -24,6 +24,12 @@
       </div>
 
       <div class="form-group">
+        <label for="telefono">Teléfono</label>
+        <input type="tel" id="telefono" formControlName="telefono" placeholder="Ej. 300 000 0000" autocomplete="tel"
+          [attr.aria-invalid]="fieldInvalid('telefono')" />
+      </div>
+
+      <div class="form-group">
         <label for="email">Correo electrónico</label>
         <input type="email" id="email" formControlName="correo" placeholder="usuario@licorera.com" autocomplete="email"
           [attr.aria-invalid]="fieldInvalid('correo')" />

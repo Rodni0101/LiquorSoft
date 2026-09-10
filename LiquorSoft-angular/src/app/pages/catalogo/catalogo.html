@@ -9,10 +9,9 @@
     </nav>
     <div class="nav-actions">
       @if (!auth.user()) {
-        <a routerLink="/login" class="login-link">Iniciar sesión</a
-        ><a routerLink="/register" class="register-link">Regístrate</a>
+        <a routerLink="/login" class="login-link">Iniciar sesión</a><a routerLink="/register" class="register-link">Registrarse</a>
       } @else {
-        @if (auth.can('dashboard')) { <a routerLink="/dashboard" class="login-link">Dashboard</a> }
+        @if (auth.isClient()) { <a routerLink="/pedidos" class="login-link">Mis pedidos</a><a routerLink="/carrito" class="register-link">Carrito</a> }
         <button type="button" class="register-link" (click)="auth.logout()">Cerrar sesión</button>
       }
     </div>
@@ -56,6 +55,9 @@
     @if (errorMessage) {
       <p class="catalog-notice" role="status">{{ errorMessage }}</p>
     }
+    @if (cartMessage) {
+      <p class="catalog-notice success-notice" role="status" aria-live="polite">✓ {{ cartMessage }} <a routerLink="/carrito">Ver carrito</a></p>
+    }
     @if (loading) {
       <p class="catalog-notice" role="status" aria-live="polite">Cargando productos…</p>
     }
@@ -63,8 +65,8 @@
     <aside id="carrito" class="cart-panel" aria-labelledby="cart-title">
       <div class="section-heading"><div><span class="eyebrow">TU SELECCIÓN</span><h2 id="cart-title">Carrito <span>({{ cart.count() }})</span></h2></div></div>
       @if (cart.items().length) {
-        <div class="cart-items">@for (item of cart.items(); track item.id || item.name) {<div class="cart-item"><span class="cart-item-icon">{{ item.icon }}</span><div><strong>{{ item.name }}</strong><small>{{ formatPrice(item.price) }} · {{ item.quantity }} ud.</small></div><div class="cart-item-actions"><button type="button" (click)="cart.decrease(item)" aria-label="Restar una unidad">−</button><b>{{ item.quantity }}</b><button type="button" (click)="cart.add({id: item.id, name: item.name, price: item.price, icon: item.icon})" aria-label="Agregar una unidad">+</button><button type="button" (click)="cart.remove(item)" aria-label="Eliminar producto">×</button></div><strong>{{ formatPrice(item.price * item.quantity) }}</strong></div>}</div>
-        <div class="cart-summary"><span>Total</span><strong>{{ formatPrice(cart.total()) }}</strong><div><a routerLink="/catalogo">Seguir comprando</a><button type="button" class="register-link">Finalizar compra</button></div></div>
+        <div class="cart-items">@for (item of cart.items(); track item.id || item.name) {<div class="cart-item"><span class="cart-item-icon">{{ item.icon }}</span><div><strong>{{ item.name }}</strong><small>{{ formatPrice(item.price) }} · {{ item.quantity }} ud.</small></div><div class="cart-item-actions"><button type="button" (click)="cart.decrease(item)" aria-label="Restar una unidad">−</button><b>{{ item.quantity }}</b><button type="button" [disabled]="item.stock !== undefined && item.quantity >= item.stock" (click)="cart.add({id: item.id, name: item.name, price: item.price, icon: item.icon, stock: item.stock})" aria-label="Agregar una unidad">+</button><button type="button" (click)="cart.remove(item)" aria-label="Eliminar producto">×</button></div><strong>{{ formatPrice(item.price * item.quantity) }}</strong></div>}</div>
+        <div class="cart-summary"><span>Total</span><strong>{{ formatPrice(cart.total()) }}</strong><div><a routerLink="/productos">Seguir comprando</a><a routerLink="/checkout" class="register-link">Finalizar compra</a></div></div>
       } @else { <p class="catalog-notice">Tu carrito está vacío. Agrega una selección para comenzar.</p> }
     </aside>
 
@@ -89,14 +91,15 @@
               </div>
               <div class="product-content">
                 <span class="product-category">{{ product.category }}</span>
-                <h3>{{ product.name }}</h3>
+                <h3><a [routerLink]="['/productos', product.id]">{{ product.name }}</a></h3>
                 <p>{{ product.description }}</p>
                 <div class="product-footer">
                   <strong>{{ formatPrice(product.price) }}</strong
-                  ><button type="button" (click)="addToCart(product)" aria-label="Agregar {{ product.name }} al carrito">
-                    Agregar <span>+</span>
+                  ><button type="button" (click)="addToCart(product)" [disabled]="!product.stock" [attr.aria-label]="product.stock ? 'Agregar ' + product.name + ' al carrito' : product.name + ' está agotado'">
+                    {{ product.stock ? 'Agregar' : 'Agotado' }} <span>+</span>
                   </button>
                 </div>
+                <a class="product-link" [routerLink]="['/productos', product.id]">Ver producto →</a>
               </div>
             </article>
           }

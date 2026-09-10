@@ -64,7 +64,7 @@
               <span class="eyebrow">INVENTARIO</span>
               <h2>Productos recientes</h2>
             </div>
-            <a routerLink="/productos">Ver todos →</a>
+            <a routerLink="/admin/productos">Ver todos →</a>
           </div>
           <div class="product-list">
             @for (product of dashboard.recentProducts; track product.name) {
@@ -91,7 +91,7 @@
           <strong class="sales-total">{{ formatPrice(dashboard.stats.revenueToday) }}</strong>
           <p>{{ dashboard.stats.salesToday }} ventas registradas hoy</p>
           <div class="sales-bar">
-            <span [style.width.%]="dashboard.stats.salesToday ? 72 : 4"></span>
+            <span [style.width.%]="dashboard.stats.salesToday ? 100 : 0"></span>
           </div>
           <small>Acumulado del día</small>
         </article>

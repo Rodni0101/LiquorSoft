@@ -1,1 +1,10 @@
 .global-theme-toggle { position:fixed; right:1rem; bottom:1rem; z-index:20; }
+
+html { scroll-behavior: smooth; }
+:focus-visible { outline: 3px solid #fbbf24; outline-offset: 3px; }
+button:disabled { cursor: not-allowed; opacity: .55; }
+.checkout-steps { display:flex; gap:1rem; margin:0 0 2rem; padding:0; list-style:none; color:#94a3b8; font-size:.78rem; }
+.checkout-steps li { display:flex; align-items:center; gap:.45rem; }
+.checkout-steps span { display:grid; place-items:center; width:1.6rem; height:1.6rem; border:1px solid #64748b; border-radius:50%; }
+.checkout-steps .current { color:#fbbf24; font-weight:700; }.checkout-steps .current span { border-color:#fbbf24; background:#fbbf24; color:#111827; }
+@media (max-width:560px) { .checkout-steps { gap:.5rem; font-size:.68rem; } }

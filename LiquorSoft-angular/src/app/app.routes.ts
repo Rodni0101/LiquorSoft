@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './auth.guard';
 import { permissionGuard } from './permission.guard';
 
 export const routes: Routes = [
@@ -14,6 +15,34 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/catalogo/catalogo')
         .then(m => m.Catalogo)
+  },
+
+  {
+    path: 'productos',
+    loadComponent: () => import('./pages/catalogo/catalogo').then(m => m.Catalogo),
+  },
+
+  {
+    path: 'productos/:id',
+    loadComponent: () => import('./pages/producto/producto').then(m => m.Producto),
+  },
+
+  {
+    path: 'carrito',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/carrito/carrito').then(m => m.Carrito),
+  },
+
+  {
+    path: 'checkout',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/checkout/checkout').then(m => m.Checkout),
+  },
+
+  {
+    path: 'pedidos',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/pedidos/pedidos').then(m => m.Pedidos),
   },
 
   {
@@ -38,7 +67,7 @@ export const routes: Routes = [
   },
 
   {
-    path: 'dashboard',
+    path: 'admin/dashboard',
     canActivate: [permissionGuard], data: { permission: 'dashboard' },
     loadComponent: () =>
       import('./pages/dashboard/dashboard')
@@ -46,7 +75,7 @@ export const routes: Routes = [
   },
 
   {
-    path: 'productos',
+    path: 'admin/productos',
     canActivate: [permissionGuard], data: { permission: 'productos' },
     loadComponent: () =>
       import('./pages/productos/productos')
@@ -54,7 +83,7 @@ export const routes: Routes = [
   },
 
   {
-    path: 'inventario',
+    path: 'admin/inventario',
     canActivate: [permissionGuard], data: { permission: 'inventario' },
     loadComponent: () =>
       import('./pages/inventario/inventario')
@@ -62,11 +91,35 @@ export const routes: Routes = [
   },
 
   {
-    path: 'ventas',
+    path: 'admin/ventas',
     canActivate: [permissionGuard], data: { permission: 'ventas' },
     loadComponent: () =>
       import('./pages/ventas/ventas')
         .then(m => m.Ventas)
+  },
+
+  {
+    path: 'admin/proveedores',
+    canActivate: [permissionGuard], data: { permission: 'proveedores' },
+    loadComponent: () => import('./pages/proveedores/proveedores').then(m => m.Proveedores),
+  },
+
+  {
+    path: 'admin/compras',
+    canActivate: [permissionGuard], data: { permission: 'compras' },
+    loadComponent: () => import('./pages/compras/compras').then(m => m.Compras),
+  },
+
+  {
+    path: 'admin/categorias',
+    canActivate: [permissionGuard], data: { permission: 'categorias' },
+    loadComponent: () => import('./pages/categorias/categorias').then(m => m.Categorias),
+  },
+
+  {
+    path: 'admin/usuarios',
+    canActivate: [permissionGuard], data: { permission: 'usuarios' },
+    loadComponent: () => import('./pages/usuarios/usuarios').then(m => m.Usuarios),
   }
 
 ];

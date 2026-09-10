@@ -1,0 +1,50 @@
+<div class="purchase-page">
+  <header class="purchase-navbar">
+    <a routerLink="/catalogo" class="logo">Liquor<span>Soft</span></a>
+    <nav>
+      <a routerLink="/catalogo">Catálogo</a>
+      <a routerLink="/carrito">Carrito</a>
+      <a routerLink="/pedidos" class="active">Pedidos</a>
+    </nav>
+    @if (auth.user(); as user) {
+      <span class="nav-action">{{ user.name }}</span>
+    }
+  </header>
+  <main class="checkout-main">
+    <div class="purchase-heading">
+      <span class="eyebrow">HISTORIAL</span>
+      <h1>Tus pedidos</h1>
+      <p>Consultas ligadas a tu sesión. Las compras de invitado no aparecen aquí.</p>
+    </div>
+    @if (loading) {
+      <section class="purchase-card">Cargando pedidos…</section>
+    }
+    @if (errorMessage) {
+      <section class="purchase-card checkout-error" role="alert">{{ errorMessage }}</section>
+    }
+    @if (!loading && !orders.length && !errorMessage) {
+      <section class="purchase-card empty-cart">
+        <h2>Aún no tienes pedidos</h2>
+        <p>Cuando registres una compra con tu cuenta, aparecerá en esta lista.</p>
+        <a routerLink="/catalogo" class="primary-action">Ir al catálogo</a>
+      </section>
+    }
+    <div class="orders-list">
+      @for (order of orders; track order.id) {
+        <article class="purchase-card">
+          <div class="order-head">
+            <h2>Pedido #{{ order.id }}</h2>
+            <strong>{{ formatPrice(order.total) }}</strong>
+          </div>
+          <p>{{ formatDate(order.createdAt) }} · {{ order.status }} · {{ order.paymentMethod || 'sin método' }}</p>
+          @for (item of order.items; track item.name) {
+            <div class="summary-product">
+              <span>{{ item.name }} <small>× {{ item.quantity }}</small></span>
+              <strong>{{ formatPrice(item.price * item.quantity) }}</strong>
+            </div>
+          }
+        </article>
+      }
+    </div>
+  </main>
+</div>

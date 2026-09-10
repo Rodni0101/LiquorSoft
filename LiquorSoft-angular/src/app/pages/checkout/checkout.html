@@ -1,0 +1,126 @@
+<div class="purchase-page">
+  <header class="purchase-navbar">
+    <a routerLink="/inicio" class="logo">Liquor<span>Soft</span></a>
+    <nav>
+      <a routerLink="/catalogo">Catálogo</a>
+      <a routerLink="/carrito">Carrito ({{ cart.count() }})</a>
+      <a routerLink="/checkout" class="active">Checkout</a>
+    </nav>
+  </header>
+  <main class="checkout-main">
+    <nav class="breadcrumbs" aria-label="Ruta de navegación"><a routerLink="/inicio">Inicio</a><span>/</span><a routerLink="/carrito">Carrito</a><span>/</span><strong>Checkout</strong></nav>
+    <div class="purchase-heading">
+      <span class="eyebrow">FINALIZAR COMPRA</span>
+      <h1>Completa tu pedido</h1>
+      <p>Revisa la información. El cobro con pasarela queda pendiente; el pedido sí se registra en inventario.</p>
+    </div>
+    <ol class="checkout-steps" aria-label="Progreso de compra"><li class="current"><span>1</span>Datos y pago</li><li><span>2</span>Confirmación</li><li><span>3</span>Pedido registrado</li></ol>
+    @if (!cart.items().length && status !== 'success') {
+      <section class="purchase-card empty-cart">
+        <h2>Tu carrito está vacío</h2>
+        <p>Agrega productos antes de continuar al checkout.</p>
+        <a routerLink="/catalogo" class="primary-action">Explorar catálogo</a>
+      </section>
+    }
+    @if (cart.items().length && status === 'ready') {
+      <div class="checkout-layout">
+        <div class="checkout-sections">
+          <section class="purchase-card">
+            <div class="section-title">
+              <span>01</span>
+              <div>
+                <h2>Información del cliente</h2>
+                <p>Tu pedido quedará asociado a la cuenta con la que iniciaste sesión.</p>
+              </div>
+            </div>
+            <div class="customer-data">
+              <div>
+                <small>Nombre</small>
+                <strong>{{ auth.user()?.name ?? 'Compra como invitado' }}</strong>
+              </div>
+              <div>
+                <small>Correo</small>
+                <strong>{{ auth.user()?.email ?? 'No registrado' }}</strong>
+              </div>
+            </div>
+          </section>
+          <section class="purchase-card">
+            <div class="section-title">
+              <span>02</span>
+              <div>
+                <h2>Notas del pedido</h2>
+                <p>Opcional: indicaciones de recogida o comentario para la tienda.</p>
+              </div>
+            </div>
+            <label class="checkout-field">
+              Notas
+              <textarea [(ngModel)]="notes" maxlength="500" rows="3" placeholder="Ej. Recojo en tienda a las 6 p. m."></textarea>
+            </label>
+          </section>
+          <section class="purchase-card">
+            <div class="section-title">
+              <span>03</span>
+              <div>
+                <h2>¿Cómo quieres pagar?</h2>
+                <p>Selecciona el método que se integrará con la pasarela oficial.</p>
+              </div>
+            </div>
+            <div class="payment-grid">
+              <button type="button" [class.selected]="method === 'nequi'" (click)="method = 'nequi'">
+                <strong>Nequi</strong><small>Pago móvil · Pendiente de configuración</small>
+              </button>
+              <button type="button" [class.selected]="method === 'paypal'" (click)="method = 'paypal'">
+                <strong>PayPal</strong><small>Pago internacional · Pendiente de configuración</small>
+              </button>
+            </div>
+            <p class="pending-copy">{{ payment.getPendingMessage(method) }}</p>
+          </section>
+          @if (stockError) {
+            <p class="checkout-error" role="alert">{{ stockError }}</p>
+          }
+        </div>
+        <aside class="purchase-card order-summary">
+          <span class="eyebrow">RESUMEN DEL PEDIDO</span>
+          <h2>Tu selección</h2>
+          @for (item of cart.items(); track item.id || item.name) {
+            <div class="summary-product">
+              <span>{{ item.icon }} {{ item.name }} <small>× {{ item.quantity }}</small></span>
+              <strong>{{ formatPrice(item.price * item.quantity) }}</strong>
+            </div>
+          }
+          <div class="summary-line"><span>Subtotal</span><strong>{{ formatPrice(cart.total()) }}</strong></div>
+          <div class="summary-total"><span>Total</span><strong>{{ formatPrice(cart.total()) }}</strong></div>
+          <button type="button" class="primary-action" [disabled]="!!stockError" (click)="preparePayment()">
+            Preparar método de pago
+          </button>
+          <a routerLink="/carrito" class="secondary-action">Volver al carrito</a>
+        </aside>
+      </div>
+    } @else if (status === 'pending') {
+      <section class="purchase-card state-card">
+        <span class="state-icon">i</span>
+        <h2>Pago pendiente de pasarela</h2>
+        <p>{{ message }}</p>
+        <button type="button" class="primary-action" [disabled]="purchaseSubmitting" (click)="registerPurchase()">
+          {{ purchaseSubmitting ? 'Registrando pedido…' : 'Registrar pedido y descontar stock' }}
+        </button>
+        <small>Esta acción reserva inventario. No confirma un cobro externo.</small>
+      </section>
+    } @else if (status === 'success') {
+      <section class="purchase-card state-card">
+        <span class="state-icon success">✓</span>
+        <h2>Pedido registrado</h2>
+        <p>{{ message }}</p>
+        <a routerLink="/pedidos" class="primary-action">Ver mis pedidos</a>
+        <a routerLink="/catalogo" class="secondary-action">Volver al catálogo</a>
+      </section>
+    } @else if (status === 'error') {
+      <section class="purchase-card state-card">
+        <span class="state-icon error">!</span>
+        <h2>No se registró el pedido</h2>
+        <p>{{ message }}</p>
+        <button type="button" class="primary-action" (click)="status = 'ready'; validateStock()">Revisar pedido</button>
+      </section>
+    }
+  </main>
+</div>

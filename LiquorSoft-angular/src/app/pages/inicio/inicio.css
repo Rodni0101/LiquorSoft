@@ -2,7 +2,7 @@
 
 .reveal{opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .55s ease}.reveal.reveal-visible{opacity:1;transform:none}
 
-.home-page{min-height:100vh;overflow:hidden;background:linear-gradient(rgba(8,4,6,.60),rgba(8,4,6,.77)),url('./liquor-bg.png') center 10% / cover fixed no-repeat;}
+.home-page{min-height:100vh;overflow:hidden;background:linear-gradient(rgba(8,4,6,.88),rgba(8,4,6,.77)),url('./liquor-bg.png') center 10% / cover fixed no-repeat;}
 
 .skip-link{position:absolute;left:1rem;top:-4rem;z-index:10;padding:.7rem 1rem;color:#fff;background:var(--wine);border-radius:6px}.skip-link:focus{top:1rem}
 

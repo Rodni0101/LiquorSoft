@@ -17,6 +17,7 @@ export class Register {
   protected readonly registerForm = this.formBuilder.nonNullable.group({
     nombre: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
     apellido: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
+    telefono: ['', Validators.maxLength(30)],
     correo: ['', [Validators.required, Validators.email, Validators.maxLength(150)]],
     password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(72)]],
     confirmPassword: ['', Validators.required],
@@ -45,18 +46,19 @@ export class Register {
     }
 
     this.submitting = true;
-    const { nombre, apellido, correo, password } = this.registerForm.getRawValue();
+    const { nombre, apellido, telefono, correo, password } = this.registerForm.getRawValue();
 
     this.http.post<{ message?: string }>('/api/auth/Registro/Register.php', {
       nombre,
       apellido,
+      telefono,
       correo,
       password,
     }).subscribe({
       next: (response) => {
         this.submitting = false;
         this.successMessage = response.message ?? 'Cuenta creada correctamente.';
-        this.registerForm.reset({ nombre: '', apellido: '', correo: '', password: '', confirmPassword: '', terms: false });
+        this.registerForm.reset({ nombre: '', apellido: '', telefono: '', correo: '', password: '', confirmPassword: '', terms: false });
         setTimeout(() => this.router.navigate(['/inicio']), 1200);
       },
       error: (error) => {
@@ -66,7 +68,7 @@ export class Register {
     });
   }
 
-  protected fieldInvalid(field: 'nombre' | 'apellido' | 'correo' | 'password' | 'confirmPassword' | 'terms'): boolean {
+  protected fieldInvalid(field: 'nombre' | 'apellido' | 'telefono' | 'correo' | 'password' | 'confirmPassword' | 'terms'): boolean {
     const control = this.registerForm.controls[field];
     return control.invalid && (control.dirty || control.touched);
   }

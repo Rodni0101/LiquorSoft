@@ -1,4 +1,8 @@
-# LiquorSoftAngular
+# LiquorSoft
+
+Tienda online de licores con panel administrativo, construida con Angular, PHP
+y MySQL. La aplicación contempla los roles `Cliente` y `Administrador`; las
+rutas y endpoints privados validan la sesión PHP y el rol correspondiente.
 
 ## Catálogo público
 
@@ -11,7 +15,8 @@ sesión. Incluye:
 - Filtro rápido por categoría.
 - Tarjetas responsive con precio, descripción y productos destacados.
 
-La vista administrativa/presentación original continúa disponible en `/inicio`.
+La portada continúa disponible en `/inicio`, la tienda en `/productos` y el
+flujo administrativo protegido en `/admin/dashboard`.
 
 ## Dashboard y datos
 
@@ -21,9 +26,10 @@ inventario, alertas de stock bajo y ventas del día. El catálogo consume
 `backend/api/products.php`, por lo que los productos sembrados en la base de
 datos se reflejan automáticamente en la vista pública.
 
-El archivo `backend/database/schema.sql` crea las tablas `productos` y `ventas`
-e inserta una selección inicial de ocho productos. Ejecútalo una vez sobre
-MySQL antes de iniciar el backend PHP:
+El archivo `backend/database/schema.sql` crea el esquema relacional completo
+(usuarios, categorías, proveedores, clientes, productos, lotes, pedidos,
+compras, ventas, movimientos y configuración) e inserta datos de prueba.
+Ejecútalo sobre una instalación limpia antes de iniciar el backend PHP:
 
 ```bash
 mysql -u root -p < backend/database/schema.sql
@@ -58,10 +64,14 @@ To start a local development server, run:
 ng serve
 ```
 
-Para habilitar el registro durante el desarrollo, ejecuta el backend PHP desde
-la raíz del repositorio (`php -S localhost:8000 -t backend`) y crea la base de
-datos con `backend/database/schema.sql`. El proxy de Angular reenvía `/api` al
+El registro público crea cuentas de cliente. Las cuentas administrativas se
+gestionan desde el panel protegido. El proxy de Angular reenvía `/api` al
 backend, por lo que no es necesario habilitar CORS localmente.
+
+Para alinear una base existente, ejecuta las migraciones en orden, terminando
+con `006_admin_only_operational_schema.sql`, `007_customer_role.sql` y
+`008_orders_purchases_lots.sql`. El esquema completo está pensado para una
+instalación limpia; las migraciones permiten conservar datos existentes.
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 

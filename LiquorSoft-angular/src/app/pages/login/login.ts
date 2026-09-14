@@ -34,7 +34,7 @@ export class Login {
     this.submitting = true;
     const { correo, password, remember } = this.loginForm.getRawValue();
     this.http.post('/api/auth/Login.php', { correo, password, remember }, { withCredentials: true }).subscribe({
-      next: () => { this.submitting = false; this.auth.refresh().subscribe(() => this.router.navigate(['/inicio'])); },
+      next: () => { this.submitting = false; this.auth.refresh().subscribe(() => this.router.navigate([this.auth.isAdmin() ? '/admin/dashboard' : '/inicio'])); },
       error: (error) => {
         this.submitting = false;
         this.errorMessage = error.error?.message ?? 'No fue posible iniciar sesión.';

@@ -13,15 +13,10 @@ export class AuthService {
   constructor() { this.refresh().subscribe(); }
   can(permission: string): boolean {
     const role = this.user()?.role.toLowerCase();
-    const permissions: Record<string, string[]> = {
-      administrador: ['dashboard', 'productos', 'inventario', 'ventas', 'usuarios'],
-      supervisor: ['productos', 'inventario', 'ventas'],
-      vendedor: ['ventas'],
-      bodega: ['inventario'],
-    };
-    return !!role && (permissions[role] ?? []).includes(permission);
+    return role === 'administrador' && ['dashboard', 'productos', 'categorias', 'inventario', 'ventas', 'proveedores', 'compras', 'usuarios'].includes(permission);
   }
   isAdmin(): boolean { return this.user()?.role.trim().toLowerCase() === 'administrador'; }
+  isClient(): boolean { return this.user()?.role.trim().toLowerCase() === 'cliente'; }
   refresh(): Observable<CurrentUser | null> {
     if (this.refreshRequest) return this.refreshRequest;
     this.refreshRequest = this.http.get<{ user: CurrentUser }>('/api/auth/me.php', { withCredentials: true }).pipe(

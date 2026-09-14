@@ -45,7 +45,7 @@ function jsonResponse(int $status, array $payload): never
 
 function requireAuthenticatedUser(): void
 {
-    session_start();
+    liquorsoftSessionStart();
     if (!isset($_SESSION['user_id'])) {
         jsonResponse(401, ['message' => 'Debes iniciar sesión para acceder.']);
     }
@@ -53,7 +53,7 @@ function requireAuthenticatedUser(): void
 
 function currentUser(mysqli $connection): ?array
 {
-    session_start();
+    liquorsoftSessionStart();
     if (!isset($_SESSION['user_id'])) {
         return null;
     }
@@ -75,6 +75,43 @@ function currentUser(mysqli $connection): ?array
         $_SESSION['user_role'] = $user['rol'] ?? '';
     }
     return $user;
+}
+
+function liquorsoftSessionStart(): void
+{
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        session_start([
+            'cookie_httponly' => true,
+            'cookie_samesite' => 'Lax',
+        ]);
+    }
+}
+
+function tableHasColumn(mysqli $connection, string $table, string $column): bool
+{
+    $statement = $connection->prepare(
+        'SELECT COUNT(*) AS total FROM INFORMATION_SCHEMA.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?'
+    );
+    if (!$statement) {
+        return false;
+    }
+    $statement->bind_param('ss', $table, $column);
+    $statement->execute();
+    $exists = ((int) ($statement->get_result()->fetch_assoc()['total'] ?? 0)) > 0;
+    $statement->close();
+    return $exists;
+}
+
+function productIcon(string $category): string
+{
+    return match (mb_strtolower(trim($category))) {
+        'vino', 'vinos' => '🍷',
+        'cerveza', 'cervezas' => '🍺',
+        'mixer', 'mixers' => '🫧',
+        'gin', 'ginebra' => '🍸',
+        default => '🥃',
+    };
 }
 
 function requireRole(mysqli $connection, array $allowedRoles): array

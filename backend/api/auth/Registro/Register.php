@@ -22,6 +22,7 @@ if (!is_array($body)) {
 
 $nombre = trim((string) ($body['nombre'] ?? ''));
 $apellido = trim((string) ($body['apellido'] ?? ''));
+$telefono = trim((string) ($body['telefono'] ?? ''));
 $correo = strtolower(trim((string) ($body['correo'] ?? '')));
 $password = (string) ($body['password'] ?? '');
 
@@ -30,6 +31,9 @@ if (mb_strlen($nombre) < 2 || mb_strlen($nombre) > 100) {
 }
 if (mb_strlen($apellido) < 2 || mb_strlen($apellido) > 100) {
     respond(422, ['message' => 'El apellido debe tener entre 2 y 100 caracteres.']);
+}
+if (mb_strlen($telefono) > 30) {
+    respond(422, ['message' => 'El teléfono no puede superar 30 caracteres.']);
 }
 if (!filter_var($correo, FILTER_VALIDATE_EMAIL) || mb_strlen($correo) > 150) {
     respond(422, ['message' => 'El correo electrónico no es válido.']);
@@ -51,9 +55,8 @@ if ($connection->connect_errno) {
     respond(503, ['message' => 'El servicio no está disponible en este momento.']);
 }
 $connection->set_charset('utf8mb4');
-
 $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-$roleResult = $connection->query("SELECT id FROM roles WHERE LOWER(TRIM(nombre)) <> 'administrador' ORDER BY id ASC LIMIT 1");
+$roleResult = $connection->query("SELECT id FROM roles WHERE LOWER(TRIM(nombre)) = 'cliente' LIMIT 1");
 if (!$roleResult || !$roleResult->num_rows) {
     error_log('LiquorSoft register failed: no existe un rol disponible en la tabla roles.');
     $connection->close();
@@ -64,9 +67,9 @@ $usernameBase = strtolower((string) strstr($correo, '@', true));
 $usernameBase = preg_replace('/[^a-z0-9._-]/', '', $usernameBase) ?: 'usuario';
 $usuario = substr($usernameBase, 0, 40) . '_' . bin2hex(random_bytes(4));
 
-$statement = $connection->prepare(
+    $statement = $connection->prepare(
     'INSERT INTO usuarios
-      (rol_id, nombre, apellido, correo, password_hash, usuario, password, estado)
+      (rol_id, nombre, apellido, telefono, correo, password_hash, usuario, estado)
      VALUES (?, ?, ?, ?, ?, ?, ?, 1)'
 );
 if (!$statement) {
@@ -75,7 +78,7 @@ if (!$statement) {
     respond(500, ['message' => 'No fue posible procesar el registro.']);
 }
 
-$statement->bind_param('issssss', $rolId, $nombre, $apellido, $correo, $passwordHash, $usuario, $passwordHash);
+    $statement->bind_param('issssss', $rolId, $nombre, $apellido, $telefono, $correo, $passwordHash, $usuario);
 if (!$statement->execute()) {
     error_log('LiquorSoft register execute failed: ' . $statement->error);
     $duplicate = $statement->errno === 1062;

@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         'SELECT u.id, u.nombre, u.apellido, u.correo, u.estado, r.id AS rol_id, r.nombre AS rol
          FROM usuarios u LEFT JOIN roles r ON r.id = u.rol_id ORDER BY u.nombre, u.apellido'
     );
-    $rolesResult = $connection->query('SELECT id, nombre FROM roles ORDER BY id');
+    $rolesResult = $connection->query("SELECT id, nombre FROM roles WHERE id IN (1, 2) ORDER BY id");
     if (!$usersResult || !$rolesResult) {
         $connection->close();
         jsonResponse(500, ['message' => 'No fue posible cargar los usuarios.']);
@@ -51,7 +51,7 @@ if ($userId === (int) $admin['id']) {
     jsonResponse(422, ['message' => 'No puedes cambiar el rol de tu propia cuenta.']);
 }
 
-$roleStatement = $connection->prepare('SELECT id, nombre FROM roles WHERE id = ? LIMIT 1');
+$roleStatement = $connection->prepare('SELECT id, nombre FROM roles WHERE id IN (1, 2) AND id = ? LIMIT 1');
 $roleStatement->bind_param('i', $roleId);
 $roleStatement->execute();
 $role = $roleStatement->get_result()->fetch_assoc();

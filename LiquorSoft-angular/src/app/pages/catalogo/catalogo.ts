@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../auth.service';
 import { CartService } from '../../cart.service';
+import { ThemeToggle } from '../../theme-toggle';
 
 interface CatalogProduct {
   id?: number;
@@ -18,7 +19,7 @@ interface CatalogProduct {
 @Component({
   selector: 'app-catalogo',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, ThemeToggle],
   templateUrl: './catalogo.html',
   styleUrl: './catalogo.css',
 })

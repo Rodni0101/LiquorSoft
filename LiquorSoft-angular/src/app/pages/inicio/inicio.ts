@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../auth.service';
 import { RevealDirective } from '../../reveal.directive';
+import { ThemeToggle } from '../../theme-toggle';
 
 interface PublicSummary {
   products: number;
@@ -23,7 +24,7 @@ interface PublicProduct {
 @Component({
   selector: 'app-inicio',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, RevealDirective],
+  imports: [RouterLink, RouterLinkActive, RevealDirective, ThemeToggle],
   templateUrl: './inicio.html',
   styleUrl: './inicio.css'
 })

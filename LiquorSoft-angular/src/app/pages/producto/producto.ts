@@ -2,10 +2,11 @@ import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CartService } from '../../cart.service';
+import { ThemeToggle } from '../../theme-toggle';
 
 interface Product { id: number; name: string; category: string; description: string; price: number; stock: number; icon: string; }
 
-@Component({ selector: 'app-producto', standalone: true, imports: [RouterLink], templateUrl: './producto.html', styleUrl: './producto.css' })
+@Component({ selector: 'app-producto', standalone: true, imports: [RouterLink, ThemeToggle], templateUrl: './producto.html', styleUrl: './producto.css' })
 export class Producto implements OnInit {
   private readonly http = inject(HttpClient);
   private readonly route = inject(ActivatedRoute);

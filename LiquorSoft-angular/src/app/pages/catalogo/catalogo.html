@@ -13,7 +13,7 @@
       } @else {
         @if (auth.isClient()) { <a routerLink="/pedidos" class="login-link">Mis pedidos</a><a routerLink="/carrito" class="register-link">Carrito</a> }
         <button type="button" class="register-link" (click)="auth.logout()">Cerrar sesión</button>
-      }
+      }<app-theme-toggle></app-theme-toggle>
     </div>
   </header>
 

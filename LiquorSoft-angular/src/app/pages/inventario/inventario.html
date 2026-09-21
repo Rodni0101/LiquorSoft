@@ -1,5 +1,5 @@
 <app-admin-shell>
-  <section class="inventory-page">
+  <section class="admin-page inventory-page">
     <header class="page-heading"><div><span class="eyebrow">CONTROL OPERATIVO</span><h1>Inventario</h1><p>Gestiona existencias y conserva el historial de cada movimiento.</p></div><button type="button" class="refresh-button" (click)="load()" [disabled]="loading">↻ Actualizar</button></header>
     @if (errorMessage) { <p class="notice error" role="alert">{{ errorMessage }}</p> }
     @if (successMessage) { <p class="notice success" role="status">{{ successMessage }}</p> }

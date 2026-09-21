@@ -336,6 +336,7 @@
 }
 
 .footer {
+  
   display: flex;
   flex-wrap: wrap;
   gap: 1rem 2rem;
@@ -501,7 +502,7 @@
 }
 
 :host-context([data-theme='light']) .footer {
-  border-color: #e6cbd3
+  border-color: #cbe6d2
 }
 
 .products-live {
@@ -894,6 +895,12 @@
 :host-context([data-theme='light']) .btn-login {
   color: #5c4350
 }
+
+:host-context([data-theme='light']) .footer {
+  border-color: #e6cbd3;
+  background: rgba(247, 255, 247, 0.877);
+}
+
 
 @media(max-width:800px) {
   .navbar {

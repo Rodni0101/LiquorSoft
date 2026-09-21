@@ -2,7 +2,7 @@
   display: block;
   --muted: #b9a5aa;
   --wine: #6d0f1a;
-  --wine-light: #d96a87;
+  --wine-light: #521616;
   color: #f8f4f5;
 }
 
@@ -89,7 +89,7 @@
 
 .register-link:hover {
   transform: translateY(-2px);
-  background: #851426;
+  background: #3a040d;
 }
 
 .catalog-page main {
@@ -587,12 +587,12 @@
 }
 
 :host-context([data-theme='light']) .catalog-page {
-  color: #241018;
+  color: #000000;
   background: linear-gradient(rgba(255, 247, 249, .82), rgba(255, 247, 249, .9)), url('../inicio/liquor-bg.png') center / cover fixed no-repeat;
 }
 
 :host-context([data-theme='light']) .catalog-navbar {
-  background: rgba(255, 247, 249, .92);
+  background: rgba(247, 255, 247, 0.877);
   border-color: #e6cbd3;
 }
 
@@ -612,13 +612,13 @@
 :host-context([data-theme='light']) .product-content p,
 :host-context([data-theme='light']) .catalog-footer,
 :host-context([data-theme='light']) .search-box {
-  color: #66545a;
+  color: #0c0c0c;
 }
 
 :host-context([data-theme='light']) .catalog-navbar nav a:hover,
 :host-context([data-theme='light']) .catalog-navbar nav a.active,
 :host-context([data-theme='light']) .login-link:hover {
-  color: #241018;
+  color: #520313;
 }
 
 :host-context([data-theme='light']) .hero-badge,
@@ -646,4 +646,5 @@
 
 :host-context([data-theme='light']) .catalog-footer {
   border-color: #e6cbd3;
+  background: rgba(247, 255, 247, 0.877);
 }

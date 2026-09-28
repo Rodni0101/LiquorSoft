@@ -503,6 +503,22 @@
   font-size: 1.2rem;
 }
 
+.catalog-notice { padding: .8rem 1rem; border: 1px solid rgba(231, 181, 106, .22); border-radius: 10px; background: rgba(231, 181, 106, .06); }
+.success-notice { border-color: rgba(115, 214, 154, .3); background: rgba(115, 214, 154, .08); }
+.product-footer button { padding: .55rem .75rem; border: 1px solid rgba(231, 181, 106, .3); border-radius: 8px; background: rgba(231, 181, 106, .06); }
+.product-footer button:hover:not(:disabled) { border-color: #e7b56a; background: rgba(231, 181, 106, .14); }
+.product-card:focus-within { border-color: #e7b56a; box-shadow: 0 15px 34px rgba(0, 0, 0, .22); }
+
+:host-context([data-theme='light']) .catalog-page { color: #2a1a1d; background: linear-gradient(rgba(255, 247, 249, .88), rgba(255, 247, 249, .94)), url('../inicio/liquor-bg.png') center / cover fixed no-repeat; }
+:host-context([data-theme='light']) .catalog-navbar { background: rgba(255, 250, 251, .9); border-color: #ead5dc; }
+:host-context([data-theme='light']) .catalog-navbar nav a, :host-context([data-theme='light']) .login-link, :host-context([data-theme='light']) .result-count { color: #6e5d62; }
+:host-context([data-theme='light']) .catalog-navbar nav a:hover, :host-context([data-theme='light']) .catalog-navbar nav a.active, :host-context([data-theme='light']) .login-link:hover { color: #2a1a1d; }
+:host-context([data-theme='light']) .catalog-hero p, :host-context([data-theme='light']) .product-content p { color: #6e5d62; }
+:host-context([data-theme='light']) .product-card, :host-context([data-theme='light']) .cart-panel, :host-context([data-theme='light']) .search-box { border-color: #e6d9d4; background: rgba(255, 255, 255, .86); }
+:host-context([data-theme='light']) .product-image { background: radial-gradient(circle, rgba(139, 45, 66, .14), transparent 60%), #faf6f2; }
+:host-context([data-theme='light']) .product-content h3 a, :host-context([data-theme='light']) .catalog-footer .logo { color: #2a1a1d; }
+:host-context([data-theme='light']) .catalog-footer { border-color: #e6d9d4; background: rgba(255,255,255,.7); }
+
 @media (max-width: 850px) {
   .catalog-navbar nav {
     display: none;

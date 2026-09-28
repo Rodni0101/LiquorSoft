@@ -4,21 +4,31 @@
     <a routerLink="/inicio" class="logo" aria-label="LiquorSoft, inicio"><span class="logo-mark"
         aria-hidden="true">LS</span><span class="logo-word">Liquor<span>Soft</span></span></a>
     <button class="menu-toggle" type="button" aria-controls="main-navigation" [attr.aria-expanded]="menuOpen"
-      (click)="menuOpen = !menuOpen"><span aria-hidden="true">{{ menuOpen ? '×' : '☰' }}</span><span class="sr-only">{{
+      (click)="menuOpen = !menuOpen" (keydown.escape)="closeMenu()"><span aria-hidden="true">{{ menuOpen ? '×' : '☰' }}</span><span class="sr-only">{{
         menuOpen ? 'Cerrar menú' : 'Abrir menú' }}</span></button>
     <nav id="main-navigation" class="nav-links" [class.open]="menuOpen" aria-label="Navegación principal">
-      <a routerLink="/inicio" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
-        (click)="menuOpen = false">Inicio</a>
-      <a routerLink="/inicio" fragment="productos" (click)="menuOpen = false">Productos</a>
-      <a routerLink="/inicio" fragment="contacto" (click)="menuOpen = false">Contacto</a>
+      <a routerLink="/inicio" fragment="inicio" [class.active]="activeSection === 'inicio'"
+        [attr.aria-current]="activeSection === 'inicio' ? 'page' : null" (click)="selectSection('inicio')">Inicio</a>
+      <a routerLink="/inicio" fragment="productos" [class.active]="activeSection === 'productos'"
+        [attr.aria-current]="activeSection === 'productos' ? 'location' : null" (click)="selectSection('productos')">Productos</a>
+      <a routerLink="/inicio" fragment="contacto" [class.active]="activeSection === 'contacto'"
+        [attr.aria-current]="activeSection === 'contacto' ? 'location' : null" (click)="selectSection('contacto')">Contacto</a>
     </nav>
-    <div class="nav-buttons">@if (!auth.user()) { <a routerLink="/login" class="btn btn-login">Iniciar sesión</a><a
-        routerLink="/register" class="btn btn-register">Crear cuenta <span aria-hidden="true">↗</span></a> } @else if
-      (auth.isClient()) { <a routerLink="/pedidos" class="btn btn-login">Mis pedidos</a><a routerLink="/carrito"
-        class="btn btn-register">Carrito <span aria-hidden="true">↗</span></a><button type="button"
-        class="btn btn-outline" (click)="auth.logout()">Cerrar sesión</button> } @else { <span class="logged-admin"><i
-          aria-hidden="true"></i>{{ auth.user()?.name }}</span><button type="button" class="btn btn-outline"
-        (click)="auth.logout()">Cerrar sesión</button> }<app-theme-toggle></app-theme-toggle></div>
+    <div class="nav-buttons">
+      @if (!auth.user()) {
+        <a routerLink="/login" class="btn btn-login">Iniciar sesión</a>
+        <a routerLink="/register" class="btn btn-register">Crear cuenta <span aria-hidden="true">↗</span></a>
+      } @else if (auth.isClient()) {
+        <a routerLink="/pedidos" class="btn btn-login">Mis pedidos</a>
+        <a routerLink="/carrito" class="btn btn-register">Carrito <span aria-hidden="true">↗</span></a>
+        <button type="button" class="btn btn-outline" (click)="auth.logout()">Cerrar sesión</button>
+      } @else {
+        <a routerLink="/admin/dashboard" class="btn btn-login">Panel administrativo</a>
+        <span class="logged-admin"><i aria-hidden="true"></i>{{ auth.user()?.name }}</span>
+        <button type="button" class="btn btn-outline" (click)="auth.logout()">Cerrar sesión</button>
+      }
+      <app-theme-toggle></app-theme-toggle>
+    </div>
   </header>
   <main id="contenido" tabindex="-1">
     <section class="hero" id="inicio" aria-labelledby="hero-title" appReveal>
@@ -61,18 +71,18 @@
       <div class="features-grid">
         <article class="feature-card"><span class="feature-icon" aria-hidden="true">◈</span>
           <h3>Catálogo que vende</h3>
-          <p>Presenta tus productos con una navegación rápida, clara y pensada para comprar.</p><span
-            class="feature-link">Ver catálogo <span aria-hidden="true">→</span></span>
+          <p>Presenta tus productos con una navegación rápida, clara y pensada para comprar.</p><a
+            routerLink="/productos" class="feature-link">Ver catálogo <span aria-hidden="true">→</span></a>
         </article>
         <article class="feature-card"><span class="feature-icon" aria-hidden="true">⌁</span>
           <h3>Inventario en vivo</h3>
-          <p>Consulta existencias y disponibilidad desde un solo lugar, sin hojas de cálculo.</p><span
-            class="feature-link">Datos actualizados <span aria-hidden="true">↗</span></span>
+          <p>Consulta existencias y disponibilidad desde un solo lugar, sin hojas de cálculo.</p><a
+            routerLink="/productos" class="feature-link">Ver productos <span aria-hidden="true">↗</span></a>
         </article>
         <article class="feature-card"><span class="feature-icon" aria-hidden="true">✦</span>
           <h3>Decisiones con contexto</h3>
-          <p>Visualiza las señales importantes para actuar con confianza en cada venta.</p><span
-            class="feature-link">Más claridad <span aria-hidden="true">→</span></span>
+          <p>Visualiza las señales importantes para actuar con confianza en cada venta.</p><a
+            routerLink="/login" class="feature-link">Entrar al sistema <span aria-hidden="true">→</span></a>
         </article>
       </div>
     </section>

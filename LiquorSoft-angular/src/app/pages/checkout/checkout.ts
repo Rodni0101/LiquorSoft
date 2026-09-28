@@ -7,6 +7,7 @@ import { AuthService } from '../../auth.service';
 import { PaymentMethod, PaymentService, PaymentStatus } from '../../payment.service';
 import { PurchaseService } from '../../purchase.service';
 import { formatCop } from '../../money';
+import { ThemeToggle } from '../../theme-toggle';
 
 interface CheckoutProduct {
   id?: number;
@@ -16,7 +17,7 @@ interface CheckoutProduct {
 @Component({
   selector: 'app-checkout',
   standalone: true,
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, ThemeToggle],
   templateUrl: './checkout.html',
   styleUrl: './checkout.css',
 })

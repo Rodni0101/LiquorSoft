@@ -6,9 +6,7 @@
       <a routerLink="/carrito">Carrito</a>
       <a routerLink="/pedidos" class="active">Pedidos</a>
     </nav>
-    @if (auth.user(); as user) {
-      <span class="nav-action">{{ user.name }}</span>
-    }
+    @if (auth.user(); as user) { <span class="nav-action">{{ user.name }}</span> }<app-theme-toggle></app-theme-toggle>
   </header>
   <main class="checkout-main">
     <div class="purchase-heading">

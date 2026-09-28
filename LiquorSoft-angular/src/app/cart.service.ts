@@ -13,19 +13,20 @@ export interface CartItem {
 export class CartService {
   readonly items = signal<CartItem[]>(this.read());
   readonly count = () => this.items().reduce((total, item) => total + item.quantity, 0);
-  add(product: Omit<CartItem, 'quantity'>): void {
+  add(product: Omit<CartItem, 'quantity'>): boolean {
     const items = [...this.items()];
     const current = items.find(item => (item.id ?? item.name) === (product.id ?? product.name));
     if (current) {
       const availableStock = product.stock ?? current.stock;
-      if (availableStock !== undefined && current.quantity >= availableStock) return;
+      if (availableStock !== undefined && current.quantity >= availableStock) return false;
       current.quantity += 1;
       if (product.stock !== undefined) current.stock = product.stock;
     } else {
-      if (product.stock !== undefined && product.stock < 1) return;
+      if (product.stock !== undefined && product.stock < 1) return false;
       items.push({ ...product, quantity: 1 });
     }
     this.items.set(items); localStorage.setItem('liquorsoft-cart', JSON.stringify(items));
+    return true;
   }
   remove(product: CartItem): void { this.persist(this.items().filter(item => (item.id ?? item.name) !== (product.id ?? product.name))); }
   clear(): void { this.persist([]); }

@@ -28,8 +28,13 @@ export class Producto implements OnInit {
 
   protected addToCart(): void {
     if (!this.product) return;
-    this.cart.add({ id: this.product.id, name: this.product.name, price: this.product.price, icon: this.product.icon, stock: this.product.stock });
-    this.cartMessage = `${this.product.name} está en tu carrito.`;
+    let added = 0;
+    for (let index = 0; index < this.quantity; index += 1) {
+      if (this.cart.add({ id: this.product.id, name: this.product.name, price: this.product.price, icon: this.product.icon, stock: this.product.stock })) added += 1;
+    }
+    this.cartMessage = added
+      ? `${added} ${added === 1 ? 'unidad añadida' : 'unidades añadidas'} de ${this.product.name}.`
+      : `${this.product.name} ya alcanzó el stock disponible.`;
     window.setTimeout(() => this.cartMessage = '', 3000);
   }
   protected increase(): void { if (this.product) this.quantity = Math.min(this.quantity + 1, this.product.stock); }

@@ -391,3 +391,80 @@ select {
     width: 100%;
   }
 }
+
+/* Sistema visual compartido: superficies, controles y estados interactivos. */
+button,
+a,
+input,
+select,
+textarea { transition: border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast); }
+
+button:not(:disabled),
+a { cursor: pointer; }
+
+.panel,
+.metric-card { overflow: hidden; }
+
+.panel-heading h2 { color: var(--color-text); }
+.panel form input:focus,
+.panel form select:focus,
+.panel form textarea:focus,
+.admin-form input:focus,
+.admin-form select:focus,
+.admin-form textarea:focus { border-color: var(--color-primary); outline: 0; box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 16%, transparent); }
+
+.admin-page > .panel,
+.admin-page > .metrics-grid,
+.admin-page > .content-grid,
+.admin-page > .inventory-layout,
+.admin-page > .providers-grid,
+.admin-page > .purchases-grid,
+.admin-page > .category-layout { animation: admin-enter .35s ease both; }
+
+@keyframes admin-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.purchase-nav-actions { display: flex; align-items: center; gap: .75rem; margin-left: auto; }
+
+:root[data-theme='light'] .purchase-page {
+  color: var(--page-text);
+  background: radial-gradient(circle at 85% 0, rgba(139, 45, 66, .12), transparent 34rem), var(--page-bg);
+}
+:root[data-theme='light'] .purchase-navbar { background: rgba(255, 250, 251, .9); border-color: var(--page-border); }
+:root[data-theme='light'] .purchase-card { border-color: var(--page-border); background: var(--page-surface); box-shadow: var(--shadow-sm); }
+:root[data-theme='light'] .purchase-navbar nav a,
+:root[data-theme='light'] .nav-action,
+:root[data-theme='light'] .purchase-heading p,
+:root[data-theme='light'] .item-details small,
+:root[data-theme='light'] .card-title span,
+:root[data-theme='light'] .empty-cart p { color: var(--page-muted); }
+
+:root[data-theme='light'] .product-page,
+:root[data-theme='light'] .auth-container,
+:root[data-theme='light'] .login-page { color: var(--page-text); background: var(--page-bg); }
+:root[data-theme='light'] .product-navbar,
+:root[data-theme='light'] .login-card,
+:root[data-theme='light'] .auth-card { border-color: var(--page-border); background: rgba(255, 255, 255, .9); box-shadow: var(--shadow-md); }
+:root[data-theme='light'] .product-navbar a,
+:root[data-theme='light'] .product-info p,
+:root[data-theme='light'] .back-link,
+:root[data-theme='light'] .auth-header p,
+:root[data-theme='light'] .login-header p,
+:root[data-theme='light'] .form-options,
+:root[data-theme='light'] .register-link,
+:root[data-theme='light'] .back-home { color: var(--page-muted); }
+:root[data-theme='light'] .product-visual,
+:root[data-theme='light'] .related a,
+:root[data-theme='light'] .form-group input,
+:root[data-theme='light'] .google-button { border-color: var(--page-border); background: var(--page-surface-2); color: var(--page-text); }
+:root[data-theme='light'] .product-visual { box-shadow: var(--shadow-sm); }
+
+@media (max-width: 560px) {
+  .purchase-nav-actions { width: 100%; justify-content: space-between; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+}

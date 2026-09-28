@@ -2,7 +2,7 @@
   <header class="purchase-navbar">
     <a routerLink="/inicio" class="logo">Liquor<span>Soft</span></a>
     <nav><a routerLink="/inicio">Inicio</a><a routerLink="/catalogo">Catálogo</a><a routerLink="/carrito" class="active">Carrito ({{ cart.count() }})</a></nav>
-    <a routerLink="/catalogo" class="nav-action">Seguir comprando</a>
+    <div class="purchase-nav-actions"><a routerLink="/catalogo" class="nav-action">Seguir comprando</a><app-theme-toggle></app-theme-toggle></div>
   </header>
   <main class="purchase-main">
     <nav class="breadcrumbs" aria-label="Ruta de navegación"><a routerLink="/inicio">Inicio</a><span>/</span><strong>Carrito</strong></nav>

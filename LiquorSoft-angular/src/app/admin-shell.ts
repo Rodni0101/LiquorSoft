@@ -9,7 +9,7 @@ import { ThemeToggle } from './theme-toggle';
   imports: [RouterLink, RouterLinkActive, ThemeToggle],
   template: `
     <div class="admin-shell">
-      <aside class="sidebar">
+      <aside class="sidebar" aria-label="Navegación administrativa">
         <a routerLink="/inicio" class="brand">Liquor<span>Soft</span></a>
         <div class="admin-identity">
           <span class="status-dot" aria-hidden="true"></span>
@@ -21,14 +21,14 @@ import { ThemeToggle } from './theme-toggle';
 
         @if (auth.can('dashboard')) {
           <p class="side-label">Principal</p>
-          <nav>
+          <nav aria-label="Principal">
             <a routerLink="/admin/dashboard" routerLinkActive="active"><span>▦</span><span>Dashboard</span></a>
           </nav>
         }
 
         @if (auth.can('productos') || auth.can('categorias') || auth.can('inventario')) {
           <p class="side-label">Inventario</p>
-          <nav>
+          <nav aria-label="Inventario">
             @if (auth.can('productos')) {
               <a routerLink="/admin/productos" routerLinkActive="active"><span>▣</span><span>Productos</span></a>
             }
@@ -43,7 +43,7 @@ import { ThemeToggle } from './theme-toggle';
 
         @if (auth.can('ventas') || auth.can('compras')) {
           <p class="side-label">Comercial</p>
-          <nav>
+          <nav aria-label="Comercial">
             @if (auth.can('ventas')) {
               <a routerLink="/admin/ventas" routerLinkActive="active"><span>◌</span><span>Historial de ventas</span></a>
             }
@@ -55,7 +55,7 @@ import { ThemeToggle } from './theme-toggle';
 
         @if (auth.can('proveedores') || auth.can('usuarios')) {
           <p class="side-label">Gestión</p>
-          <nav>
+          <nav aria-label="Gestión">
             @if (auth.can('proveedores')) {
               <a routerLink="/admin/proveedores" routerLinkActive="active"><span>▥</span><span>Proveedores</span></a>
             }
@@ -75,44 +75,18 @@ import { ThemeToggle } from './theme-toggle';
     </div>
   `,
   styles: [`
-    :host { display: block; min-height: 100vh; }
-    .admin-shell { min-height: 100vh; display: flex; color: var(--color-text); background: var(--color-background); }
-    .sidebar {
-      width: 260px; flex: none; display: flex; flex-direction: column;
-      padding: 24px 16px; border-right: 1px solid var(--color-border); background: var(--color-surface);
-    }
-    .brand { margin: 0 10px 20px; color: var(--color-text); font-size: 1.4rem; font-weight: 800; }
-    .brand span { color: var(--color-primary); }
-    .admin-identity {
-      display: flex; gap: 10px; align-items: center; margin: 0 6px 22px; padding: 10px 12px;
-      border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-surface-2);
-    }
-    .admin-identity strong, .admin-identity small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .admin-identity strong { font-size: .78rem; }
-    .admin-identity small { margin-top: 2px; color: var(--color-muted); font-size: .65rem; }
-    .status-dot { width: 8px; height: 8px; flex: none; border-radius: 50%; background: var(--color-success); }
-    .side-label {
-      margin: 14px 10px 8px; color: var(--color-muted); font-size: .62rem; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase;
-    }
-    nav { display: grid; gap: 4px; }
-    nav a {
-      display: flex; gap: 10px; align-items: center; padding: 9px 12px; border-radius: 8px;
-      color: var(--color-muted); font-size: .84rem;
-    }
-    nav a:hover, nav a.active { color: var(--color-primary); background: color-mix(in srgb, var(--color-primary) 12%, transparent); }
-    .sidebar-foot { margin-top: auto; display: grid; gap: 8px; padding-top: 16px; }
-    .back-link, .logout { color: var(--color-muted); font-size: .73rem; text-align: left; }
-    .logout { padding: 6px 0; border: 0; color: var(--color-danger); background: transparent; cursor: pointer; }
-    .admin-content { flex: 1; min-width: 0; }
-    @media (max-width: 800px) {
-      .admin-shell { display: block; }
-      .sidebar { width: 100%; padding: 14px; }
-      .brand { display: inline-block; margin: 0 10px 12px 0; }
-      .admin-identity { margin-bottom: 12px; }
-      nav { display: flex; overflow: auto; }
-      nav a { white-space: nowrap; }
-      .sidebar-foot { grid-template-columns: auto 1fr auto; align-items: center; padding-top: 10px; }
-    }
+    :host { display:block; min-height:100vh; }
+    .admin-shell { display:flex; min-height:100vh; color:var(--color-text); background:var(--color-background); }
+    .sidebar { position:sticky; top:0; display:flex; flex:none; flex-direction:column; width:264px; height:100vh; padding:26px 15px 18px; overflow:auto; border-right:1px solid var(--color-border); background:color-mix(in srgb,var(--color-surface) 94%,transparent); }
+    .brand { display:flex; align-items:center; gap:9px; margin:0 11px 26px; color:var(--color-text); font:700 1.15rem var(--font-display); letter-spacing:-.055em; }
+    .brand::before { content:'LS'; display:grid; place-items:center; width:28px; height:28px; border-radius:50%; color:#151515; background:var(--color-primary); font:800 .55rem var(--font-ui); letter-spacing:-.08em; }
+    .brand span { color:var(--color-primary); }
+    .admin-identity { display:flex; gap:11px; align-items:center; margin:0 5px 25px; padding:12px; border:1px solid var(--color-border); border-radius:var(--radius-sm); background:var(--color-surface-2); }
+    .admin-identity strong,.admin-identity small { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }.admin-identity strong { font-size:.78rem; }.admin-identity small { margin-top:3px; color:var(--color-muted); font-size:.64rem; }.status-dot { width:8px; height:8px; flex:none; border-radius:50%; background:var(--color-success); box-shadow:0 0 0 4px color-mix(in srgb,var(--color-success) 15%,transparent); }
+    .side-label { margin:17px 10px 8px; color:var(--color-muted); font-size:.59rem; font-weight:800; letter-spacing:.16em; text-transform:uppercase; }
+    nav { display:grid; gap:3px; } nav a { display:flex; gap:11px; align-items:center; padding:10px 12px; border:1px solid transparent; border-radius:var(--radius-sm); color:var(--color-muted); font-size:.8rem; }.sidebar nav a span:first-child { width:18px; color:var(--color-muted); text-align:center; font-size:.95rem; }.sidebar nav a:hover,.sidebar nav a.active { color:var(--color-text); border-color:color-mix(in srgb,var(--color-primary) 25%,transparent); background:color-mix(in srgb,var(--color-primary) 10%,transparent); }.sidebar nav a.active span:first-child { color:var(--color-primary); }
+    .sidebar-foot { display:grid; gap:7px; margin-top:auto; padding-top:20px; border-top:1px solid var(--color-border); }.back-link,.logout { color:var(--color-muted); font-size:.72rem; text-align:left; }.back-link:hover { color:var(--color-text); }.logout { padding:7px 0; border:0; color:var(--color-danger); background:transparent; cursor:pointer; text-align:left; }.admin-content { flex:1; min-width:0; }
+    @media (max-width:800px) { .admin-shell { display:block; }.sidebar { position:relative; width:100%; height:auto; min-height:0; padding:15px; }.brand { display:inline-flex; margin:0 0 15px 5px; }.admin-identity { margin-bottom:13px; } .sidebar nav { display:flex; overflow:auto; }.sidebar nav a { white-space:nowrap; }.side-label { margin-top:13px; }.sidebar-foot { grid-template-columns:auto 1fr auto; align-items:center; padding-top:12px; }.sidebar-foot .theme-toggle { width:max-content; } }
   `],
 })
 export class AdminShell {

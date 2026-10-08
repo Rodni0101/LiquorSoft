@@ -1,20 +1,30 @@
 <div class="purchase-page">
   <header class="purchase-navbar">
-    <a routerLink="/inicio" class="logo">Liquor<span>Soft</span></a>
+    <a routerLink="/inicio" class="logo"><span class="logo-mark" aria-hidden="true">LS</span><span class="logo-word">liquor<span>soft</span></span></a>
     <nav>
       <a routerLink="/catalogo">Catálogo</a>
       <a routerLink="/carrito">Carrito ({{ cart.count() }})</a>
       <a routerLink="/checkout" class="active">Checkout</a>
-    </nav><app-theme-toggle></app-theme-toggle>
+    </nav>
+    <app-theme-toggle></app-theme-toggle>
   </header>
   <main class="checkout-main">
-    <nav class="breadcrumbs" aria-label="Ruta de navegación"><a routerLink="/inicio">Inicio</a><span>/</span><a routerLink="/carrito">Carrito</a><span>/</span><strong>Checkout</strong></nav>
+    <nav class="breadcrumbs" aria-label="Ruta de navegación">
+      <a routerLink="/inicio">Inicio</a><span>/</span><a routerLink="/carrito">Carrito</a
+      ><span>/</span><strong>Checkout</strong>
+    </nav>
     <div class="purchase-heading">
       <span class="eyebrow">FINALIZAR COMPRA</span>
       <h1>Completa tu pedido</h1>
-      <p>Revisa la información. El cobro con pasarela queda pendiente; el pedido sí se registra en inventario.</p>
+      <p>
+        Revisa la información. El pedido solo se registrará cuando una pasarela confirme el pago.
+      </p>
     </div>
-    <ol class="checkout-steps" aria-label="Progreso de compra"><li class="current"><span>1</span>Datos y pago</li><li><span>2</span>Confirmación</li><li><span>3</span>Pedido registrado</li></ol>
+    <ol class="checkout-steps" aria-label="Progreso de compra">
+      <li class="current"><span>1</span>Datos y pago</li>
+      <li><span>2</span>Confirmación</li>
+      <li><span>3</span>Pedido registrado</li>
+    </ol>
     @if (!cart.items().length && status !== 'success') {
       <section class="purchase-card empty-cart">
         <h2>Tu carrito está vacío</h2>
@@ -54,7 +64,12 @@
             </div>
             <label class="checkout-field">
               Notas
-              <textarea [(ngModel)]="notes" maxlength="500" rows="3" placeholder="Ej. Recojo en tienda a las 6 p. m."></textarea>
+              <textarea
+                [(ngModel)]="notes"
+                maxlength="500"
+                rows="3"
+                placeholder="Ej. Recojo en tienda a las 6 p. m."
+              ></textarea>
             </label>
           </section>
           <section class="purchase-card">
@@ -66,11 +81,20 @@
               </div>
             </div>
             <div class="payment-grid">
-              <button type="button" [class.selected]="method === 'nequi'" (click)="method = 'nequi'">
+              <button
+                type="button"
+                [class.selected]="method === 'nequi'"
+                (click)="method = 'nequi'"
+              >
                 <strong>Nequi</strong><small>Pago móvil · Pendiente de configuración</small>
               </button>
-              <button type="button" [class.selected]="method === 'paypal'" (click)="method = 'paypal'">
-                <strong>PayPal</strong><small>Pago internacional · Pendiente de configuración</small>
+              <button
+                type="button"
+                [class.selected]="method === 'paypal'"
+                (click)="method = 'paypal'"
+              >
+                <strong>PayPal</strong
+                ><small>Pago internacional · Pendiente de configuración</small>
               </button>
             </div>
             <p class="pending-copy">{{ payment.getPendingMessage(method) }}</p>
@@ -84,13 +108,24 @@
           <h2>Tu selección</h2>
           @for (item of cart.items(); track item.id || item.name) {
             <div class="summary-product">
-              <span>{{ item.icon }} {{ item.name }} <small>× {{ item.quantity }}</small></span>
+              <span
+                >{{ item.icon }} {{ item.name }} <small>× {{ item.quantity }}</small></span
+              >
               <strong>{{ formatPrice(item.price * item.quantity) }}</strong>
             </div>
           }
-          <div class="summary-line"><span>Subtotal</span><strong>{{ formatPrice(cart.total()) }}</strong></div>
-          <div class="summary-total"><span>Total</span><strong>{{ formatPrice(cart.total()) }}</strong></div>
-          <button type="button" class="primary-action" [disabled]="!!stockError" (click)="preparePayment()">
+          <div class="summary-line">
+            <span>Subtotal</span><strong>{{ formatPrice(cart.total()) }}</strong>
+          </div>
+          <div class="summary-total">
+            <span>Total</span><strong>{{ formatPrice(cart.total()) }}</strong>
+          </div>
+          <button
+            type="button"
+            class="primary-action"
+            [disabled]="!!stockError"
+            (click)="preparePayment()"
+          >
             Preparar método de pago
           </button>
           <a routerLink="/carrito" class="secondary-action">Volver al carrito</a>
@@ -99,12 +134,10 @@
     } @else if (status === 'pending') {
       <section class="purchase-card state-card">
         <span class="state-icon">i</span>
-        <h2>Pago pendiente de pasarela</h2>
+        <h2>Pago no disponible todavía</h2>
         <p>{{ message }}</p>
-        <button type="button" class="primary-action" [disabled]="purchaseSubmitting" (click)="registerPurchase()">
-          {{ purchaseSubmitting ? 'Registrando pedido…' : 'Registrar pedido y descontar stock' }}
-        </button>
-        <small>Esta acción reserva inventario. No confirma un cobro externo.</small>
+        <p>El pedido no se registró y el inventario no fue modificado.</p>
+        <a routerLink="/carrito" class="secondary-action">Volver al carrito</a>
       </section>
     } @else if (status === 'success') {
       <section class="purchase-card state-card">
@@ -119,7 +152,9 @@
         <span class="state-icon error">!</span>
         <h2>No se registró el pedido</h2>
         <p>{{ message }}</p>
-        <button type="button" class="primary-action" (click)="status = 'ready'; validateStock()">Revisar pedido</button>
+        <button type="button" class="primary-action" (click)="status = 'ready'; validateStock()">
+          Revisar pedido
+        </button>
       </section>
     }
   </main>

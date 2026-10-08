@@ -45,9 +45,9 @@ export class Checkout implements OnInit {
   protected validateStock(): void {
     if (!this.cart.items().length) return;
     this.http.get<{ products: CheckoutProduct[] }>('/api/products.php').subscribe({
-      next: response => {
-        const problems = this.cart.items().flatMap(item => {
-          const product = response.products.find(candidate => candidate.id === item.id);
+      next: (response) => {
+        const problems = this.cart.items().flatMap((item) => {
+          const product = response.products.find((candidate) => candidate.id === item.id);
           return !product
             ? [`${item.name} ya no está disponible.`]
             : item.quantity > (product.stock ?? 0)
@@ -67,23 +67,32 @@ export class Checkout implements OnInit {
     const result = this.payment.preparePayment({
       method: this.method,
       amount: this.cart.total(),
-      items: this.cart.items().map(item => ({ id: item.id, quantity: item.quantity })),
+      items: this.cart.items().map((item) => ({ id: item.id, quantity: item.quantity })),
     });
     this.status = result.status;
     this.message = result.message;
   }
 
   protected registerPurchase(): void {
-    if (this.purchaseSubmitting || this.stockError || !this.cart.items().length) return;
+    // Nunca se debe crear una venta ni descontar inventario sin confirmación
+    // positiva de una pasarela de pago. Actualmente PaymentService solo deja
+    // el pago en estado pending hasta que exista una integración real.
+    if (
+      this.status !== 'success' ||
+      this.purchaseSubmitting ||
+      this.stockError ||
+      !this.cart.items().length
+    )
+      return;
     this.purchaseSubmitting = true;
     this.purchase.checkout(this.cart.items(), this.method, this.notes).subscribe({
-      next: response => {
+      next: (response) => {
         this.purchaseSubmitting = false;
         this.status = 'success';
         this.message = `${response.message} Número de pedido: ${response.orderNumber ?? response.saleId}.`;
         this.cart.clear();
       },
-      error: error => {
+      error: (error) => {
         this.purchaseSubmitting = false;
         this.status = 'error';
         this.message = error.error?.message ?? 'No fue posible registrar el pedido.';

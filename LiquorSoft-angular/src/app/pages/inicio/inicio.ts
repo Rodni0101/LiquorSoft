@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, HostListener, inject, OnInit } from '@angular/core';
+import { afterNextRender, ChangeDetectorRef, Component, HostListener, inject, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../auth.service';
@@ -42,9 +42,19 @@ export class Inicio implements OnInit {
   protected menuOpen = false;
   protected activeSection = 'inicio';
 
+  constructor() {
+    afterNextRender(() => {
+      // La home siempre inicia arriba. Los saltos internos siguen funcionando
+      // cuando la URL trae explícitamente un fragmento como #productos.
+      if (!this.route.snapshot.fragment) {
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      }
+    });
+  }
+
   ngOnInit(): void {
     this.route.fragment.subscribe(fragment => {
-      this.activeSection = fragment && ['inicio', 'productos', 'contacto'].includes(fragment) ? fragment : 'inicio';
+      this.activeSection = fragment && ['inicio', 'experiencia', 'productos', 'contacto'].includes(fragment) ? fragment : 'inicio';
       this.changeDetector.markForCheck();
     });
     this.http.get<PublicSummary>('/api/public-summary.php').subscribe({
@@ -69,7 +79,7 @@ export class Inicio implements OnInit {
   @HostListener('window:scroll')
   protected updateActiveSection(): void {
     const marker = 140;
-    const current = ['inicio', 'productos', 'contacto']
+    const current = ['inicio', 'experiencia', 'productos', 'contacto']
       .map(id => document.getElementById(id))
       .find(section => section && section.getBoundingClientRect().top <= marker && section.getBoundingClientRect().bottom > marker);
     const nextSection = current?.id ?? 'inicio';

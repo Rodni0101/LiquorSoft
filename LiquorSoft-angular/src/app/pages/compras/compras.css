@@ -1,3 +1,362 @@
-:host { display: block; min-height: 100%; }
-.purchases-grid { display: grid; grid-template-columns: 310px minmax(0, 1fr); gap: 16px; }
-@media (max-width: 900px) { .purchases-grid { grid-template-columns: 1fr; } }
+:host {
+display: block;
+min-height: 100%;
+}
+
+.purchases-page {
+box-sizing: border-box;
+width: 100%;
+max-width: 1400px;
+margin: 0 auto;
+padding: 32px clamp(16px, 4vw, 44px);
+color: #F8F1F3;
+}
+
+.page-heading {
+margin-bottom: 26px;
+}
+
+.page-heading h1 {
+margin: 8px 0;
+color: #FFFFFF;
+font-size: clamp(2rem, 4vw, 2.8rem);
+font-weight: 800;
+}
+
+.page-heading p {
+color: #D0C0C6;
+line-height: 1.7;
+}
+
+.eyebrow {
+color: #E58DA3;
+font-size: .7rem;
+font-weight: 800;
+letter-spacing: 1.5px;
+}
+
+.purchase-summary {
+display: grid;
+grid-template-columns: repeat(3, minmax(0, 1fr));
+gap: 16px;
+margin-bottom: 22px;
+}
+
+.summary-card,
+.panel {
+min-width: 0;
+padding: 22px;
+border: 1px solid #49303A;
+border-radius: 15px;
+color: #F8F1F3;
+background: #21171C;
+box-shadow: 0 8px 24px rgba(0, 0, 0, .14);
+}
+
+.summary-card span {
+display: block;
+margin-bottom: 10px;
+color: #D0C0C6;
+font-size: .82rem;
+}
+
+.summary-card strong {
+color: #FFFFFF;
+font-size: clamp(1.3rem, 3vw, 2rem);
+font-weight: 800;
+overflow-wrap: anywhere;
+}
+
+.panel {
+margin-bottom: 22px;
+}
+
+.panel h2 {
+margin: 0 0 20px;
+color: #FFFFFF;
+font-size: 1.15rem;
+}
+
+.panel form {
+display: grid;
+grid-template-columns: repeat(2, minmax(0, 1fr));
+gap: 16px;
+}
+
+.panel label {
+display: grid;
+gap: 8px;
+color: #F0DDE3;
+font-size: .84rem;
+font-weight: 650;
+}
+
+.panel input,
+.panel select,
+.panel textarea {
+box-sizing: border-box;
+width: 100%;
+min-height: 43px;
+padding: 11px 13px;
+border: 1px solid #60404C;
+border-radius: 9px;
+outline: none;
+color: #FFFFFF;
+background: #171014;
+font: inherit;
+font-size: .9rem;
+}
+
+.panel textarea {
+min-height: 90px;
+resize: vertical;
+}
+
+.panel input:focus,
+.panel select:focus,
+.panel textarea:focus {
+border-color: #B83D5B;
+box-shadow: 0 0 0 3px rgba(184, 61, 91, .18);
+}
+
+.primary-action,
+.secondary-action,
+.refresh-button {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+gap: 8px;
+min-height: 42px;
+padding: 10px 15px;
+border: 1px solid #6D0F1A;
+border-radius: 9px;
+font: inherit;
+font-size: .85rem;
+font-weight: 750;
+cursor: pointer;
+}
+
+.primary-action {
+color: #FFFFFF;
+background: #6D0F1A;
+}
+
+.primary-action:hover {
+border-color: #8D1B30;
+background: #8D1B30;
+}
+
+.secondary-action,
+.refresh-button {
+border-color: #60404C;
+color: #F0DDE3;
+background: #302027;
+}
+
+.secondary-action:hover,
+.refresh-button:hover {
+border-color: #B83D5B;
+color: #FFFFFF;
+background: #3A1722;
+}
+
+.table-wrap {
+width: 100%;
+overflow-x: auto;
+border: 1px solid #49303A;
+border-radius: 12px;
+}
+
+table {
+width: 100%;
+border-collapse: collapse;
+text-align: left;
+}
+
+thead {
+background: #3A1722;
+}
+
+th {
+padding: 14px;
+color: #FFFFFF;
+font-size: .76rem;
+font-weight: 800;
+white-space: nowrap;
+}
+
+td {
+padding: 14px;
+border-top: 1px solid #38252D;
+color: #F8F1F3;
+font-size: .85rem;
+vertical-align: middle;
+}
+
+tbody tr {
+background: #21171C;
+}
+
+tbody tr:hover {
+background: #302027;
+}
+
+td small {
+display: block;
+margin-top: 4px;
+color: #D0C0C6;
+}
+
+.purchase-total {
+color: #F3B7C7;
+font-weight: 800;
+white-space: nowrap;
+}
+
+.status-badge {
+display: inline-flex;
+padding: 5px 10px;
+border: 1px solid #6D3445;
+border-radius: 20px;
+color: #F3C4D0;
+background: #301923;
+font-size: .74rem;
+font-weight: 750;
+white-space: nowrap;
+}
+
+.status-badge.pending {
+border-color: #85404D;
+color: #FFDDE2;
+background: #35171E;
+}
+
+.notice {
+padding: 13px 15px;
+margin-bottom: 18px;
+border: 1px solid #85404D;
+border-radius: 10px;
+color: #FFDDE2;
+background: #35171E;
+line-height: 1.6;
+}
+
+.empty-state {
+padding: 30px 15px;
+color: #D0C0C6;
+text-align: center;
+}
+
+:host-context([data-theme='light']) .purchases-page {
+color: #29151C;
+}
+
+:host-context([data-theme='light']) .page-heading h1,
+:host-context([data-theme='light']) .panel h2,
+:host-context([data-theme='light']) .summary-card strong {
+color: #29151C;
+}
+
+:host-context([data-theme='light']) .page-heading p,
+:host-context([data-theme='light']) .summary-card span,
+:host-context([data-theme='light']) td small,
+:host-context([data-theme='light']) .empty-state {
+color: #62515A;
+}
+
+:host-context([data-theme='light']) .eyebrow {
+color: #6D0F1A;
+}
+
+:host-context([data-theme='light']) .summary-card,
+:host-context([data-theme='light']) .panel {
+border-color: #DFCBD3;
+color: #29151C;
+background: #FFFFFF;
+box-shadow: 0 8px 24px rgba(67, 20, 37, .07);
+}
+
+:host-context([data-theme='light']) .panel label {
+color: #4B2935;
+}
+
+:host-context([data-theme='light']) .panel input,
+:host-context([data-theme='light']) .panel select,
+:host-context([data-theme='light']) .panel textarea {
+border-color: #CBB3BD;
+color: #29151C;
+background: #FFFFFF;
+}
+
+:host-context([data-theme='light']) .secondary-action,
+:host-context([data-theme='light']) .refresh-button {
+border-color: #CBB3BD;
+color: #6D0F1A;
+background: #FFFFFF;
+}
+
+:host-context([data-theme='light']) .secondary-action:hover,
+:host-context([data-theme='light']) .refresh-button:hover {
+border-color: #8D1B30;
+background: #F9EAF0;
+}
+
+:host-context([data-theme='light']) .table-wrap {
+border-color: #DFCBD3;
+}
+
+:host-context([data-theme='light']) thead {
+background: #F5E5EB;
+}
+
+:host-context([data-theme='light']) th {
+color: #4B202E;
+}
+
+:host-context([data-theme='light']) td {
+border-top-color: #EADDE2;
+color: #29151C;
+}
+
+:host-context([data-theme='light']) tbody tr {
+background: #FFFFFF;
+}
+
+:host-context([data-theme='light']) tbody tr:hover {
+background: #FCF4F7;
+}
+
+:host-context([data-theme='light']) .purchase-total {
+color: #6D0F1A;
+}
+
+:host-context([data-theme='light']) .status-badge {
+border-color: #E4BCC8;
+color: #6D0F1A;
+background: #F9EAF0;
+}
+
+:host-context([data-theme='light']) .status-badge.pending,
+:host-context([data-theme='light']) .notice {
+border-color: #E7B7C0;
+color: #7B1829;
+background: #FFF0F2;
+}
+
+@media (max-width: 760px) {
+.purchases-page {
+padding: 24px 14px;
+}
+
+.purchase-summary {
+grid-template-columns: 1fr;
+}
+
+.panel {
+padding: 17px;
+}
+
+.panel form {
+grid-template-columns: 1fr;
+}
+}

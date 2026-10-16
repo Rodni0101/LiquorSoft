@@ -1,7 +1,6 @@
 import { Component, ElementRef, ViewChild, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { RouterOutlet } from '@angular/router';
-import { CurrencyPipe } from '@angular/common';
 import { CartService } from './cart.service';
 
 interface ChatProduct {
@@ -12,7 +11,7 @@ interface ChatProduct {
 interface ChatMessage { role: 'assistant' | 'user'; text: string; products?: ChatProduct[]; }
 
 @Component({
-  imports: [RouterOutlet, CurrencyPipe],
+  imports: [RouterOutlet],
   selector: 'app-root',
   styleUrl: './app.css',
   templateUrl: './app.html',
@@ -132,6 +131,14 @@ export class App {
 
   protected setChatInput(event: Event): void {
     this.chatInput.set((event.target as HTMLInputElement).value);
+  }
+
+  protected formatChatPrice(value: number): string {
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      maximumFractionDigits: 0,
+    }).format(value);
   }
 
   protected addChatProduct(product: ChatProduct): void {

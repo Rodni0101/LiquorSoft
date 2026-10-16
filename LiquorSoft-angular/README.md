@@ -69,10 +69,17 @@ solo recomienda productos activos con stock positivo. Conserva el criterio de
 categoría y precio en la sesión PHP para preguntas de seguimiento. El estado de
 pedidos se devuelve únicamente para el usuario de la sesión actual.
 
-El chatbot actual es conversacional y basado en reglas; no se debe presentar
-como un modelo generativo. No hay clave de OpenAI ni integración con n8n
-configurada en el repositorio. Las preguntas sobre políticas de envío se
-responden como no configuradas. No se persisten transcripciones completas.
+El chatbot admite respuestas generativas con OpenAI Responses API cuando se
+configura `LIQUORSOFT_OPENAI_API_KEY` en `backend/.env`; el modelo se elige con
+`LIQUORSOFT_OPENAI_MODEL` (por defecto `gpt-4.1-mini`). La clave solo se lee en
+PHP y nunca se envía al navegador. Sin clave, el endpoint conserva las
+respuestas locales. OpenAI puede pedir al backend búsquedas del catálogo,
+conteos y consulta de pedidos; PHP ejecuta únicamente esas herramientas de
+solo lectura, con consultas preparadas y pedidos limitados al usuario de la
+sesión. La conversación se mantiene en la sesión PHP y la API se llama con
+`store: false`; no se guarda una transcripción en la base de datos. Configura
+límites y facturación en el proyecto de OpenAI si habilitas la clave. No hay
+integración con n8n en el repositorio.
 
 ## Estado de auditoría local
 

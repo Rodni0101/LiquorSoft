@@ -24,6 +24,9 @@ export class App {
   @ViewChild('chatMessages') private chatMessages?: ElementRef<HTMLElement>;
   protected readonly chatOpen = signal(false);
   protected readonly chatBusy = signal(false);
+  protected readonly catalogLoading = signal(false);
+  protected readonly catalogLoaded = signal(false);
+  protected readonly catalogProducts = signal<ChatProduct[]>([]);
   protected readonly showMoreQuickQuestions = signal(false);
   protected readonly chatInput = signal('');
   protected readonly chatMessagesList = signal<ChatMessage[]>([
@@ -41,10 +44,63 @@ export class App {
     'Envíos y horarios',
   ];
 
+  protected openChat(): void {
+    this.chatOpen.set(true);
+    if (this.catalogLoaded() || this.catalogLoading()) return;
+    this.catalogLoading.set(true);
+    this.http.get<{ products: ChatProduct[] }>('/api/products.php').subscribe({
+      next: response => {
+        this.catalogProducts.set(response.products);
+        this.catalogLoaded.set(true);
+        this.catalogLoading.set(false);
+      },
+      error: () => this.catalogLoading.set(false),
+    });
+  }
+
   protected askQuickQuestion(question: string): void {
     this.showMoreQuickQuestions.set(false);
+    if (this.answerQuickQuestion(question)) return;
     this.chatInput.set(question);
     this.sendChatMessage();
+  }
+
+  private answerQuickQuestion(question: string): boolean {
+    if (!this.catalogLoaded()) return false;
+    const products = this.catalogProducts();
+    const normalized = question.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    let matches: ChatProduct[] | null = null;
+    let answer = '';
+
+    if (normalized.includes('cuantos productos')) {
+      const available = products.filter(product => product.stock > 0).length;
+      answer = `Hay ${products.length} productos activos en el catálogo; ${available} tienen existencias disponibles.`;
+      matches = [];
+    } else if (normalized.includes('menos de $')) {
+      const amount = Number(normalized.match(/\$([\d.]+)/)?.[1]?.replace(/\./g, '') ?? 0);
+      matches = products.filter(product => product.stock > 0 && product.price < amount).slice(0, 3);
+      answer = matches.length ? 'Estas opciones disponibles están dentro de ese presupuesto:' : 'No encontré productos disponibles dentro de ese presupuesto.';
+    } else if (normalized.startsWith('buscar ')) {
+      const category = normalized.slice('buscar '.length).trim();
+      matches = products.filter(product => product.stock > 0 && this.normalizeCategory(product.category) === this.normalizeCategory(category)).slice(0, 3);
+      answer = matches.length ? `Estas opciones de ${category} están disponibles:` : `No encontré productos disponibles en la categoría ${category}.`;
+    } else if (normalized.includes('productos disponibles')) {
+      matches = products.filter(product => product.stock > 0).slice(0, 3);
+      answer = matches.length ? 'Estos productos tienen existencias disponibles:' : 'No hay productos disponibles en este momento.';
+    }
+
+    if (matches === null) return false;
+    this.chatMessagesList.update(messages => [
+      ...messages,
+      { role: 'user', text: question },
+      { role: 'assistant', text: answer, products: matches },
+    ]);
+    this.scrollChat();
+    return true;
+  }
+
+  private normalizeCategory(value: string): string {
+    return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/s$/, '');
   }
 
   protected toggleQuickQuestions(): void {
@@ -60,7 +116,7 @@ export class App {
     this.chatBusy.set(true);
     this.http.post<{ answer: string; products: ChatProduct[] }>('/api/chat.php', { message: question }).subscribe({
       next: (response) => {
-        this.chatMessagesList.update(messages => [...messages, { role: 'assistant', text: response.answer, products: response.products }]);
+        this.chatMessagesList.update(messages => [...messages, { role: 'assistant', text: response.answer, products: response.products.filter(product => product.name).slice(0, 3) }]);
         this.chatBusy.set(false);
         this.scrollChat();
       },

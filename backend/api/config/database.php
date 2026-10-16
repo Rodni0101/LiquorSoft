@@ -4,14 +4,14 @@ declare(strict_types=1);
 function databaseConnection(): mysqli
 {
     mysqli_report(MYSQLI_REPORT_OFF);
-    $connection = new mysqli(
+    $connection = @new mysqli(
         liquorsoftEnv('LIQURSOFT_DB_HOST', '127.0.0.1'),
         liquorsoftEnv('LIQURSOFT_DB_USER', 'root'),
         liquorsoftEnv('LIQURSOFT_DB_PASSWORD', ''),
         liquorsoftEnv('LIQURSOFT_DB_NAME', 'liquorsoft')
     );
     if ($connection->connect_errno) {
-        error_log('LiquorSoft database connection failed: ' . $connection->connect_error);
+        error_log('LiquorSoft database connection failed (code ' . $connection->connect_errno . ').');
         http_response_code(503);
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode(['message' => 'El servicio no está disponible en este momento.']);
@@ -83,6 +83,9 @@ function liquorsoftSessionStart(): void
         session_start([
             'cookie_httponly' => true,
             'cookie_samesite' => 'Lax',
+            'cookie_secure' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+                || liquorsoftEnv('LIQUORSOFT_COOKIE_SECURE', '0') === '1',
+            'use_strict_mode' => true,
         ]);
     }
 }

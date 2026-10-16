@@ -28,8 +28,9 @@ datos se reflejan automáticamente en la vista pública.
 
 El archivo `backend/database/schema.sql` crea el esquema relacional completo
 (usuarios, categorías, proveedores, clientes, productos, lotes, pedidos,
-compras, ventas, movimientos y configuración) e inserta datos de prueba.
-Ejecútalo sobre una instalación limpia antes de iniciar el backend PHP:
+compras, ventas, movimientos y configuración) e inserta categorías/productos
+de muestra. **Es destructivo**: elimina las tablas indicadas al inicio y solo
+debe usarse para una base descartable vacía.
 
 ```bash
 mysql -u root -p < backend/database/schema.sql
@@ -37,7 +38,8 @@ php -S localhost:8000 -t backend
 ```
 
 Las credenciales se configuran con `LIQURSOFT_DB_HOST`, `LIQURSOFT_DB_USER`,
-`LIQURSOFT_DB_PASSWORD` y `LIQURSOFT_DB_NAME`. Angular reenvía `/api` al
+`LIQURSOFT_DB_PASSWORD` y `LIQURSOFT_DB_NAME` en `backend/.env` o en el
+entorno del proceso. Angular reenvía `/api` al
 backend mediante `proxy.conf.json` durante el desarrollo.
 
 En producción configura también `LIQURSOFT_COOKIE_SECURE=1` y sirve el frontend
@@ -55,8 +57,31 @@ export LIQURSOFT_DB_NAME=liquorsoft
 php -S 127.0.0.1:8000 -t backend
 ```
 
-No uses ni guardes la contraseña dentro del código. Consulta
-`backend/.env.example` como referencia.
+No uses ni guardes credenciales dentro del código. Copia `backend/.env.example`
+a `backend/.env` y reemplaza los valores localmente. El archivo `.env` no debe
+versionarse.
+
+## Chat del catálogo
+
+El widget envía preguntas a `POST /api/chat.php`. El backend consulta `productos`
+y `categorias` con consultas preparadas, limita resultados a seis artículos y
+solo recomienda productos activos con stock positivo. Conserva el criterio de
+categoría y precio en la sesión PHP para preguntas de seguimiento. El estado de
+pedidos se devuelve únicamente para el usuario de la sesión actual.
+
+El chatbot actual es conversacional y basado en reglas; no se debe presentar
+como un modelo generativo. No hay clave de OpenAI ni integración con n8n
+configurada en el repositorio. Las preguntas sobre políticas de envío se
+responden como no configuradas. No se persisten transcripciones completas.
+
+## Estado de auditoría local
+
+La conexión MySQL solo se considera comprobada tras consultar el servidor con
+las credenciales del entorno. Si MySQL no está iniciado, el backend responde
+503 y el catálogo/chat no pueden consultar productos. No ejecutes
+`backend/database/schema.sql` para solucionar conectividad: puede borrar datos.
+La migración `003_reset_users_create_admin.sql` está deprecada porque borraba
+usuarios y contenía una credencial compartida; no la ejecutes.
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.5.
 

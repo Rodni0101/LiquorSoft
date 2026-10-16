@@ -214,10 +214,6 @@ CREATE TABLE detalle_compra (
   CONSTRAINT fk_detalle_compra_lote FOREIGN KEY (lote_id) REFERENCES lotes(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
-INSERT INTO usuarios (rol_id, nombre, apellido, correo, password_hash, usuario)
-VALUES (1, 'Administrador', 'LiquorSoft', 'admin123@gmail.com',
-  '$2y$10$7uqvy0Ap..sDa7MXb4XBz.BlHOJ1OtEsLfMVCUZq.v4XPf7fsoRFi', 'admin123');
-
 INSERT INTO categorias (nombre, descripcion) VALUES
   ('Whisky', 'Destilados de cereal con crianza.'),
   ('Ron', 'Destilados de caña de azúcar.'),

@@ -1,1 +1,195 @@
-<app-admin-shell><section class="products-page"><header><a routerLink="/admin/dashboard" class="brand">Liquor<span>Soft</span></a><a routerLink="/productos" class="public-link">← Tienda</a></header><main><div class="heading"><div><span>GESTIÓN DE CATÁLOGO</span><h1>Productos</h1><p>Administra la selección disponible para tus clientes.</p></div><strong>{{ products.length }} activos</strong></div>@if (loading) { <div class="state">Cargando productos…</div> } @if (errorMessage) { <div class="state error" role="alert">{{ errorMessage }}</div> } @if (!loading && !errorMessage) { <div class="table-wrap"><table><thead><tr><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Estado</th></tr></thead><tbody>@for (product of products; track product.id) {<tr><td><b>{{ product.name }}</b><small>{{ product.description }}</small></td><td>{{ product.category }}</td><td>{{ formatPrice(product.price) }}</td><td [class.low]="product.stock <= 5">{{ product.stock }} und.</td><td><span class="status">Activo</span></td></tr>}</tbody></table></div> }</main></section></app-admin-shell>
+
+<app-admin-shell>
+  <section class="products-page">
+    <header class="page-header">
+      <a routerLink="/admin/dashboard" class="brand">
+        Liquor<span>Soft</span>
+      </a>
+      <a routerLink="/productos" class="public-link">← Tienda</a>
+    </header>
+
+    <main>
+      <div class="heading">
+        <div>
+          <span class="eyebrow">GESTIÓN DE CATÁLOGO</span>
+          <h1>Productos</h1>
+          <p>Administra las botellas y referencias de tu catálogo.</p>
+        </div>
+
+        <button class="btn-primary" type="button" (click)="openForm()">
+          + Nuevo producto
+        </button>
+      </div>
+
+      @if (successMessage) {
+        <div class="notice success" role="status">{{ successMessage }}</div>
+      }
+
+      @if (errorMessage) {
+        <div class="notice error" role="alert">{{ errorMessage }}</div>
+      }
+
+      @if (showForm) {
+        <section class="form-card">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">
+                {{ editingId === null ? 'NUEVA REFERENCIA' : 'EDITAR REFERENCIA' }}
+              </span>
+              <h2>{{ editingId === null ? 'Registrar producto' : 'Actualizar producto' }}</h2>
+              <p>Completa la información comercial y de inventario.</p>
+            </div>
+            <button class="btn-secondary" type="button" (click)="cancelForm()">
+              Cancelar
+            </button>
+          </div>
+
+          <form #productForm="ngForm" (ngSubmit)="saveProduct()">
+            <div class="form-grid">
+              <label class="field">
+                <span>Nombre del producto *</span>
+                <input name="name" [(ngModel)]="form.name" required minlength="2" maxlength="150" />
+              </label>
+
+              <label class="field">
+                <span>SKU / Referencia</span>
+                <input name="sku" [(ngModel)]="form.sku" maxlength="60" />
+              </label>
+
+              <label class="field">
+                <span>Marca</span>
+                <input name="brand" [(ngModel)]="form.brand" maxlength="100" />
+              </label>
+
+              <label class="field">
+                <span>Presentación</span>
+                <input name="presentation" [(ngModel)]="form.presentation" maxlength="100" />
+              </label>
+
+              <label class="field">
+                <span>Categoría *</span>
+                <select name="categoryId" [(ngModel)]="form.categoryId" required>
+                  <option [ngValue]="null" disabled>Selecciona una categoría</option>
+                  @for (category of categories; track category.id) {
+                    <option [ngValue]="category.id">{{ category.name }}</option>
+                  }
+                </select>
+              </label>
+
+              <label class="field">
+                <span>Graduación alcohólica (%)</span>
+                <input type="number" name="alcoholicGraduation" [(ngModel)]="form.alcoholicGraduation" min="0" max="100" step="0.1" />
+              </label>
+
+              <label class="field">
+                <span>Precio de compra (COP)</span>
+                <input type="number" name="purchasePrice" [(ngModel)]="form.purchasePrice" min="0" step="1" required />
+              </label>
+
+              <label class="field">
+                <span>Precio de venta (COP) *</span>
+                <input type="number" name="price" [(ngModel)]="form.price" min="0" step="1" required />
+              </label>
+
+              <label class="field">
+                <span>Stock *</span>
+                <input type="number" name="stock" [(ngModel)]="form.stock" min="0" step="1" required />
+              </label>
+
+              <label class="field">
+                <span>Stock mínimo</span>
+                <input type="number" name="minStock" [(ngModel)]="form.minStock" min="0" step="1" required />
+              </label>
+
+              <label class="field full-width">
+                <span>Ruta o URL de la imagen</span>
+                <input name="image" [(ngModel)]="form.image" maxlength="255" />
+                <small>Usa una ruta o URL válida. Este campo no sube archivos.</small>
+              </label>
+
+              <label class="field full-width">
+                <span>Descripción</span>
+                <textarea name="description" [(ngModel)]="form.description" maxlength="500" rows="3"></textarea>
+              </label>
+
+              <label class="check-field full-width">
+                <input type="checkbox" name="featured" [(ngModel)]="form.featured" />
+                <span>Destacar este producto en la tienda</span>
+              </label>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn-secondary" type="button" (click)="cancelForm()" [disabled]="saving">
+                Cancelar
+              </button>
+              <button class="btn-primary" type="submit" [disabled]="saving || productForm.invalid">
+                {{ saving ? 'Guardando…' : (editingId === null ? 'Guardar producto' : 'Guardar cambios') }}
+              </button>
+            </div>
+          </form>
+        </section>
+      }
+
+      <section class="catalog-card">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">INVENTARIO COMERCIAL</span>
+            <h2>Catálogo registrado</h2>
+            <p>Consulta y administra los productos guardados.</p>
+          </div>
+          <span class="count">{{ products.length }} productos</span>
+        </div>
+
+        @if (loading) {
+          <div class="state">Cargando productos…</div>
+        } @else if (products.length === 0) {
+          <div class="empty-state">
+            <span class="empty-icon">◇</span>
+            <h3>Aún no hay productos registrados</h3>
+            <p>Agrega la primera referencia para comenzar tu catálogo.</p>
+            <button class="btn-primary" type="button" (click)="openForm()">Registrar primer producto</button>
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Categoría</th>
+                  <th>Precio de venta</th>
+                  <th>Stock</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (product of products; track product.id) {
+                  <tr>
+                    <td>
+                      <b>{{ product.name }}</b>
+                      <small>{{ product.description || 'Sin descripción' }}</small>
+                    </td>
+                    <td>{{ product.category }}</td>
+                    <td class="price">{{ formatPrice(product.price) }}</td>
+                    <td [class.low]="product.stock <= 5">{{ product.stock }} und.</td>
+                    <td><span class="status">Registrado</span></td>
+                    <td>
+                      <div class="product-actions">
+                        <button class="btn-secondary" type="button" (click)="editProduct(product)">
+                          Editar
+                        </button>
+                        <button class="btn-danger" type="button" (click)="deleteProduct(product)" [disabled]="saving">
+                          Eliminar
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    </main>
+  </section>
+</app-admin-shell>

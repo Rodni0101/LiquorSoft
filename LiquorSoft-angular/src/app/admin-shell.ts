@@ -4,12 +4,521 @@ import { AuthService } from './auth.service';
 import { ThemeToggle } from './theme-toggle';
 
 @Component({
-  selector: 'app-admin-shell',
-  standalone: true,
-  imports: [RouterLink, RouterLinkActive, ThemeToggle],
-  template: `<div class="admin-shell"><aside class="sidebar"><a routerLink="/inicio" class="brand">Liquor<span>Soft</span></a><div class="admin-identity"><span class="status-dot" aria-hidden="true"></span><div><strong>{{ auth.user()?.name }}</strong><small>Administrador</small></div></div><p class="side-label">GESTIÓN</p><nav>@if (auth.can('dashboard')) {<a routerLink="/admin/dashboard" routerLinkActive="active"><span>▦</span><span>Resumen</span></a>}@if (auth.can('productos')) {<a routerLink="/admin/productos" routerLinkActive="active"><span>▣</span><span>Productos</span></a>}@if (auth.can('categorias')) {<a routerLink="/admin/categorias" routerLinkActive="active"><span>◈</span><span>Categorías</span></a>}@if (auth.can('inventario')) {<a routerLink="/admin/inventario" routerLinkActive="active"><span>◫</span><span>Inventario</span></a>}@if (auth.can('ventas')) {<a routerLink="/admin/ventas" routerLinkActive="active"><span>◌</span><span>Ventas</span></a>}@if (auth.can('compras')) {<a routerLink="/admin/compras" routerLinkActive="active"><span>▤</span><span>Compras</span></a>}@if (auth.can('proveedores')) {<a routerLink="/admin/proveedores" routerLinkActive="active"><span>▥</span><span>Proveedores</span></a>}@if (auth.can('usuarios')) {<a routerLink="/admin/usuarios" routerLinkActive="active"><span>♙</span><span>Usuarios</span></a>}</nav><app-theme-toggle class="admin-theme-toggle"></app-theme-toggle><a routerLink="/productos" class="back-link">← Ver tienda</a><button type="button" class="logout" (click)="auth.logout()">Cerrar sesión</button></aside><main class="admin-content"><ng-content></ng-content></main></div>`,
-  styles: [`:host{display:block;min-height:100vh}.admin-shell{min-height:100vh;display:flex;color:#f8fafc;background:#0b1120}.sidebar{width:270px;flex:none;display:flex;flex-direction:column;padding:30px 18px;border-right:1px solid rgba(255,255,255,.07);background:#0f172a}.brand{margin:0 14px 28px;color:#fff;font-size:1.5rem;font-weight:800;text-decoration:none}.brand span{color:#f59e0b}.admin-identity{display:flex;gap:10px;align-items:center;margin:0 8px 34px;padding:12px;border:1px solid rgba(255,255,255,.07);border-radius:10px;background:rgba(255,255,255,.03)}.admin-identity strong,.admin-identity small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.admin-identity strong{color:#e2e8f0;font-size:.75rem}.admin-identity small{margin-top:3px;color:#64748b;font-size:.65rem}.status-dot{width:8px;height:8px;flex:none;border-radius:50%;background:#4ade80;box-shadow:0 0 0 4px rgba(74,222,128,.12)}.side-label{margin:0 14px 14px;color:#64748b;font-size:.64rem;font-weight:800;letter-spacing:1.8px}nav{display:grid;gap:7px}nav a{display:flex;gap:13px;align-items:center;padding:12px 14px;border-radius:9px;color:#94a3b8;font-size:.88rem;text-decoration:none}nav a:hover,nav a.active{color:#fbbf24;background:rgba(245,158,11,.1)}.admin-theme-toggle{margin:18px 14px 10px}.back-link{margin:auto 14px 10px;color:#64748b;font-size:.73rem;text-decoration:none}.logout{margin:0 14px;padding:9px 0;border:0;color:#fca5a5;background:transparent;text-align:left;font:inherit;font-size:.73rem;cursor:pointer}.admin-content{flex:1;min-width:0}@media(max-width:600px){.admin-shell{display:block}.sidebar{width:100%;padding:18px}.brand{display:inline-block;margin:0 0 18px}.admin-identity{margin:0 0 18px}.side-label{display:none}.back-link,.logout{display:none}nav{display:flex;overflow:auto}nav a{white-space:nowrap}}`],
+selector: 'app-admin-shell',
+standalone: true,
+imports: [RouterLink, RouterLinkActive, ThemeToggle],
+template: ` <div class="admin-shell"> <aside class="sidebar"> <a routerLink="/inicio" class="brand">
+Liquor<span>Soft</span> </a>
+
+
+    <div class="admin-identity">
+      <span class="status-dot" aria-hidden="true"></span>
+      <div class="identity-info">
+        <strong>{{ auth.user()?.name }}</strong>
+        <small>Administrador</small>
+      </div>
+    </div>
+
+    <p class="side-label">GESTIÓN</p>
+
+    <nav aria-label="Menú de administración">
+      @if (auth.can('dashboard')) {
+        <a routerLink="/admin/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          <span class="nav-icon">▦</span>
+          <span>Resumen</span>
+        </a>
+      }
+
+      @if (auth.can('productos')) {
+        <a routerLink="/admin/productos" routerLinkActive="active">
+          <span class="nav-icon">▣</span>
+          <span>Productos</span>
+        </a>
+      }
+
+      @if (auth.can('categorias')) {
+        <a routerLink="/admin/categorias" routerLinkActive="active">
+          <span class="nav-icon">◈</span>
+          <span>Categorías</span>
+        </a>
+      }
+
+      @if (auth.can('inventario')) {
+        <a routerLink="/admin/inventario" routerLinkActive="active">
+          <span class="nav-icon">◫</span>
+          <span>Inventario</span>
+        </a>
+      }
+
+      @if (auth.can('ventas')) {
+        <a routerLink="/admin/ventas" routerLinkActive="active">
+          <span class="nav-icon">◌</span>
+          <span>Ventas</span>
+        </a>
+      }
+
+      @if (auth.can('compras')) {
+        <a routerLink="/admin/compras" routerLinkActive="active">
+          <span class="nav-icon">▤</span>
+          <span>Compras</span>
+        </a>
+      }
+
+      @if (auth.can('proveedores')) {
+        <a routerLink="/admin/proveedores" routerLinkActive="active">
+          <span class="nav-icon">▥</span>
+          <span>Proveedores</span>
+        </a>
+      }
+
+      @if (auth.can('usuarios')) {
+        <a routerLink="/admin/usuarios" routerLinkActive="active">
+          <span class="nav-icon">♙</span>
+          <span>Usuarios</span>
+        </a>
+      }
+    </nav>
+
+    <div class="sidebar-footer">
+      <app-theme-toggle class="admin-theme-toggle"></app-theme-toggle>
+
+      <a routerLink="/productos" class="back-link">
+        <span aria-hidden="true">←</span>
+        Ver tienda
+      </a>
+
+      <button type="button" class="logout" (click)="auth.logout()">
+        <span aria-hidden="true">↪</span>
+        Cerrar sesión
+      </button>
+    </div>
+  </aside>
+
+  <main class="admin-content">
+    <ng-content></ng-content>
+  </main>
+</div>
+
+
+`,
+  styles: [`
+:host {
+display: block;
+min-height: 100vh;
+color: #F8FAFC;
+}
+
+
+* {
+  box-sizing: border-box;
+}
+
+.admin-shell {
+  --admin-wine: #6D0F1A;
+  --admin-wine-hover: #8D1B30;
+  --admin-rose: #B83D5B;
+  --sidebar-width: 270px;
+
+  min-height: 100vh;
+  color: #F8FAFC;
+  background: #0B0B0B;
+}
+
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  width: var(--sidebar-width);
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  padding: 28px 18px 20px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #80545F #171014;
+  background: #171014;
+  border-right: 1px solid rgba(184, 61, 91, 0.24);
+}
+
+.brand {
+  display: inline-block;
+  width: fit-content;
+  margin: 0 14px 28px;
+  color: #FFFFFF;
+  font-size: 1.55rem;
+  font-weight: 850;
+  letter-spacing: -0.8px;
+  text-decoration: none;
+}
+
+.brand span {
+  color: var(--brand-accent, #c9294b);
+}
+
+.admin-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  margin: 0 4px 30px;
+  padding: 14px 12px;
+  background: rgba(184, 61, 91, 0.09);
+  border: 1px solid rgba(184, 61, 91, 0.25);
+  border-radius: 12px;
+}
+
+.identity-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.admin-identity strong,
+.admin-identity small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-identity strong {
+  color: #FFFFFF;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.admin-identity small {
+  margin-top: 5px;
+  color: #D6BFC7;
+  font-size: 0.7rem;
+}
+
+.status-dot {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 9px;
+  border-radius: 50%;
+  background: #D99AA9;
+  box-shadow: 0 0 0 4px rgba(184, 61, 91, 0.15);
+}
+
+.side-label {
+  margin: 0 14px 13px;
+  color: #C7AEB7;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+}
+
+nav {
+  display: grid;
+  flex: 0 0 auto;
+  gap: 7px;
+}
+
+nav a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 11px 13px;
+  color: #D0C2C8;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-size: 0.86rem;
+  font-weight: 550;
+  text-decoration: none;
+  transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 23px;
+  flex: 0 0 23px;
+  color: #D99AA9;
+  font-size: 1.05rem;
+}
+
+nav a:hover {
+  color: #FFFFFF;
+  background: rgba(141, 27, 48, 0.25);
+  border-color: rgba(184, 61, 91, 0.38);
+}
+
+nav a:hover .nav-icon {
+  color: #FFFFFF;
+}
+
+nav a.active {
+  color: #FFFFFF;
+  background: #6D0F1A;
+  border-color: #8D1B30;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(109, 15, 26, 0.2);
+}
+
+nav a.active .nav-icon {
+  color: #FFFFFF;
+}
+
+nav a:focus-visible,
+.brand:focus-visible,
+.back-link:focus-visible,
+.logout:focus-visible {
+  outline: 2px solid #E58DA3;
+  outline-offset: 3px;
+}
+
+.sidebar-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: auto;
+  padding-top: 24px;
+}
+
+.admin-theme-toggle {
+  display: block;
+  margin: 0 10px 14px;
+}
+
+.back-link,
+.logout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  margin: 0;
+  padding: 10px 13px;
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: 0.78rem;
+  text-decoration: none;
+  text-align: left;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.back-link {
+  color: #D0C2C8;
+  background: transparent;
+}
+
+.back-link:hover {
+  color: #FFFFFF;
+  background: rgba(184, 61, 91, 0.12);
+}
+
+.logout {
+  width: 100%;
+  color: #FFB8C3;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.logout:hover {
+  color: #FFFFFF;
+  background: rgba(141, 27, 48, 0.25);
+  border-color: rgba(255, 184, 195, 0.18);
+}
+
+.admin-content {
+  min-width: 0;
+  min-height: 100vh;
+  margin-left: var(--sidebar-width);
+  background: #0B0B0B;
+}
+
+:host-context([data-theme='light']) .admin-shell {
+  color: #29151C;
+  background: #F7F3F5;
+}
+
+:host-context([data-theme='light']) .sidebar {
+  background: #FFFFFF;
+  border-right-color: #DFCBD3;
+  box-shadow: 4px 0 18px rgba(66, 24, 40, 0.04);
+  scrollbar-color: #C8A6AF #FFFFFF;
+}
+
+:host-context([data-theme='light']) .brand {
+  color: #29151C;
+}
+
+:host-context([data-theme='light']) .brand span {
+  color: #6D0F1A;
+}
+
+:host-context([data-theme='light']) .admin-identity {
+  background: #F9EDF1;
+  border-color: #E7CCD5;
+}
+
+:host-context([data-theme='light']) .admin-identity strong {
+  color: #29151C;
+}
+
+:host-context([data-theme='light']) .admin-identity small {
+  color: #62515A;
+}
+
+:host-context([data-theme='light']) .side-label {
+  color: #70505D;
+}
+
+:host-context([data-theme='light']) nav a {
+  color: #51404A;
+}
+
+:host-context([data-theme='light']) .nav-icon {
+  color: #6D0F1A;
+}
+
+:host-context([data-theme='light']) nav a:hover {
+  color: #6D0F1A;
+  background: #F9EDF1;
+  border-color: #E7CCD5;
+}
+
+:host-context([data-theme='light']) nav a:hover .nav-icon {
+  color: #6D0F1A;
+}
+
+:host-context([data-theme='light']) nav a.active {
+  color: #FFFFFF;
+  background: #6D0F1A;
+  border-color: #6D0F1A;
+}
+
+:host-context([data-theme='light']) nav a.active .nav-icon {
+  color: #FFFFFF;
+}
+
+:host-context([data-theme='light']) .back-link {
+  color: #51404A;
+}
+
+:host-context([data-theme='light']) .back-link:hover {
+  color: #6D0F1A;
+  background: #F9EDF1;
+}
+
+:host-context([data-theme='light']) .logout {
+  color: #8F243A;
+}
+
+:host-context([data-theme='light']) .logout:hover {
+  color: #6D0F1A;
+  background: #F9EDF1;
+  border-color: #E7CCD5;
+}
+
+:host-context([data-theme='light']) .admin-content {
+  background: #F7F3F5;
+}
+
+@media (max-width: 900px) {
+  .admin-shell {
+    --sidebar-width: 230px;
+  }
+
+  .sidebar {
+    padding-right: 13px;
+    padding-left: 13px;
+  }
+}
+
+@media (max-width: 600px) {
+  .admin-shell {
+    --sidebar-width: 0px;
+  }
+
+  .sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    padding: 18px 14px 12px;
+    overflow: visible;
+    border-right: 0;
+    border-bottom: 1px solid rgba(184, 61, 91, 0.24);
+  }
+
+  .brand {
+    margin: 0 0 16px;
+    font-size: 1.4rem;
+  }
+
+  .admin-identity {
+    margin: 0 0 18px;
+  }
+
+  .side-label {
+    margin-bottom: 10px;
+  }
+
+  nav {
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+    padding: 2px 1px 8px;
+    scrollbar-width: thin;
+  }
+
+  nav a {
+    flex: 0 0 auto;
+    min-height: 40px;
+    padding: 10px 12px;
+    white-space: nowrap;
+  }
+
+  .sidebar-footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(184, 61, 91, 0.18);
+  }
+
+  .admin-theme-toggle {
+    grid-column: 1 / -1;
+    margin: 4px 8px 8px;
+  }
+
+  .back-link,
+  .logout {
+    justify-content: center;
+    padding: 9px 7px;
+    font-size: 0.72rem;
+  }
+
+  .admin-content {
+    min-height: auto;
+    margin-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  nav a,
+  .back-link,
+  .logout {
+    transition: none;
+  }
+}
+
+
+`],
 })
 export class AdminShell {
-  protected readonly auth = inject(AuthService);
+protected readonly auth = inject(AuthService);
 }

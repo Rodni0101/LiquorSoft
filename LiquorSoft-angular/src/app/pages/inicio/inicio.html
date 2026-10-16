@@ -128,3 +128,10 @@
     <p>Sistema de gestión para licorerías.</p><span>© 2026 LiquorSoft</span>
   </footer>
 </div>
+  <div class="preview-table">
+          <h2>Productos recientes</h2>@if (productsLoading) { <p class="muted">Cargando productos…</p> } @if
+          (!productsLoading && productsError) { <p class="muted">No fue posible cargar los productos.</p> } @for
+          (product of products.slice(0, 3); track product.name) { <div class="table-row"><span>{{ product.icon }} {{
+              product.name }}</span><strong>{{ formatPrice(product.price) }}</strong></div> } @if (!productsLoading &&
+          !productsError && !products.length) { <p class="muted">No hay productos disponibles.</p> }
+        </div>

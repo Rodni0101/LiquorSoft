@@ -1,3 +1,4 @@
+
 import { Injectable, signal } from '@angular/core';
 
 export interface CartItem {
@@ -11,29 +12,124 @@ export interface CartItem {
 
 @Injectable({ providedIn: 'root' })
 export class CartService {
+  private readonly storageKey = 'liquorsoft-cart';
+
   readonly items = signal<CartItem[]>(this.read());
-  readonly count = () => this.items().reduce((total, item) => total + item.quantity, 0);
-  add(product: Omit<CartItem, 'quantity'>): void {
-    const items = [...this.items()];
-    const current = items.find(item => (item.id ?? item.name) === (product.id ?? product.name));
-    if (current) {
-      const availableStock = product.stock ?? current.stock;
-      if (availableStock !== undefined && current.quantity >= availableStock) return;
-      current.quantity += 1;
-      if (product.stock !== undefined) current.stock = product.stock;
-    } else {
-      if (product.stock !== undefined && product.stock < 1) return;
-      items.push({ ...product, quantity: 1 });
+
+  readonly count = () =>
+    this.items().reduce((total, item) => total + item.quantity, 0);
+
+  readonly total = () =>
+    this.items().reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
+    );
+
+  add(product: Omit<CartItem, 'quantity'>): boolean {
+    if (!Number.isFinite(product.price) || product.price < 0) {
+      return false;
     }
-    this.items.set(items); localStorage.setItem('liquorsoft-cart', JSON.stringify(items));
+
+    const items = this.items().map(item => ({ ...item }));
+    const key = product.id ?? product.name;
+
+    const index = items.findIndex(
+      item => (item.id ?? item.name) === key
+    );
+
+    if (index >= 0) {
+      const current = items[index];
+      const stock = product.stock ?? current.stock;
+
+      if (stock !== undefined && current.quantity >= stock) {
+        return false;
+      }
+
+      items[index] = {
+        ...current,
+        stock,
+        quantity: current.quantity + 1
+      };
+    } else {
+      if (product.stock !== undefined && product.stock < 1) {
+        return false;
+      }
+
+      items.push({
+        ...product,
+        quantity: 1
+      });
+    }
+
+    this.persist(items);
+    return true;
   }
-  remove(product: CartItem): void { this.persist(this.items().filter(item => (item.id ?? item.name) !== (product.id ?? product.name))); }
-  clear(): void { this.persist([]); }
+
   decrease(product: CartItem): void {
-    const items = this.items().map(item => item === product ? { ...item, quantity: item.quantity - 1 } : item).filter(item => item.quantity > 0);
+    const key = product.id ?? product.name;
+
+    const items = this.items()
+      .map(item =>
+        (item.id ?? item.name) === key
+          ? { ...item, quantity: item.quantity - 1 }
+          : { ...item }
+      )
+      .filter(item => item.quantity > 0);
+
     this.persist(items);
   }
-  total(): number { return this.items().reduce((total, item) => total + item.price * item.quantity, 0); }
-  private persist(items: CartItem[]): void { this.items.set(items); localStorage.setItem('liquorsoft-cart', JSON.stringify(items)); }
-  private read(): CartItem[] { try { return JSON.parse(localStorage.getItem('liquorsoft-cart') ?? '[]') as CartItem[]; } catch { return []; } }
+
+  remove(product: CartItem): void {
+    const key = product.id ?? product.name;
+
+    this.persist(
+      this.items().filter(
+        item => (item.id ?? item.name) !== key
+      )
+    );
+  }
+
+  clear(): void {
+    this.persist([]);
+  }
+
+  private persist(items: CartItem[]): void {
+    this.items.set(items);
+
+    try {
+      localStorage.setItem(this.storageKey, JSON.stringify(items));
+    } catch {
+      console.warn(
+        'No se pudo guardar el carrito en el almacenamiento local.'
+      );
+    }
+  }
+
+  private read(): CartItem[] {
+    try {
+      const stored = localStorage.getItem(this.storageKey);
+
+      if (!stored) return [];
+
+      const parsed: unknown = JSON.parse(stored);
+
+      if (!Array.isArray(parsed)) return [];
+
+      return parsed.filter(
+        (item): item is CartItem =>
+          item !== null &&
+          typeof item === 'object' &&
+          typeof item.name === 'string' &&
+          typeof item.price === 'number' &&
+          Number.isFinite(item.price) &&
+          item.price >= 0 &&
+          typeof item.quantity === 'number' &&
+          Number.isInteger(item.quantity) &&
+          item.quantity > 0 &&
+          typeof item.icon === 'string'
+      );
+    } catch {
+      return [];
+    }
+  }
 }

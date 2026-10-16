@@ -3,10 +3,11 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CartService } from '../../cart.service';
 import { ThemeToggle } from '../../theme-toggle';
+import { ProductVisual } from '../../product-visual';
 
-interface Product { id: number; name: string; category: string; description: string; price: number; stock: number; icon: string; }
+interface Product { id: number; name: string; category: string; description: string; price: number; stock: number; icon: string; image?: string | null; }
 
-@Component({ selector: 'app-producto', standalone: true, imports: [RouterLink, ThemeToggle], templateUrl: './producto.html', styleUrl: './producto.css' })
+@Component({ selector: 'app-producto', standalone: true, imports: [RouterLink, ThemeToggle, ProductVisual], templateUrl: './producto.html', styleUrl: './producto.css' })
 export class Producto implements OnInit {
   private readonly http = inject(HttpClient);
   private readonly route = inject(ActivatedRoute);
@@ -30,7 +31,7 @@ export class Producto implements OnInit {
     if (!this.product) return;
     let added = 0;
     for (let index = 0; index < this.quantity; index += 1) {
-      if (this.cart.add({ id: this.product.id, name: this.product.name, price: this.product.price, icon: this.product.icon, stock: this.product.stock })) added += 1;
+      if (this.cart.add({ id: this.product.id, name: this.product.name, price: this.product.price, icon: this.product.icon, stock: this.product.stock, image: this.product.image, category: this.product.category })) added += 1;
     }
     this.cartMessage = added
       ? `${added} ${added === 1 ? 'unidad añadida' : 'unidades añadidas'} de ${this.product.name}.`

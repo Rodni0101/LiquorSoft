@@ -6,6 +6,8 @@ export interface CartItem {
   name: string;
   price: number;
   icon: string;
+  image?: string | null;
+  category?: string;
   stock?: number;
   quantity: number;
 }
@@ -47,6 +49,8 @@ export class CartService {
       items[index] = {
         ...current,
         stock,
+        image: product.image ?? current.image,
+        category: product.category ?? current.category,
         quantity: current.quantity + 1
       };
     } else {

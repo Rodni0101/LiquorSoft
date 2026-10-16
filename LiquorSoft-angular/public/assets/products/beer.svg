@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="260" viewBox="0 0 180 260">
+  <defs><linearGradient id="beer-glass" x1="0" x2="1"><stop stop-color="#49230c"/><stop offset=".2" stop-color="#c67518"/><stop offset=".5" stop-color="#ffd35b"/><stop offset=".8" stop-color="#b95c13"/><stop offset="1" stop-color="#3c1c0a"/></linearGradient><linearGradient id="beer-liquid" x2="0" y2="1"><stop stop-color="#f6bc36"/><stop offset="1" stop-color="#a8440e"/></linearGradient></defs>
+  <ellipse cx="90" cy="244" rx="39" ry="8" fill="#160d05" opacity=".4"/>
+  <!-- Amber long-neck bottle with narrow neck, angled shoulders and crown cap. -->
+  <path d="M80 20h20v39l13 13q8 8 8 20v127q0 13-13 13H72q-13 0-13-13V92q0-12 8-20l13-13z" fill="url(#beer-glass)" stroke="#f4c96d" stroke-width="2"/>
+  <path d="M79 16h22v9H79z" fill="#d5d1bd"/><path d="M79 25h22v10H79z" fill="#8c8270"/>
+  <path d="M63 146h54v65q0 11-11 11H74q-11 0-11-11z" fill="url(#beer-liquid)"/><path d="M66 98v43m48-43v43" stroke="#fff1bd" stroke-width="4" opacity=".42"/>
+  <path d="M61 111h58v40H61z" fill="#f5e7c8" stroke="#b58a4c"/><path d="M73 122h34m-25 10h16" stroke="#94662c" stroke-width="2"/>
+  <circle cx="76" cy="178" r="3" fill="#fff0aa"/><circle cx="99" cy="188" r="2.5" fill="#fff0aa"/><circle cx="88" cy="169" r="2" fill="#fff0aa"/>
+</svg>

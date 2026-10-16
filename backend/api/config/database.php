@@ -30,7 +30,22 @@ function liquorsoftEnv(string $key, string $fallback): string
     static $fileValues;
     if ($fileValues === null) {
         $envFile = dirname(__DIR__, 2) . '/.env';
-        $fileValues = is_file($envFile) ? (parse_ini_file($envFile, false, INI_SCANNER_RAW) ?: []) : [];
+        $fileValues = [];
+        if (is_file($envFile) && is_readable($envFile)) {
+            foreach (file($envFile, FILE_IGNORE_NEW_LINES) ?: [] as $line) {
+                $line = trim($line);
+                if ($line === '' || $line[0] === '#' || $line[0] === ';') continue;
+                $separator = strpos($line, '=');
+                if ($separator === false) continue;
+                $name = trim(substr($line, 0, $separator));
+                if ($name === '' || !preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $name)) continue;
+                $value = trim(substr($line, $separator + 1));
+                if (strlen($value) >= 2 && (($value[0] === '"' && $value[-1] === '"') || ($value[0] === "'" && $value[-1] === "'"))) {
+                    $value = substr($value, 1, -1);
+                }
+                $fileValues[$name] = $value;
+            }
+        }
     }
     return isset($fileValues[$key]) ? trim((string) $fileValues[$key], " \t\n\r\0\x0B\"'") : $fallback;
 }
@@ -80,6 +95,15 @@ function currentUser(mysqli $connection): ?array
 function liquorsoftSessionStart(): void
 {
     if (session_status() !== PHP_SESSION_ACTIVE) {
+        $configuredPath = liquorsoftEnv('LIQUORSOFT_SESSION_SAVE_PATH', '');
+        if ($configuredPath !== '') {
+            if (!is_dir($configuredPath)) @mkdir($configuredPath, 0700, true);
+            if (is_dir($configuredPath) && is_writable($configuredPath)) session_save_path($configuredPath);
+        } elseif (!is_writable(session_save_path())) {
+            $fallbackPath = sys_get_temp_dir() . '/liquorsoft-sessions';
+            if (!is_dir($fallbackPath)) @mkdir($fallbackPath, 0700, true);
+            if (is_dir($fallbackPath) && is_writable($fallbackPath)) session_save_path($fallbackPath);
+        }
         session_start([
             'cookie_httponly' => true,
             'cookie_samesite' => 'Lax',
@@ -104,6 +128,47 @@ function tableHasColumn(mysqli $connection, string $table, string $column): bool
     $exists = ((int) ($statement->get_result()->fetch_assoc()['total'] ?? 0)) > 0;
     $statement->close();
     return $exists;
+}
+
+function paymentSimulatorEnabled(): bool
+{
+    return liquorsoftEnv('LIQUORSOFT_APP_ENV', 'production') === 'development'
+        && liquorsoftEnv('LIQUORSOFT_PAYMENT_SIMULATOR', '0') === '1';
+}
+
+function isAdultBirthDate(string $value): bool
+{
+    $timezone = new DateTimeZone('America/Bogota');
+    $birthDate = DateTimeImmutable::createFromFormat('!Y-m-d', $value, $timezone);
+    $errors = DateTimeImmutable::getLastErrors();
+    return $birthDate !== false
+        && ($errors === false || ($errors['warning_count'] === 0 && $errors['error_count'] === 0))
+        && $birthDate->format('Y-m-d') === $value
+        && $birthDate->modify('+18 years') <= new DateTimeImmutable('today', $timezone);
+}
+
+function issueCsrfCookie(): void
+{
+    liquorsoftSessionStart();
+    if (empty($_SESSION['csrf_token'])) $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || liquorsoftEnv('LIQUORSOFT_COOKIE_SECURE', '0') === '1';
+    setcookie('liquorsoft_csrf', (string) $_SESSION['csrf_token'], [
+        'expires' => time() + 7200, 'path' => '/', 'secure' => $secure,
+        'httponly' => false, 'samesite' => 'Strict',
+    ]);
+}
+
+function requireCsrfToken(): void
+{
+    liquorsoftSessionStart();
+    $cookie = (string) ($_COOKIE['liquorsoft_csrf'] ?? '');
+    $header = (string) ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
+    $sessionToken = (string) ($_SESSION['csrf_token'] ?? '');
+    if ($cookie === '' || $header === '' || $sessionToken === ''
+        || !hash_equals($sessionToken, $cookie) || !hash_equals($sessionToken, $header)) {
+        jsonResponse(403, ['message' => 'La sesión de compra caducó. Actualiza la página e inténtalo de nuevo.']);
+    }
 }
 
 function productIcon(string $category): string

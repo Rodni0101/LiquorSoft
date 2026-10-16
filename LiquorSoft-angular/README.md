@@ -14,9 +14,19 @@ sesión. Incluye:
 - Búsqueda por nombre, categoría o descripción.
 - Filtro rápido por categoría.
 - Tarjetas responsive con precio, descripción y productos destacados.
+- Fotografía por producto si `productos.imagen` contiene una ruta/URL válida;
+  cuando falta o no carga, se muestra una ilustración SVG local según la
+  categoría. Las ilustraciones son recursos genéricos, no fotos ni logos de
+  marcas.
 
 La portada continúa disponible en `/inicio`, la tienda en `/productos` y el
 flujo administrativo protegido en `/admin/dashboard`.
+
+Los recursos alternativos viven en `LiquorSoft-angular/public/assets/products/`
+y los renderiza el componente reutilizable `ProductVisual`. Está integrado en
+catálogo, inicio, detalle, recomendaciones, carrito, chat y lista del panel
+administrativo. Para usar una foto real, asigna su ruta o URL desde el campo de
+imagen del formulario administrativo; ese campo no carga archivos.
 
 ## Dashboard y datos
 

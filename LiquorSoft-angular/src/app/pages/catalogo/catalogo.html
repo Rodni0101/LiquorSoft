@@ -1,6 +1,6 @@
 <div class="catalog-page">
   <header class="catalog-navbar">
-    <a routerLink="/catalogo" class="logo" aria-label="LiquorSoft, catálogo principal"><span class="logo-mark" aria-hidden="true">LS</span><span class="logo-word">Liquor<span>Soft</span></span></a>
+    <a routerLink="/inicio" class="logo" aria-label="LiquorSoft, ir al inicio"><span class="logo-mark" aria-hidden="true">LS</span><span class="logo-word">Liquor<span>Soft</span></span></a>
     <nav aria-label="Navegación principal">
       <a routerLink="/catalogo" class="active">Catálogo</a>
       <a routerLink="/inicio">Conoce LiquorSoft</a>
@@ -21,9 +21,6 @@
         <span class="eyebrow">SELECCIÓN LIQUORSOFT</span>
         <h1>Encuentra algo <span>especial.</span></h1>
         <p>Explora nuestra selección de licores, vinos, cervezas y mixers para cada ocasión.</p>
-      </div>
-      <div class="hero-badge" aria-hidden="true">
-        <span>✦</span><small>Calidad<br />para compartir</small>
       </div>
     </section>
 
@@ -63,7 +60,7 @@
     <aside id="carrito" class="cart-panel" aria-labelledby="cart-title">
       <div class="section-heading"><div><span class="eyebrow">TU SELECCIÓN</span><h2 id="cart-title">Carrito <span>({{ cart.count() }})</span></h2></div></div>
       @if (cart.items().length) {
-        <div class="cart-items">@for (item of cart.items(); track item.id || item.name) {<div class="cart-item"><span class="cart-item-icon">{{ item.icon }}</span><div><strong>{{ item.name }}</strong><small>{{ formatPrice(item.price) }} · {{ item.quantity }} ud.</small></div><div class="cart-item-actions"><button type="button" (click)="cart.decrease(item)" aria-label="Restar una unidad">−</button><b>{{ item.quantity }}</b><button type="button" [disabled]="item.stock !== undefined && item.quantity >= item.stock" (click)="cart.add({id: item.id, name: item.name, price: item.price, icon: item.icon, stock: item.stock})" aria-label="Agregar una unidad">+</button><button type="button" (click)="cart.remove(item)" aria-label="Eliminar producto">×</button></div><strong>{{ formatPrice(item.price * item.quantity) }}</strong></div>}</div>
+      <div class="cart-items">@for (item of cart.items(); track item.id || item.name) {<div class="cart-item"><app-product-visual class="cart-item-icon" [category]="item.category || ''" [imageUrl]="item.image || null" [altText]="item.name" /><div><strong>{{ item.name }}</strong><small>{{ formatPrice(item.price) }} · {{ item.quantity }} ud.</small></div><div class="cart-item-actions"><button type="button" (click)="cart.decrease(item)" aria-label="Restar una unidad">−</button><b>{{ item.quantity }}</b><button type="button" [disabled]="item.stock !== undefined && item.quantity >= item.stock" (click)="cart.add({id: item.id, name: item.name, price: item.price, icon: item.icon, stock: item.stock,image:item.image,category:item.category})" aria-label="Agregar una unidad">+</button><button type="button" (click)="cart.remove(item)" aria-label="Eliminar producto">×</button></div><strong>{{ formatPrice(item.price * item.quantity) }}</strong></div>}</div>
         <div class="cart-summary"><span>Total</span><strong>{{ formatPrice(cart.total()) }}</strong><div><a routerLink="/productos">Seguir comprando</a><a routerLink="/checkout" class="register-link">Finalizar compra</a></div></div>
       } @else { <p class="catalog-notice">Tu carrito está vacío. Agrega una selección para comenzar.</p> }
     </aside>
@@ -82,7 +79,7 @@
           @for (product of filteredProducts(); track product.name) {
             <article class="product-card">
               <div class="product-image">
-                <span>{{ product.icon }}</span>
+                <app-product-visual [category]="product.category" [imageUrl]="product.image || null" [altText]="product.name" />
                 @if (product.featured) {
                   <b>Destacado</b>
                 }
@@ -113,7 +110,7 @@
   </main>
 
   <footer class="catalog-footer">
-    <span class="logo"><span class="logo-mark" aria-hidden="true">LS</span><span class="logo-word">Liquor<span>Soft</span></span></span>
+    <a routerLink="/inicio" class="logo" aria-label="LiquorSoft, ir al inicio"><span class="logo-mark" aria-hidden="true">LS</span><span class="logo-word">Liquor<span>Soft</span></span></a>
     <p>Una selección para disfrutar buenos momentos.</p>
     <span>© 2026 LiquorSoft</span>
   </footer>

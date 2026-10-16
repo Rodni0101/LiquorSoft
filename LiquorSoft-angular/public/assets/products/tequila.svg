@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="260" viewBox="0 0 180 260">
+  <defs><linearGradient id="tequila-glass" x1="0" x2="1"><stop stop-color="#84602f"/><stop offset=".2" stop-color="#e4c475"/><stop offset=".5" stop-color="#fff0bf"/><stop offset=".8" stop-color="#c09348"/><stop offset="1" stop-color="#68502c"/></linearGradient><linearGradient id="tequila-liquid" x2="0" y2="1"><stop stop-color="#d9bc70"/><stop offset="1" stop-color="#a77432"/></linearGradient></defs>
+  <ellipse cx="90" cy="244" rx="47" ry="8" fill="#171108" opacity=".35"/>
+  <!-- Heavy, squared agave-spirit bottle with short neck and a broad foot. -->
+  <path d="M75 22h30v30l18 18v148q0 14-14 14H71q-14 0-14-14V70l18-18z" fill="url(#tequila-glass)" stroke="#f8e7ae" stroke-width="2"/>
+  <path d="M59 164h62v52q0 11-12 11H71q-12 0-12-11z" fill="url(#tequila-liquid)"/><path d="M75 22h30v15H75z" fill="#4a633a"/>
+  <path d="M64 89v65m51-65v65" stroke="#fff9dd" stroke-width="4" opacity=".42"/>
+  <path d="M59 113h62v48H59z" fill="#f4e9c9" stroke="#a48d5d"/><path d="M90 119c-13 10-13 21 0 31 13-10 13-21 0-31Z" fill="#719458"/>
+  <path d="M90 150v-27m0 13-12-10m12 18 11-11" stroke="#416f42" stroke-width="2"/><path d="M72 155h36" stroke="#91764b" stroke-width="2"/>
+  <path d="M69 76h42" stroke="#fff4cb" stroke-width="3" opacity=".7"/>
+</svg>

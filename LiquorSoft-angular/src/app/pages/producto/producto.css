@@ -89,9 +89,10 @@
   border: 1px solid #4a2030;
   border-radius: 24px;
   background: radial-gradient(circle, rgba(183, 74, 103, .25), transparent 55%), linear-gradient(145deg, #321322, #16090f);
-  font-size: 9rem;
   box-shadow: 0 25px 65px rgba(0, 0, 0, .35);
 }
+
+.product-visual app-product-visual { width: 100%; height: 100%; }
 
 .eyebrow {
   color: #e7b56a;
@@ -203,9 +204,7 @@
   text-decoration: none;
 }
 
-.related a > span {
-  font-size: 2rem;
-}
+.related a app-product-visual { width: 100%; height: 128px; overflow: hidden; border-radius: 8px; background: radial-gradient(circle, rgba(183, 74, 103, .2), transparent 65%); }
 
 .related small {
   color: #b9a5aa;
@@ -251,7 +250,6 @@
 
   .product-visual {
     min-height: 260px;
-    font-size: 6rem;
   }
 
   .purchase-controls {
@@ -268,4 +266,53 @@
   .related > div {
     grid-template-columns: 1fr;
   }
+}
+
+:host-context([data-theme='light']) .product-page {
+  color: #302725;
+  background: #f4f0e8;
+}
+
+:host-context([data-theme='light']) .product-navbar {
+  border-color: #ded5c9;
+  background: rgba(244, 240, 232, .96);
+}
+
+:host-context([data-theme='light']) .product-navbar a,
+:host-context([data-theme='light']) .back-link,
+:host-context([data-theme='light']) .product-info p,
+:host-context([data-theme='light']) .breadcrumbs,
+:host-context([data-theme='light']) .related small,
+:host-context([data-theme='light']) .state {
+  color: #71665f;
+}
+
+:host-context([data-theme='light']) .breadcrumbs strong,
+:host-context([data-theme='light']) .state.error h1 {
+  color: #302725;
+}
+
+:host-context([data-theme='light']) .product-visual {
+  min-height: 480px;
+  border-color: #ded5c9;
+  border-radius: 10px;
+  background: #eee8de;
+  box-shadow: none;
+}
+
+:host-context([data-theme='light']) .eyebrow { color: #a6554b; }
+:host-context([data-theme='light']) .product-price { color: #65252b; }
+:host-context([data-theme='light']) .stock-copy { color: #276b46; }
+:host-context([data-theme='light']) .stock-copy.empty { color: #9b3830; }
+:host-context([data-theme='light']) .quantity { border-color: #ded5c9; }
+:host-context([data-theme='light']) .quantity button { color: #302725; background: #eee8de; }
+:host-context([data-theme='light']) .primary-action { border-radius: 5px; background: #65252b; }
+:host-context([data-theme='light']) .primary-action:hover { background: #7b3035; }
+:host-context([data-theme='light']) .related a { border-color: #ded5c9; border-radius: 8px; color: #302725; background: #fbf9f4; }
+:host-context([data-theme='light']) .related a app-product-visual { border-radius: 5px; background: #eee8de; }
+:host-context([data-theme='light']) .cart-feedback { border-color: #a9cbb2; color: #276b46; background: #eff7ed; }
+:host-context([data-theme='light']) .cart-feedback a { color: #65252b; }
+
+@media (max-width: 700px) {
+  :host-context([data-theme='light']) .product-visual { min-height: 300px; }
 }

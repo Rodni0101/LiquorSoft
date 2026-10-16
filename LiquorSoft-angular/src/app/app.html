@@ -1,14 +1,49 @@
 <router-outlet></router-outlet>
+<section class="global-notices" aria-label="Notificaciones" aria-live="polite">
+  @for (notice of notifications.notices(); track notice.id) {
+    <article class="global-notice" [class]="'global-notice ' + notice.kind" role="status">
+      <span aria-hidden="true">{{ notice.kind === 'success' ? '✓' : notice.kind === 'error' ? '!' : notice.kind === 'warning' ? '⚠' : 'i' }}</span>
+      <p>{{ notice.message }}</p>
+      <button type="button" aria-label="Cerrar aviso" (click)="notifications.close(notice.id)">×</button>
+    </article>
+  }
+</section>
+@if (notifications.confirmation(); as confirmation) {
+  <div class="confirm-backdrop" role="presentation">
+    <section class="confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-message" (keydown.escape)="notifications.answerConfirmation(false)">
+      <h2 id="confirm-title">{{ confirmation.title }}</h2>
+      <p id="confirm-message">{{ confirmation.message }}</p>
+      <div><button type="button" class="confirm-cancel" autofocus (click)="notifications.answerConfirmation(false)">Cancelar</button><button type="button" class="confirm-accept" (click)="notifications.answerConfirmation(true)">{{ confirmation.acceptLabel }}</button></div>
+    </section>
+  </div>
+}
 <section class="store-chat" aria-label="Asistente de LiquorSoft">
   @if (chatOpen()) {
     <div class="chat-panel" role="dialog" aria-labelledby="chat-title">
-      <header class="chat-header"><div class="chat-heading"><span class="chat-status-dot" aria-hidden="true"></span><strong id="chat-title">Asistente LiquorSoft</strong><small>Catálogo y recomendaciones</small></div><button type="button" class="chat-close" aria-label="Cerrar chat" (click)="chatOpen.set(false)">×</button></header>
+      <header class="chat-header">
+        <div class="chat-heading">
+          <span class="chat-status-dot" aria-hidden="true"></span>
+          <span class="chat-brand-icon" aria-hidden="true">
+            <svg class="bi bi-chat-dots-fill" viewBox="0 0 16 16"><path d="M16 8c0 3.866-3.582 7-8 7a9 9 0 0 1-2.347-.306c-.584.296-1.925.864-4.181 1.234-.2.032-.352-.176-.273-.362.354-.836.674-1.95.77-2.966C.744 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7M5 8a1 1 0 1 0-2 0 1 1 0 0 0 2 0m4 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0m3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/></svg>
+          </span>
+          <strong id="chat-title">Asistente LiquorSoft</strong>
+          <small>Catálogo y recomendaciones</small>
+        </div>
+        <button type="button" class="chat-close" aria-label="Cerrar chat" (click)="chatOpen.set(false)">
+          <svg class="bi bi-x-lg" aria-hidden="true" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg>
+        </button>
+      </header>
       <div #chatMessages class="chat-messages" aria-live="polite">
         @for (message of chatMessagesList(); track $index) {
-          <p class="chat-bubble" [class.from-user]="message.role === 'user'">{{ message.text }}</p>
+          <p class="chat-bubble" [class.from-user]="message.role === 'user'">
+            @if (message.role === 'assistant') {
+              <svg class="bi chat-bubble-icon" aria-hidden="true" viewBox="0 0 16 16"><path d="M16 8c0 3.866-3.582 7-8 7a9 9 0 0 1-2.347-.306c-.584.296-1.925.864-4.181 1.234-.2.032-.352-.176-.273-.362.354-.836.674-1.95.77-2.966C.744 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7M5 8a1 1 0 1 0-2 0 1 1 0 0 0 2 0m4 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0m3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/></svg>
+            }
+            {{ message.text }}
+          </p>
           @for (product of message.products ?? []; track product.id) {
             @if (product.name) {
-              <article class="chat-product"><div><strong>{{ product.icon }} {{ product.name }}</strong><small>{{ product.category }} · {{ product.stock }} disponibles</small></div><b>{{ formatChatPrice(product.price) }}</b><button type="button" [disabled]="product.stock < 1" (click)="addChatProduct(product)">Agregar</button></article>
+              <article class="chat-product"><app-product-visual class="chat-product-visual" [category]="product.category" [imageUrl]="product.image || null" [altText]="product.name" /><div><strong>{{ product.name }}</strong><small>{{ product.category }} · {{ product.stock }} disponibles</small></div><b>{{ formatChatPrice(product.price) }}</b><button type="button" [disabled]="product.stock < 1" (click)="addChatProduct(product)"><svg class="bi" aria-hidden="true" viewBox="0 0 16 16"><path d="M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9z"/><path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4h7a2 2 0 1 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1zm3.915 10L3.102 4h10.796l-1.313 7zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0m7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/></svg><span>Agregar</span></button></article>
             }
           }
         }
@@ -22,10 +57,10 @@
           </nav>
         }
       </div>
-      <form class="chat-form" (submit)="sendChatMessage($event)"><input aria-label="Escribe tu pregunta" [value]="chatInput()" (input)="setChatInput($event)" placeholder="¿Qué estás buscando?" autocomplete="off" [disabled]="catalogLoading()" /><button type="submit" [disabled]="catalogLoading() || chatBusy() || !chatInput().trim()" aria-label="Enviar pregunta"><span aria-hidden="true">↑</span></button></form>
+      <form class="chat-form" (submit)="sendChatMessage($event)"><input aria-label="Escribe tu pregunta" [value]="chatInput()" (input)="setChatInput($event)" placeholder="¿Qué estás buscando?" autocomplete="off" [disabled]="catalogLoading()" /><button type="submit" [disabled]="catalogLoading() || chatBusy() || !chatInput().trim()" aria-label="Enviar pregunta"><svg class="bi" aria-hidden="true" viewBox="0 0 16 16"><path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471z"/></svg></button></form>
     </div>
   }
-  @if (!chatOpen()) { <button type="button" class="chat-launcher" [attr.aria-expanded]="chatOpen()" aria-label="Abrir asistente de LiquorSoft" (click)="openChat()"><span aria-hidden="true">✦</span><span>¿Te ayudo?</span></button> }
+  @if (!chatOpen()) { <button type="button" class="chat-launcher" [attr.aria-expanded]="chatOpen()" aria-label="Abrir asistente de LiquorSoft" (click)="openChat()"><svg class="bi" aria-hidden="true" viewBox="0 0 16 16"><path d="M16 8c0 3.866-3.582 7-8 7a9 9 0 0 1-2.347-.306c-.584.296-1.925.864-4.181 1.234-.2.032-.352-.176-.273-.362.354-.836.674-1.95.77-2.966C.744 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7M5 8a1 1 0 1 0-2 0 1 1 0 0 0 2 0m4 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0m3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/></svg><span>¿Te ayudo?</span></button> }
 </section>
 <a class="whatsapp-float" href="https://wa.me/573000000000?text=Hola%20LiquorSoft" target="_blank"
 	rel="noopener noreferrer" aria-label="Contactar por WhatsApp" title="Contactar por WhatsApp">

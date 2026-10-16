@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="260" viewBox="0 0 180 260">
+  <defs><linearGradient id="rum-glass" x1="0" x2="1"><stop stop-color="#4e2014"/><stop offset=".2" stop-color="#d17a35"/><stop offset=".45" stop-color="#743119"/><stop offset=".72" stop-color="#bd6425"/><stop offset="1" stop-color="#38170f"/></linearGradient><linearGradient id="rum-fill" x2="0" y2="1"><stop stop-color="#db9149"/><stop offset="1" stop-color="#6c2b17"/></linearGradient></defs>
+  <ellipse cx="90" cy="244" rx="50" ry="8" fill="#130b08" opacity=".35"/>
+  <!-- Rounded shoulders and generous amber body, common in aged rum bottles. -->
+  <path d="M75 20h30v32q0 7 10 13 27 17 27 43v105q0 15-15 15H53q-15 0-15-15V108q0-26 27-43 10-6 10-13z" fill="url(#rum-glass)" stroke="#f0c17a" stroke-opacity=".68" stroke-width="2"/>
+  <path d="M40 153h100v60q0 12-12 12H52q-12 0-12-12z" fill="url(#rum-fill)"/>
+  <path d="M75 20h30v20H75z" fill="#38231a"/><path d="M72 52h36" stroke="#ffe0ad" stroke-width="3" opacity=".55"/>
+  <path d="M48 105v39m84-39v39" stroke="#fff3d5" stroke-width="4" opacity=".27"/>
+  <path d="M50 112h80v48H50z" fill="#4b261a" stroke="#d4a75f" stroke-width="2"/><path d="M59 121h62v30H59z" fill="#ead1a4"/>
+  <path d="M68 129h44m-32 9h22m-15 8h8" stroke="#73452a" stroke-width="2.5"/><path d="M61 170h58" stroke="#efc783" stroke-width="2" opacity=".7"/>
+</svg>

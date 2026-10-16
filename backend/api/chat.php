@@ -91,7 +91,7 @@ if (preg_match('/\b(envios?|domicilio|entregas?|horarios?|devoluciones?|direccio
 } else {
     $sql = "SELECT p.id, p.nombre AS name, COALESCE(c.nombre, 'Sin categoría') AS category,
                    COALESCE(p.descripcion, '') AS description,
-                   p.precio AS price, p.stock
+                   p.precio AS price, p.stock, p.imagen AS image
             FROM productos p LEFT JOIN categorias c ON c.id = p.categoria_id
             WHERE p.estado = 1 AND p.stock > 0";
     $types = '';
@@ -138,6 +138,7 @@ if (preg_match('/\b(envios?|domicilio|entregas?|horarios?|devoluciones?|direccio
             'description' => (string) $product['description'],
             'price' => (float) $product['price'],
             'stock' => (int) $product['stock'],
+            'image' => !empty($product['image']) ? (string) $product['image'] : null,
             'icon' => productIcon((string) $product['category']),
         ];
     }
@@ -323,7 +324,7 @@ function chatRunTool(mysqli $connection, string $name, array $arguments): array
     }
 
     $sql = "SELECT p.id, p.nombre AS name, COALESCE(c.nombre, 'Sin categoría') AS category,
-                   COALESCE(p.descripcion, '') AS description, p.precio AS price, p.stock
+                   COALESCE(p.descripcion, '') AS description, p.precio AS price, p.stock, p.imagen AS image
             FROM productos p LEFT JOIN categorias c ON c.id = p.categoria_id
             WHERE p.estado = 1 AND p.stock > 0";
     $types = '';
@@ -367,6 +368,7 @@ function chatRunTool(mysqli $connection, string $name, array $arguments): array
             'id' => (int) $row['id'], 'name' => (string) $row['name'],
             'category' => (string) $row['category'], 'description' => (string) $row['description'],
             'price' => (float) $row['price'], 'stock' => (int) $row['stock'],
+            'image' => !empty($row['image']) ? (string) $row['image'] : null,
             'icon' => productIcon((string) $row['category']),
         ];
     }

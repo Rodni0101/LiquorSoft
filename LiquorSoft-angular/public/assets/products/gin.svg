@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="260" viewBox="0 0 180 260">
+  <defs><linearGradient id="gin-glass" x1="0" x2="1"><stop stop-color="#173e44"/><stop offset=".2" stop-color="#78c3b0"/><stop offset=".45" stop-color="#d8ead0"/><stop offset=".7" stop-color="#579a8b"/><stop offset="1" stop-color="#173239"/></linearGradient></defs>
+  <ellipse cx="90" cy="244" rx="49" ry="8" fill="#071514" opacity=".4"/>
+  <!-- Squat apothecary shoulders and a heavy square base distinguish a gin bottle. -->
+  <path d="M76 17h28v35l20 16v146q0 13-13 13H69q-13 0-13-13V68l20-16z" fill="url(#gin-glass)" stroke="#d4f2d9" stroke-opacity=".75" stroke-width="2"/>
+  <path d="M76 17h28v15H76z" fill="#203d39"/><path d="M65 83v124m50-124v124" stroke="#f1fff0" stroke-width="3" opacity=".45"/>
+  <path d="M59 116h62v58H59z" fill="#f4ead2" stroke="#c7b891"/>
+  <path d="M74 137q16-22 32 0-16 21-32 0Z" fill="none" stroke="#466e5d" stroke-width="2"/><path d="M74 137h32" stroke="#466e5d" stroke-width="2"/>
+  <circle cx="74" cy="155" r="3" fill="#668b65"/><circle cx="106" cy="155" r="3" fill="#668b65"/><path d="M81 155h18m-22 12h26" stroke="#8f8064" stroke-width="2"/>
+  <path d="M69 71h42" stroke="#e5ffe8" stroke-width="3" opacity=".5"/>
+</svg>

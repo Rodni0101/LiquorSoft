@@ -2,16 +2,18 @@ import { Component, ElementRef, ViewChild, inject, signal } from '@angular/core'
 import { HttpClient } from '@angular/common/http';
 import { RouterOutlet } from '@angular/router';
 import { CartService } from './cart.service';
+import { ProductVisual } from './product-visual';
+import { NotificationService } from './notification.service';
 
 interface ChatProduct {
   id: number; name: string; category: string; description: string;
-  price: number; stock: number; icon: string;
+  price: number; stock: number; icon: string; image?: string | null;
 }
 
 interface ChatMessage { role: 'assistant' | 'user'; text: string; products?: ChatProduct[]; }
 
 @Component({
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, ProductVisual],
   selector: 'app-root',
   styleUrl: './app.css',
   templateUrl: './app.html',
@@ -20,6 +22,7 @@ export class App {
   protected readonly title = signal('LiquorSoft-angular');
   private readonly http = inject(HttpClient);
   private readonly cart = inject(CartService);
+  protected readonly notifications = inject(NotificationService);
   @ViewChild('chatMessages') private chatMessages?: ElementRef<HTMLElement>;
   protected readonly chatOpen = signal(false);
   protected readonly chatBusy = signal(false);
@@ -142,7 +145,7 @@ export class App {
   }
 
   protected addChatProduct(product: ChatProduct): void {
-    const added = this.cart.add({ id: product.id, name: product.name, price: product.price, icon: product.icon, stock: product.stock });
+    const added = this.cart.add({ id: product.id, name: product.name, price: product.price, icon: product.icon, stock: product.stock, image: product.image, category: product.category });
     this.chatMessagesList.update(messages => [...messages, { role: 'assistant', text: added ? `${product.name} se agregó al carrito.` : `${product.name} no tiene unidades disponibles.` }]);
     this.scrollChat();
   }

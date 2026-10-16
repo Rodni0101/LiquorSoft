@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="260" viewBox="0 0 180 260">
+  <defs><linearGradient id="vodka-glass" x1="0" x2="1"><stop stop-color="#8ab8d0" stop-opacity=".35"/><stop offset=".22" stop-color="#fff" stop-opacity=".88"/><stop offset=".48" stop-color="#bad9e9" stop-opacity=".46"/><stop offset=".8" stop-color="#fff" stop-opacity=".84"/><stop offset="1" stop-color="#719db6" stop-opacity=".4"/></linearGradient><linearGradient id="vodka-label" x2="0" y2="1"><stop stop-color="#f9ffff"/><stop offset="1" stop-color="#c8e0ed"/></linearGradient></defs>
+  <ellipse cx="90" cy="244" rx="39" ry="8" fill="#13212a" opacity=".3"/>
+  <!-- Tall, narrow clear bottle with long straight walls and a compact shoulder. -->
+  <path d="M77 14h26v40l12 16q8 10 8 24v131q0 12-12 12H69q-12 0-12-12V94q0-14 8-24l12-16z" fill="url(#vodka-glass)" stroke="#d8f4ff" stroke-width="2"/>
+  <path d="M77 14h26v17H77z" fill="#718c9e"/><path d="M75 55h30" stroke="#fff" stroke-width="3" opacity=".8"/>
+  <path d="M65 91v122m50-122v122" stroke="#fff" stroke-width="4" opacity=".7"/>
+  <path d="M60 125h60v43H60z" fill="url(#vodka-label)" stroke="#8eb5ca"/><circle cx="90" cy="140" r="7" fill="none" stroke="#749db2" stroke-width="2"/>
+  <path d="M73 155h34m-24 7h14" stroke="#7194a8" stroke-width="2"/><path d="M72 184h36" stroke="#dff8ff" stroke-width="3" opacity=".85"/>
+</svg>

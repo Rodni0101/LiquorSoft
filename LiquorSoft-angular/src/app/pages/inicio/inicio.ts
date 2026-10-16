@@ -4,6 +4,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../auth.service';
 import { RevealDirective } from '../../reveal.directive';
 import { ThemeToggle } from '../../theme-toggle';
+import { ProductVisual } from '../../product-visual';
 
 interface PublicSummary {
   products: number;
@@ -17,6 +18,7 @@ interface PublicProduct {
   category: string;
   price: number;
   icon: string;
+  image?: string | null;
   featured?: boolean;
   stock?: number;
 }
@@ -24,7 +26,7 @@ interface PublicProduct {
 @Component({
   selector: 'app-inicio',
   standalone: true,
-  imports: [RouterLink, RevealDirective, ThemeToggle],
+  imports: [RouterLink, RevealDirective, ThemeToggle, ProductVisual],
   templateUrl: './inicio.html',
   styleUrl: './inicio.css'
 })

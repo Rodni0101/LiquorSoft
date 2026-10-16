@@ -304,6 +304,10 @@ td small {
   display: block;
 }
 
+.product-name-cell { display: flex; align-items: center; gap: 12px; }
+.product-name-cell app-product-visual { flex: 0 0 42px; width: 42px; height: 54px; overflow: hidden; border: 1px solid #4d2a35; border-radius: 8px; background: #180b10; }
+.product-name-cell > div { min-width: 150px; }
+
 td b {
   color: #fff5f7;
   white-space: normal;

@@ -5,9 +5,10 @@ import { RouterLink } from '@angular/router';
 import { CartService } from '../../cart.service';
 import { AuthService } from '../../auth.service';
 import { PaymentMethod, PaymentService, PaymentStatus } from '../../payment.service';
-import { PurchaseService } from '../../purchase.service';
+import { PurchaseResponse, PurchaseService } from '../../purchase.service';
 import { formatCop } from '../../money';
 import { ThemeToggle } from '../../theme-toggle';
+import { NotificationService } from '../../notification.service';
 
 interface CheckoutProduct {
   id?: number;
@@ -27,15 +28,28 @@ export class Checkout implements OnInit {
   private readonly http = inject(HttpClient);
   protected readonly payment = inject(PaymentService);
   private readonly purchase = inject(PurchaseService);
-  protected method: PaymentMethod = 'nequi';
+  private readonly notifications = inject(NotificationService);
+  protected method: PaymentMethod = 'nequi_simulado';
+  protected simulationOutcome = 'approved';
+  protected simulatorEnabled = false;
   protected status: PaymentStatus | 'ready' = 'ready';
   protected message = '';
   protected stockError = '';
   protected purchaseSubmitting = false;
   protected notes = '';
+  protected deliveryAddress = '';
+  protected birthDate = '';
+  protected orderNumber = '';
+  protected orderId: number | null = null;
+  protected invoiceUrl = '';
+  private idempotencyKey = crypto.randomUUID();
 
   ngOnInit(): void {
     this.validateStock();
+    this.http.get<{ simulatorEnabled: boolean }>('/api/payment-config.php').subscribe({
+      next: config => this.simulatorEnabled = config.simulatorEnabled,
+      error: () => this.simulatorEnabled = false,
+    });
   }
 
   protected formatPrice(value: number): string {
@@ -62,41 +76,49 @@ export class Checkout implements OnInit {
     });
   }
 
-  protected preparePayment(): void {
-    if (!this.cart.items().length || this.stockError) return;
-    const result = this.payment.preparePayment({
-      method: this.method,
-      amount: this.cart.total(),
-      items: this.cart.items().map((item) => ({ id: item.id, quantity: item.quantity })),
-    });
-    this.status = result.status;
-    this.message = result.message;
-  }
-
   protected registerPurchase(): void {
-    // Nunca se debe crear una venta ni descontar inventario sin confirmación
-    // positiva de una pasarela de pago. Actualmente PaymentService solo deja
-    // el pago en estado pending hasta que exista una integración real.
     if (
-      this.status !== 'success' ||
       this.purchaseSubmitting ||
+      !this.simulatorEnabled ||
       this.stockError ||
-      !this.cart.items().length
+      !this.cart.items().length ||
+      !this.deliveryAddress.trim() ||
+      !this.birthDate
     )
       return;
     this.purchaseSubmitting = true;
-    this.purchase.checkout(this.cart.items(), this.method, this.notes).subscribe({
+    this.status = 'processing';
+    this.purchase.checkout(this.cart.items(), this.method, this.simulationOutcome, this.idempotencyKey, this.deliveryAddress, this.birthDate, this.notes).subscribe({
       next: (response) => {
         this.purchaseSubmitting = false;
-        this.status = 'success';
-        this.message = `${response.message} Número de pedido: ${response.orderNumber ?? response.saleId}.`;
-        this.cart.clear();
+        this.applyResponse(response);
+        if (response.success) this.notifications.showSuccess(response.message);
+        else this.notifications.showWarning(response.message);
       },
       error: (error) => {
         this.purchaseSubmitting = false;
         this.status = 'error';
         this.message = error.error?.message ?? 'No fue posible registrar el pedido.';
+        this.notifications.showError(this.message);
       },
     });
+  }
+
+  private applyResponse(response: PurchaseResponse): void {
+    this.message = response.message;
+    this.orderNumber = response.orderNumber ?? '';
+    this.orderId = response.orderId;
+    this.invoiceUrl = response.invoiceAvailable ? `/api/invoice.php?id=${response.orderId}` : '';
+    this.status = response.paymentStatus === 'APROBADO' ? 'success'
+      : response.paymentStatus === 'RECHAZADO' ? 'rejected'
+        : response.paymentStatus === 'CANCELADO' ? 'cancelled'
+          : response.paymentStatus === 'ERROR' ? 'error' : 'pending';
+    if (response.success) this.cart.clear();
+    else this.idempotencyKey = crypto.randomUUID();
+  }
+
+  protected retry(): void {
+    this.status = 'ready';
+    this.validateStock();
   }
 }

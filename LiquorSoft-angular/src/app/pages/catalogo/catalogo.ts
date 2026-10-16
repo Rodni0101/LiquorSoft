@@ -4,6 +4,7 @@ import { RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../auth.service';
 import { CartService } from '../../cart.service';
 import { ThemeToggle } from '../../theme-toggle';
+import { ProductVisual } from '../../product-visual';
 
 interface CatalogProduct {
   id?: number;
@@ -13,13 +14,14 @@ interface CatalogProduct {
   price: number;
   stock?: number;
   icon: string;
+  image?: string | null;
   featured?: boolean;
 }
 
 @Component({
   selector: 'app-catalogo',
   standalone: true,
-  imports: [RouterLink, ThemeToggle],
+  imports: [RouterLink, ThemeToggle, ProductVisual],
   templateUrl: './catalogo.html',
   styleUrl: './catalogo.css',
 })
@@ -75,7 +77,7 @@ export class Catalogo implements OnInit {
   }
 
   protected addToCart(product: CatalogProduct): void {
-    const added = this.cart.add({ id: product.id, name: product.name, price: product.price, icon: product.icon, stock: product.stock });
+    const added = this.cart.add({ id: product.id, name: product.name, price: product.price, icon: product.icon, stock: product.stock, image: product.image, category: product.category });
     this.cartMessage = added ? `${product.name} está en tu carrito.` : `${product.name} está agotado o alcanzó el límite disponible.`;
     window.setTimeout(() => this.cartMessage = '', 2600);
   }

@@ -17,6 +17,8 @@ interface Order {
   status: string;
   createdAt: string;
   paymentMethod: string;
+  paymentStatus: string;
+  invoiceUrl: string | null;
   items: OrderItem[];
 }
 
@@ -56,5 +58,9 @@ export class Pedidos implements OnInit {
 
   protected formatDate(value: string): string {
     return new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
+  }
+
+  protected openInvoice(url: string): void {
+    window.location.assign(url);
   }
 }

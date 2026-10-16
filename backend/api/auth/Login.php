@@ -51,9 +51,10 @@ if (!$user || !password_verify($password, $user['password_hash'])) {
     loginResponse(401, ['message' => 'El correo o la contraseña son incorrectos.']);
 }
 
-session_start();
+liquorsoftSessionStart();
 session_regenerate_id(true);
 $_SESSION['user_id'] = (int) $user['id'];
 $_SESSION['user_name'] = $user['nombre'];
 $_SESSION['user_role'] = $user['rol'] ?? '';
+issueCsrfCookie();
 loginResponse(200, ['message' => 'Inicio de sesión correcto.', 'user' => ['id' => (int) $user['id'], 'name' => trim($user['nombre'] . ' ' . ($user['apellido'] ?? '')), 'role' => $user['rol'] ?? '', 'roleId' => (int) ($user['rol_id'] ?? 0)]]);

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="260" viewBox="0 0 180 260">
+  <defs><linearGradient id="bubbles-glass" x1="0" x2="1"><stop stop-color="#a48b43"/><stop offset=".22" stop-color="#f4e5a1"/><stop offset=".5" stop-color="#fff6ca"/><stop offset=".8" stop-color="#c6ae5c"/><stop offset="1" stop-color="#71632d"/></linearGradient></defs>
+  <ellipse cx="90" cy="244" rx="46" ry="8" fill="#171306" opacity=".35"/>
+  <!-- Champagne profile: broad body, sloped shoulders and foil-wrapped neck. -->
+  <path d="M78 43h24v29q0 8 10 16 25 20 25 47v88q0 15-15 15H58q-15 0-15-15v-88q0-27 25-47 10-8 10-16z" fill="url(#bubbles-glass)" stroke="#fff0af" stroke-width="2"/>
+  <path d="M78 43h24V17H78z" fill="#c3aa49"/><path d="M75 17h30v11H75z" fill="#e3ce6e"/><path d="M75 28h30v9H75z" fill="#aa9440"/>
+  <path d="M48 162h84v49q0 12-12 12H60q-12 0-12-12z" fill="#e7d67b" opacity=".52"/><path d="M50 115v42m80-42v42" stroke="#fffde2" stroke-width="3" opacity=".58"/>
+  <path d="M48 125h84v42H48z" fill="#efe5c7"/><path d="M73 137h34m-24 10h14" stroke="#897746" stroke-width="2"/>
+  <circle cx="72" cy="184" r="3" fill="#fff4ad"/><circle cx="94" cy="176" r="2.5" fill="#fff4ad"/><circle cx="108" cy="195" r="3" fill="#fff4ad"/>
+</svg>

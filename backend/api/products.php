@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 $connection = databaseConnection();
 $result = $connection->query(
     "SELECT p.id, p.nombre AS name, COALESCE(c.nombre, 'Sin categoría') AS category,
-            COALESCE(p.descripcion, '') AS description, p.precio AS price, p.stock,
+            COALESCE(p.descripcion, '') AS description, p.precio AS price, p.stock, p.imagen AS image,
             0 AS featured
      FROM productos p
      LEFT JOIN categorias c ON c.id = p.categoria_id
@@ -25,6 +25,9 @@ while ($product = $result->fetch_assoc()) {
     $product['id'] = (int) $product['id'];
     $product['price'] = (float) $product['price'];
     $product['stock'] = (int) $product['stock'];
+    $product['image'] = $product['image'] !== null && trim((string) $product['image']) !== ''
+        ? (string) $product['image']
+        : null;
     $product['featured'] = (bool) $product['featured'];
     $product['icon'] = match ($product['category']) {
         'Vinos' => '🍷', 'Cervezas' => '🍺', 'Mixers' => '🫧', default => '🥃',

@@ -11,7 +11,7 @@
         routerLink="/inicio">Inicio</a><span>/</span><a routerLink="/productos">Productos</a><span>/</span><strong>{{
         product.name }}</strong></nav><a routerLink="/productos" class="back-link">← Volver a productos</a>
     <section class="product-detail">
-      <div class="product-visual"><span>{{ product.icon }}</span></div>
+      <div class="product-visual"><app-product-visual [category]="product.category" [imageUrl]="product.image || null" [altText]="product.name" /></div>
       <div class="product-info"><span class="eyebrow">{{ product.category }}</span>
         <h1>{{ product.name }}</h1>
         <p>{{ product.description }}</p>
@@ -27,8 +27,7 @@
             routerLink="/carrito">Ir al carrito</a></p> }
       </div>
     </section>@if (related.length) { <section class="related"><span class="eyebrow">TAMBIÉN TE PUEDE GUSTAR</span>
-      <div>@for (item of related; track item.id) { <a [routerLink]="['/productos', item.id]"><span>{{ item.icon
-            }}</span><strong>{{ item.name }}</strong><small>{{ formatPrice(item.price) }}</small></a> }</div>
+      <div>@for (item of related; track item.id) { <a [routerLink]="['/productos', item.id]"><app-product-visual [category]="item.category" [imageUrl]="item.image || null" [altText]="item.name" /><strong>{{ item.name }}</strong><small>{{ formatPrice(item.price) }}</small></a> }</div>
     </section> } }
   </main>
 </div>

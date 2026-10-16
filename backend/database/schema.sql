@@ -113,6 +113,10 @@ CREATE TABLE pedidos (
   metodo_pago VARCHAR(30) NULL,
   direccion_entrega VARCHAR(255) NULL,
   notas VARCHAR(500) NULL,
+  clave_idempotencia CHAR(36) NULL UNIQUE,
+  estado_pago VARCHAR(20) NOT NULL DEFAULT 'PENDIENTE',
+  referencia_pago VARCHAR(100) NULL,
+  moneda CHAR(3) NOT NULL DEFAULT 'COP',
   CONSTRAINT fk_pedidos_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
   INDEX idx_pedidos_fecha (creado_en),
   INDEX idx_pedidos_estado (estado)
@@ -124,6 +128,7 @@ CREATE TABLE detalle_pedido (
   producto_id INT UNSIGNED NOT NULL,
   cantidad INT UNSIGNED NOT NULL,
   precio_unitario DECIMAL(12,2) NOT NULL,
+  nombre_producto VARCHAR(150) NULL,
   CONSTRAINT fk_detalle_pedido FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE,
   CONSTRAINT fk_detalle_pedido_producto FOREIGN KEY (producto_id) REFERENCES productos(id),
   INDEX idx_detalle_pedido (pedido_id)

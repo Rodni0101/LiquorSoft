@@ -34,13 +34,14 @@
             <h2>Pedido #{{ order.id }}</h2>
             <strong>{{ formatPrice(order.total) }}</strong>
           </div>
-          <p>{{ formatDate(order.createdAt) }} · {{ order.status }} · {{ order.paymentMethod || 'sin método' }}</p>
+          <p>{{ formatDate(order.createdAt) }} · Pedido: {{ order.status }} · Pago: {{ order.paymentStatus }} · {{ order.paymentMethod || 'sin método' }}</p>
           @for (item of order.items; track item.name) {
             <div class="summary-product">
               <span>{{ item.name }} <small>× {{ item.quantity }}</small></span>
               <strong>{{ formatPrice(item.price * item.quantity) }}</strong>
             </div>
           }
+          @if (order.invoiceUrl) { <button class="invoice-download" type="button" (click)="openInvoice(order.invoiceUrl)">Descargar comprobante PDF</button> }
         </article>
       }
     </div>

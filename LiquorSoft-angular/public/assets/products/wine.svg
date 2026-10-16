@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="260" viewBox="0 0 180 260">
+  <defs><linearGradient id="wine-glass" x1="0" x2="1"><stop stop-color="#381020"/><stop offset=".2" stop-color="#a5465d"/><stop offset=".5" stop-color="#6e1836"/><stop offset=".8" stop-color="#a44459"/><stop offset="1" stop-color="#300d20"/></linearGradient><linearGradient id="wine-liquid" x2="0" y2="1"><stop stop-color="#a63b58"/><stop offset="1" stop-color="#4a1029"/></linearGradient></defs>
+  <ellipse cx="90" cy="244" rx="39" ry="8" fill="#10070b" opacity=".4"/>
+  <!-- Bordeaux-style long neck, sloped shoulders and a tapered lower body. -->
+  <path d="M79 13h22v60l13 17q9 12 9 28v95q0 14-14 14H71q-14 0-14-14v-95q0-16 9-28l13-17z" fill="url(#wine-glass)" stroke="#e4a2a9" stroke-opacity=".65" stroke-width="2"/>
+  <path d="M79 13h22v18H79z" fill="#26151b"/><path d="M67 109v99m46-99v99" stroke="#ffe8dc" stroke-width="3" opacity=".34"/>
+  <path d="M59 139h62v47H59z" fill="#e9d7bd" stroke="#b99b7c"/><path d="M90 145c-10 8-10 20 0 28 10-8 10-20 0-28Z" fill="#86324b"/>
+  <path d="M90 149v20m-16 9h32m-22 7h12" stroke="#805d48" stroke-width="2"/>
+</svg>

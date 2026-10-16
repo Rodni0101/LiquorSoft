@@ -424,3 +424,24 @@
     transition: none !important;
   }
 }
+
+:host-context([data-theme='light']) {
+  --bg: #f4f0e8;
+  --surface: #fbf9f4;
+  --muted: #71665f;
+  --wine: #65252b;
+  --wine-light: #a6554b;
+  --text: #302725;
+}
+
+:host-context([data-theme='light']) .login-page { background: #f4f0e8; }
+:host-context([data-theme='light']) .login-background { display: none; }
+:host-context([data-theme='light']) .login-card { border-color: #ded5c9; border-radius: 10px; background: #fbf9f4; box-shadow: 0 12px 38px rgba(48, 39, 37, .08); backdrop-filter: none; }
+:host-context([data-theme='light']) .login-card::before { display: none; }
+:host-context([data-theme='light']) .login-divider::before,
+:host-context([data-theme='light']) .login-divider::after { background: #ded5c9; }
+:host-context([data-theme='light']) .form-group input,
+:host-context([data-theme='light']) .google-button { border-color: #ded5c9; color: #302725; background: #fbf9f4; }
+:host-context([data-theme='light']) .login-button { border-color: #65252b; color: #fffaf4; background: #65252b; box-shadow: none; }
+:host-context([data-theme='light']) .login-button:hover,
+:host-context([data-theme='light']) .google-button:hover { border-color: #7b3035; background: #eee8de; color: #302725; }

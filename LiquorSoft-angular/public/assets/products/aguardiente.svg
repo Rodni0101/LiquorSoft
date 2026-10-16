@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="260" viewBox="0 0 180 260">
+  <defs><linearGradient id="anis-glass" x1="0" x2="1"><stop stop-color="#d8e8f1" stop-opacity=".55"/><stop offset=".2" stop-color="#fff" stop-opacity=".9"/><stop offset=".5" stop-color="#9bc5d5" stop-opacity=".5"/><stop offset=".8" stop-color="#f8ffff" stop-opacity=".85"/><stop offset="1" stop-color="#8db5c5" stop-opacity=".5"/></linearGradient></defs>
+  <ellipse cx="90" cy="244" rx="42" ry="8" fill="#0d1720" opacity=".3"/>
+  <!-- Colombian aguardiente's familiar clear, straight-sided tall format. -->
+  <path d="M80 16h20v42l12 15q8 10 8 23v136q0 11-11 11H71q-11 0-11-11V96q0-13 8-23l12-15z" fill="url(#anis-glass)" stroke="#e2f5fc" stroke-width="2"/>
+  <path d="M78 16h24v17H78z" fill="#4b91ae"/><path d="M67 91v127m47-127v127" stroke="#fff" stroke-width="4" opacity=".7"/>
+  <path d="M62 116h56v57H62z" fill="#e9f3f4" stroke="#8fb3bf"/><path d="M90 123c-9 9-9 20 0 29 9-9 9-20 0-29Z" fill="#4e9aaf"/>
+  <path d="M90 126v22m0-13-8-7m8 14 8-7" stroke="#286b81" stroke-width="2"/><path d="M73 157h34m-25 8h16" stroke="#578092" stroke-width="2"/>
+  <path d="M75 75h30" stroke="#fff" stroke-width="3" opacity=".7"/>
+</svg>

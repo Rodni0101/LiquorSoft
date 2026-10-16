@@ -10,6 +10,8 @@ import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AdminShell } from '../../admin-shell';
+import { ProductVisual } from '../../product-visual';
+import { NotificationService } from '../../notification.service';
 
 interface Product {
   id: number;
@@ -54,13 +56,14 @@ interface ProductForm {
 @Component({
   selector: 'app-productos',
   standalone: true,
-  imports: [RouterLink, AdminShell, FormsModule],
+  imports: [RouterLink, AdminShell, FormsModule, ProductVisual],
   styleUrl: './productos.css',
   templateUrl: './productos.html'
 })
 export class Productos implements OnInit {
   private readonly http = inject(HttpClient);
   private readonly changeDetector = inject(ChangeDetectorRef);
+  private readonly notifications = inject(NotificationService);
 
   protected products: Product[] = [];
   protected categories: Category[] = [];
@@ -269,10 +272,12 @@ export class Productos implements OnInit {
     });
   }
 
-  protected deleteProduct(product: Product): void {
-    const confirmed = window.confirm(
-      `¿Seguro que deseas eliminar "${product.name}"?`
-    );
+  protected async deleteProduct(product: Product): Promise<void> {
+    const confirmed = await this.notifications.confirm({
+      title: 'Eliminar producto',
+      message: `¿Seguro que deseas eliminar "${product.name}"?`,
+      acceptLabel: 'Eliminar',
+    });
 
     if (!confirmed) {
       return;

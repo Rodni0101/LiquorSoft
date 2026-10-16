@@ -9,7 +9,8 @@ $userId = (int) $user['id'];
 $hasPayment = tableHasColumn($connection, 'pedidos', 'metodo_pago');
 $paymentSelect = $hasPayment ? ', p.metodo_pago AS paymentMethod' : ", '' AS paymentMethod";
 $statement = $connection->prepare(
-    "SELECT p.id, p.numero, p.total, p.estado AS status, p.creado_en AS createdAt $paymentSelect
+    "SELECT p.id, p.numero, p.total, p.estado AS status, p.estado_pago AS paymentStatus,
+            p.creado_en AS createdAt, p.referencia_pago AS paymentReference $paymentSelect
      FROM pedidos p
      WHERE p.usuario_id = ?
      ORDER BY p.creado_en DESC
@@ -30,6 +31,9 @@ while ($row = $result->fetch_assoc()) {
         'status' => (string) $row['status'],
         'createdAt' => (string) $row['createdAt'],
         'paymentMethod' => (string) ($row['paymentMethod'] ?? ''),
+        'paymentStatus' => (string) ($row['paymentStatus'] ?? ''),
+        'paymentReference' => (string) ($row['paymentReference'] ?? ''),
+        'invoiceUrl' => ($row['paymentStatus'] ?? '') === 'APROBADO' ? '/api/invoice.php?id=' . $id : null,
         'items' => [],
     ];
 }
@@ -39,7 +43,7 @@ if ($ids) {
     $placeholders = implode(',', array_fill(0, count($ids), '?'));
     $types = str_repeat('i', count($ids));
     $details = $connection->prepare(
-        "SELECT d.pedido_id, d.cantidad, d.precio_unitario, p.nombre
+        "SELECT d.pedido_id, d.cantidad, d.precio_unitario, COALESCE(d.nombre_producto, p.nombre) AS nombre
          FROM detalle_pedido d
          INNER JOIN productos p ON p.id = d.producto_id
          WHERE d.pedido_id IN ($placeholders)"

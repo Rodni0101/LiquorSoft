@@ -123,7 +123,7 @@
           } @else if (products.length) {
             @for (product of products.slice(0, 2); track product.name) {
               <div class="activity-row">
-                <span class="activity-icon" aria-hidden="true">{{ product.icon }}</span>
+                <app-product-visual class="activity-icon" [category]="product.category" [imageUrl]="product.image || null" [altText]="product.name" />
                 <span><b>{{ product.name }}</b><small>{{ product.category }}</small></span>
                 <strong>{{ formatPrice(product.price) }}</strong>
               </div>
@@ -189,14 +189,14 @@
         <div class="product-layout">
           <a routerLink="/productos" class="featured-product">
             <span class="product-tag">DESTACADO</span>
-            <span class="product-emoji">{{ products[0].icon }}</span>
+            <app-product-visual class="product-emoji" [category]="products[0].category" [imageUrl]="products[0].image || null" [altText]="products[0].name" />
             <div class="featured-info"><span>{{ products[0].category }}</span><h3>{{ products[0].name }}</h3><strong>{{ formatPrice(products[0].price) }}</strong></div>
             <span class="round-arrow" aria-hidden="true">↗</span>
           </a>
           <div class="product-list">
             @for (product of products.slice(1, 5); track product.name) {
               <a routerLink="/productos" class="product-row">
-                <span class="row-emoji">{{ product.icon }}</span>
+                <app-product-visual class="row-emoji" [category]="product.category" [imageUrl]="product.image || null" [altText]="product.name" />
                 <span><small>{{ product.category }}</small><b>{{ product.name }}</b></span>
                 <strong>{{ formatPrice(product.price) }}</strong>
                 <span class="row-arrow" aria-hidden="true">↗</span>

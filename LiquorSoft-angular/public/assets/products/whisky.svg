@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="260" viewBox="0 0 180 260">
+  <defs><linearGradient id="whisky-glass" x1="0" x2="1"><stop stop-color="#7a3d19"/><stop offset=".18" stop-color="#f5bc58"/><stop offset=".38" stop-color="#9b501e"/><stop offset=".7" stop-color="#e69b37"/><stop offset="1" stop-color="#542812"/></linearGradient><linearGradient id="whisky-liquid" x2="0" y2="1"><stop stop-color="#f4c56b"/><stop offset="1" stop-color="#9c4e1c"/></linearGradient></defs>
+  <ellipse cx="90" cy="244" rx="52" ry="8" fill="#130b08" opacity=".35"/>
+  <!-- Squared shoulders and broad, straight body echo a classic Scotch bottle. -->
+  <path d="M72 18h36v29l14 15 8 14v143q0 14-14 14H64q-14 0-14-14V76l8-14 14-15z" fill="url(#whisky-glass)" stroke="#f9d58b" stroke-opacity=".72" stroke-width="2"/>
+  <path d="M52 148h76v71q0 11-11 11H63q-11 0-11-11z" fill="url(#whisky-liquid)" opacity=".88"/>
+  <path d="M72 18h36v21H72z" fill="#191817"/><path d="M68 46h44" stroke="#d9c7a1" stroke-width="3"/>
+  <path d="M60 83v51m60-52v52" stroke="#fff4d5" stroke-width="4" opacity=".3"/>
+  <path d="M56 105h68v43H56z" fill="#171719" stroke="#c8a862" stroke-width="2"/>
+  <path d="M63 111h54m-45 8h36m-30 20h24" stroke="#c6a766" stroke-width="2" opacity=".9"/>
+  <path d="M68 165h44m-36 9h28" stroke="#ffe3a5" stroke-width="2" opacity=".75"/>
+</svg>

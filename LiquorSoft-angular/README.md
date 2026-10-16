@@ -40,6 +40,10 @@ Las credenciales se configuran con `LIQURSOFT_DB_HOST`, `LIQURSOFT_DB_USER`,
 `LIQURSOFT_DB_PASSWORD` y `LIQURSOFT_DB_NAME`. Angular reenvía `/api` al
 backend mediante `proxy.conf.json` durante el desarrollo.
 
+En producción configura también `LIQURSOFT_COOKIE_SECURE=1` y sirve el frontend
+y backend sobre HTTPS. Las operaciones autenticadas usan una protección CSRF
+mediante la cookie `liquorsoft_csrf` y el encabezado `X-CSRF-Token`.
+
 Si MySQL tiene contraseña para `root`, debes exportarla antes de iniciar PHP
 (o usar un usuario dedicado):
 

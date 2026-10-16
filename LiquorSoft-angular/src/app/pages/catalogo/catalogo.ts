@@ -75,8 +75,8 @@ export class Catalogo implements OnInit {
   }
 
   protected addToCart(product: CatalogProduct): void {
-    this.cart.add({ id: product.id, name: product.name, price: product.price, icon: product.icon, stock: product.stock });
-    this.cartMessage = product.stock ? `${product.name} está en tu carrito.` : `${product.name} está agotado.`;
+    const added = this.cart.add({ id: product.id, name: product.name, price: product.price, icon: product.icon, stock: product.stock });
+    this.cartMessage = added ? `${product.name} está en tu carrito.` : `${product.name} está agotado o alcanzó el límite disponible.`;
     window.setTimeout(() => this.cartMessage = '', 2600);
   }
 }

@@ -1,4 +1,3 @@
-
 <app-admin-shell>
   <section class="products-page">
     <header class="page-header">
@@ -171,10 +170,24 @@
                     </td>
                     <td>{{ product.category }}</td>
                     <td class="price">{{ formatPrice(product.price) }}</td>
-                    <td [class.low]="product.stock <= 5">{{ product.stock }} und.</td>
-                    <td><span class="status">Registrado</span></td>
+                    <td [class.low]="product.stock > 0 && product.stock <= 5">{{ product.stock }} und.</td>
+                    <td>
+                      <span
+                        class="status"
+                        [class.low]="product.stock > 0 && product.stock <= 5"
+                        [class.empty]="product.stock < 1"
+                      >
+                        {{ product.stock < 1 ? 'Agotado' : product.stock <= 5 ? 'Stock bajo' : 'Disponible' }}
+                      </span>
+                      @if (product.featured) {
+                        <small>Destacado</small>
+                      }
+                    </td>
                     <td>
                       <div class="product-actions">
+                        <a class="btn-secondary" [routerLink]="['/productos', product.id]">
+                          Ver
+                        </a>
                         <button class="btn-secondary" type="button" (click)="editProduct(product)">
                           Editar
                         </button>

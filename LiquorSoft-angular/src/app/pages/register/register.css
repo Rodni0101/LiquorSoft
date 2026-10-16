@@ -5,7 +5,7 @@
   --surface: #180b10;
   --muted: #b9a5aa;
   --wine: #6D0F1A;
-  --wine-light: #6D0F1A;
+  --wine-light: #B83D5B;
   --text: #f8f4f5;
   color: var(--text);
 }
@@ -102,16 +102,37 @@
   margin-bottom: 26px;
 }
 
-.logo {
-  display: inline-block;
+.auth-header .logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
   color: var(--text);
-  font-size: 2rem;
+  font-size: 1.85rem;
   font-weight: 800;
-  letter-spacing: -1.5px;
+  letter-spacing: -1.2px;
+  text-decoration: none;
 }
 
+.auth-header .logo-mark {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--wine, #6D0F1A);
+  font-size: 0.6rem;
+  font-weight: 800;
+}
+
+.auth-header .logo-word {
+  color: var(--text);
+}
+
+.auth-header .logo-word span,
 .logo span {
-  color: var(--wine-light);
+  color: var(--wine-light, #B83D5B);
 }
 
 .auth-header h2 {

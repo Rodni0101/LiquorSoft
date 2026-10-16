@@ -156,7 +156,7 @@ color: #F8FAFC;
 }
 
 .brand span {
-  color: var(--brand-accent, #c9294b);
+  color: var(--brand-accent, #B83D5B);
 }
 
 .admin-identity {

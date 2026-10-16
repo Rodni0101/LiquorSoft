@@ -35,6 +35,11 @@ if ($connection->connect_errno) {
 }
 $connection->set_charset('utf8mb4');
 $statement = $connection->prepare('SELECT u.id, u.nombre, u.apellido, u.password_hash, r.id AS rol_id, r.nombre AS rol FROM usuarios u LEFT JOIN roles r ON r.id = u.rol_id WHERE u.correo = ? AND COALESCE(u.estado, 1) = 1 LIMIT 1');
+if (!$statement) {
+    error_log('LiquorSoft login query failed: ' . $connection->error);
+    $connection->close();
+    loginResponse(503, ['message' => 'La base de datos no está actualizada. Ejecuta las migraciones pendientes.']);
+}
 $statement->bind_param('s', $correo);
 $statement->execute();
 $result = $statement->get_result();

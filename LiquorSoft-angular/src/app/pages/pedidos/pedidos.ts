@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../auth.service';
 import { formatCop } from '../../money';
+import { ThemeToggle } from '../../theme-toggle';
 
 interface OrderItem {
   name: string;
@@ -22,7 +23,7 @@ interface Order {
 @Component({
   selector: 'app-pedidos',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, ThemeToggle],
   templateUrl: './pedidos.html',
   styleUrl: './pedidos.css',
 })

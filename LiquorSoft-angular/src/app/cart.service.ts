@@ -15,7 +15,6 @@ export class CartService {
   private readonly storageKey = 'liquorsoft-cart';
 
   readonly items = signal<CartItem[]>(this.read());
-
   readonly count = () =>
     this.items().reduce((total, item) => total + item.quantity, 0);
 

@@ -10,7 +10,8 @@ $hasPayment = tableHasColumn($connection, 'pedidos', 'metodo_pago');
 $paymentSelect = $hasPayment ? ', p.metodo_pago AS paymentMethod' : ", '' AS paymentMethod";
 $statement = $connection->prepare(
     "SELECT p.id, p.numero, p.total, p.estado AS status, p.estado_pago AS paymentStatus,
-            p.creado_en AS createdAt, p.referencia_pago AS paymentReference $paymentSelect
+            p.creado_en AS createdAt, p.referencia_pago AS paymentReference,
+            p.metodo_entrega AS fulfillmentMethod, p.direccion_entrega AS fulfillmentDetails $paymentSelect
      FROM pedidos p
      WHERE p.usuario_id = ?
      ORDER BY p.creado_en DESC
@@ -33,7 +34,10 @@ while ($row = $result->fetch_assoc()) {
         'paymentMethod' => (string) ($row['paymentMethod'] ?? ''),
         'paymentStatus' => (string) ($row['paymentStatus'] ?? ''),
         'paymentReference' => (string) ($row['paymentReference'] ?? ''),
-        'invoiceUrl' => ($row['paymentStatus'] ?? '') === 'APROBADO' ? '/api/invoice.php?id=' . $id : null,
+        'fulfillmentMethod' => (string) ($row['fulfillmentMethod'] ?? 'POR_COORDINAR'),
+        'fulfillmentDetails' => (string) ($row['fulfillmentDetails'] ?? ''),
+        'invoiceUrl' => in_array(($row['paymentStatus'] ?? ''), ['APROBADO', 'CAPTURADO'], true)
+            ? '/api/invoice.php?id=' . $id : null,
         'items' => [],
     ];
 }

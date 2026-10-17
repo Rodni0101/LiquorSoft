@@ -35,6 +35,7 @@
 .payment-grid strong { color: var(--purchase-text); }
 .payment-grid small, .pending-copy, .summary-product small { font-size: .68rem; }
 .pending-copy { margin: .85rem 0 0; color: var(--purchase-muted); line-height: 1.5; }
+#paypal-button-container { max-width: 420px; margin-top: 1rem; }
 .checkout-field { display: grid; gap: .45rem; margin-top: 1rem; color: var(--purchase-muted); font-size: .76rem; }
 .checkout-field textarea, .checkout-field input, .checkout-field select { width: 100%; padding: .8rem; border: 1px solid var(--purchase-border); border-radius: 5px; color: var(--purchase-text); background: var(--purchase-surface); font: inherit; }
 .checkout-field textarea { resize: vertical; }

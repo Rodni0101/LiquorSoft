@@ -17,7 +17,7 @@
       <span class="eyebrow">FINALIZAR COMPRA</span>
       <h1>Completa tu pedido</h1>
       <p>
-        Los importes e inventario se verifican en el servidor. El simulador no cobra dinero real.
+        Los importes e inventario se verifican en el servidor. PayPal Sandbox usa dinero de prueba.
       </p>
     </div>
     <ol class="checkout-steps" aria-label="Progreso de compra">
@@ -89,25 +89,63 @@
                 <p>Solo se muestran métodos que el servidor tiene habilitados.</p>
               </div>
             </div>
-            @if (simulatorEnabled) {
+            @if (simulatorEnabled || paypalEnabled) {
               <div class="payment-grid">
-                <button type="button" class="selected" aria-pressed="true">
-                  <strong>Nequi simulado</strong><small>Solo desarrollo · No se mueve dinero real</small>
-                </button>
+                @if (simulatorEnabled) {
+                  <button type="button" [class.selected]="method === 'nequi_simulado'" [attr.aria-pressed]="method === 'nequi_simulado'" (click)="selectPaymentMethod('nequi_simulado')">
+                    <strong>Nequi simulado</strong><small>Solo desarrollo · No se mueve dinero real</small>
+                  </button>
+                }
+                @if (paypalEnabled) {
+                  <button type="button" [class.selected]="method === 'paypal'" [attr.aria-pressed]="method === 'paypal'" (click)="selectPaymentMethod('paypal')">
+                    <strong>PayPal Sandbox</strong><small>Pago de prueba en USD · No es un cobro real</small>
+                  </button>
+                }
               </div>
-              <label class="checkout-field">
-                Resultado de prueba
-                <select [(ngModel)]="simulationOutcome">
-                  <option value="approved">Pago aprobado</option>
-                  <option value="rejected">Pago rechazado</option>
-                  <option value="pending">Pago pendiente</option>
-                  <option value="cancelled">Cancelación</option>
-                  <option value="error">Error de procesamiento</option>
-                </select>
-              </label>
-              <p class="pending-copy">{{ payment.getPendingMessage(method) }}</p>
+              @if (method === 'nequi_simulado' && simulatorEnabled) {
+                <label class="checkout-field">
+                  Resultado de prueba
+                  <select [(ngModel)]="simulationOutcome">
+                    <option value="approved">Pago aprobado</option>
+                    <option value="rejected">Pago rechazado</option>
+                    <option value="pending">Pago pendiente</option>
+                    <option value="cancelled">Cancelación</option>
+                    <option value="error">Error de procesamiento</option>
+                  </select>
+                </label>
+                <p class="pending-copy">{{ payment.getPendingMessage(method) }}</p>
+              }
+              @if (method === 'paypal' && paypalEnabled) {
+                <p class="pending-copy">
+                  Total aproximado en PayPal: {{ formatUsd(cart.total()) }}.
+                  Tasa configurada: 1 USD = {{ formatPrice(paypalCopPerUsd ?? 0) }} COP.
+                  El monto exacto se calcula y valida en el servidor.
+                </p>
+                @if (paypalOrderApproved && paypalOrderId) {
+                  <p class="pending-copy" role="status">
+                    Hay un pago pendiente de verificación. Se conservaron los datos originales del pedido; ingresa nuevamente tu fecha de nacimiento y revisaremos esta misma orden sin iniciar otro cobro.
+                  </p>
+                  <button
+                    type="button"
+                    class="primary-action"
+                    [disabled]="!birthDate || purchaseSubmitting"
+                    (click)="retry()"
+                  >
+                    Verificar pago pendiente
+                  </button>
+                } @else {
+                  <div id="paypal-button-container"></div>
+                }
+              }
+              @if (!paypalEnabled) {
+                <p class="pending-copy" role="status">
+                  PayPal Sandbox no está disponible: {{ paypalUnavailableMessage() }}
+                </p>
+              }
             } @else {
-              <p class="checkout-error" role="status">No hay métodos de pago habilitados. Activa el simulador solo en desarrollo mediante las variables documentadas.</p>
+              <p class="checkout-error" role="status">
+                No hay métodos de pago habilitados. PayPal Sandbox: {{ paypalUnavailableMessage() }}
+              </p>
             }
           </section>
           @if (stockError) {
@@ -131,19 +169,27 @@
           <div class="summary-total">
             <span>Total</span><strong>{{ formatPrice(cart.total()) }}</strong>
           </div>
-          <button
-            type="button"
-            class="primary-action"
-            [disabled]="!!stockError || !simulatorEnabled || !deliveryAddress.trim() || purchaseSubmitting"
-            (click)="registerPurchase()"
-          >
-            {{ purchaseSubmitting ? 'Procesando…' : 'Confirmar compra de prueba' }}
-          </button>
+          @if (method === 'nequi_simulado' && simulatorEnabled) {
+            <button
+              type="button"
+              class="primary-action"
+              [disabled]="!!stockError || !deliveryAddress.trim() || !birthDate || purchaseSubmitting"
+              (click)="registerPurchase()"
+            >
+              {{ purchaseSubmitting ? 'Procesando…' : 'Confirmar compra de prueba' }}
+            </button>
+          }
+          @if (method === 'paypal') {
+            <p class="pending-copy">Completa la dirección y fecha de nacimiento antes de aprobar el pago en PayPal.</p>
+          }
           <a routerLink="/carrito" class="secondary-action">Volver al carrito</a>
         </aside>
       </div>
     } @else if (status === 'processing') {
-      <section class="purchase-card state-card"><h2>Procesando pago de prueba…</h2><p role="status">Validando el pedido con el backend.</p></section>
+      <section class="purchase-card state-card">
+        <h2>Procesando pago…</h2>
+        <p role="status">Validando el pedido y la confirmación con el backend.</p>
+      </section>
     } @else if (status === 'pending' || status === 'rejected' || status === 'cancelled') {
       <section class="purchase-card state-card">
         <span class="state-icon">i</span>
@@ -156,7 +202,7 @@
     } @else if (status === 'success') {
       <section class="purchase-card state-card">
         <span class="state-icon success">✓</span>
-        <h2>Compra de prueba confirmada</h2>
+        <h2>Compra confirmada</h2>
         <p>{{ message }} Pedido: <strong>{{ orderNumber }}</strong>.</p>
         @if (invoiceUrl) { <a [href]="invoiceUrl" class="primary-action" download>Descargar comprobante PDF</a> }
         <a routerLink="/pedidos" class="primary-action">Ver mis pedidos</a>
@@ -165,11 +211,19 @@
     } @else if (status === 'error') {
       <section class="purchase-card state-card">
         <span class="state-icon error">!</span>
-        <h2>No se registró el pedido</h2>
+        <h2>No pudimos confirmar el resultado del pago</h2>
         <p>{{ message }}</p>
+        <p>No vuelvas a pagar hasta verificar el resultado. Puedes volver a consultar el mismo pago.</p>
+        @if (method === 'paypal' && paypalOrderApproved && paypalOrderId) {
+          <label class="checkout-field">
+            Fecha de nacimiento
+            <input [(ngModel)]="birthDate" type="date" required autocomplete="bday" />
+          </label>
+        }
         <button type="button" class="primary-action" (click)="retry()">
-          Revisar pedido
+          Volver a verificar
         </button>
+        <a routerLink="/carrito" class="secondary-action">Volver al carrito</a>
       </section>
     }
   </main>

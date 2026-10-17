@@ -22,7 +22,12 @@ export class AuthService {
     this.refreshRequest = this.http.get<{ user: CurrentUser }>('/api/auth/me.php', { withCredentials: true }).pipe(
       map(r => r.user),
       tap(user => { this.user.set(user); this.loading.set(false); }),
-      catchError((error) => { console.error('LiquorSoft: no se pudo validar la sesión.', error); this.user.set(null); this.loading.set(false); return of(null); }),
+      catchError((error) => {
+        if (error.status !== 401) console.error('LiquorSoft: no se pudo validar la sesión.', error);
+        this.user.set(null);
+        this.loading.set(false);
+        return of(null);
+      }),
       finalize(() => { this.refreshRequest = null; }),
       shareReplay({ bufferSize: 1, refCount: true }),
     );

@@ -1,0 +1,213 @@
+{
+  "info": {
+    "name": "LiquorSoft PayPal Sandbox",
+    "description": "Direct PayPal REST API smoke test. Uses only Sandbox and contains no credentials.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. OAuth - Client credentials",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('OAuth succeeds with a token', function () {",
+              "  pm.response.to.have.status(200);",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.access_token).to.be.a('string').and.not.empty;",
+              "  pm.environment.set('paypal_access_token', body.access_token);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "auth": {
+          "type": "basic",
+          "basic": [
+            { "key": "username", "value": "{{paypal_client_id}}", "type": "string" },
+            { "key": "password", "value": "{{paypal_client_secret}}", "type": "string" }
+          ]
+        },
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Accept-Language", "value": "en_US" },
+          { "key": "Content-Type", "value": "application/x-www-form-urlencoded" }
+        ],
+        "body": { "mode": "urlencoded", "urlencoded": [{ "key": "grant_type", "value": "client_credentials", "type": "text" }] },
+        "url": "{{paypal_base_url}}/v1/oauth2/token"
+      }
+    },
+    {
+      "name": "1b. OAuth - invalid client secret (expected 401)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Invalid credentials are rejected', function () {",
+              "  pm.response.to.have.status(401);",
+              "  pm.expect(pm.response.json().error).to.eql('invalid_client');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "auth": {
+          "type": "basic",
+          "basic": [
+            { "key": "username", "value": "{{paypal_client_id}}", "type": "string" },
+            { "key": "password", "value": "intentionally-invalid-secret", "type": "string" }
+          ]
+        },
+        "header": [
+          { "key": "Accept", "value": "application/json" },
+          { "key": "Content-Type", "value": "application/x-www-form-urlencoded" }
+        ],
+        "body": { "mode": "urlencoded", "urlencoded": [{ "key": "grant_type", "value": "client_credentials", "type": "text" }] },
+        "url": "{{paypal_base_url}}/v1/oauth2/token"
+      }
+    },
+    {
+      "name": "2. Create USD 1 Sandbox order",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('PayPal creates an order', function () {",
+              "  pm.response.to.have.status(201);",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.id).to.be.a('string').and.not.empty;",
+              "  pm.expect(body.status).to.eql('CREATED');",
+              "  pm.environment.set('paypal_order_id', body.id);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{paypal_access_token}}", "type": "string" }] },
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "PayPal-Request-Id", "value": "{{$guid}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"intent\":\"CAPTURE\",\"purchase_units\":[{\"amount\":{\"currency_code\":\"USD\",\"value\":\"1.00\"},\"description\":\"LiquorSoft Sandbox smoke test\"}]}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{paypal_base_url}}/v2/checkout/orders"
+      }
+    },
+    {
+      "name": "3. Get order status",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Order can be queried', function () {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(pm.response.json().id).to.eql(pm.environment.get('paypal_order_id'));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{paypal_access_token}}", "type": "string" }] },
+        "url": "{{paypal_base_url}}/v2/checkout/orders/{{paypal_order_id}}"
+      }
+    },
+    {
+      "name": "4. Capture approved order",
+      "description": "Approve the order with a Sandbox buyer before sending this request.",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Capture completes', function () {",
+              "  pm.response.to.have.status(201);",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.status).to.eql('COMPLETED');",
+              "  pm.expect(body.purchase_units[0].payments.captures[0].status).to.eql('COMPLETED');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{paypal_access_token}}", "type": "string" }] },
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "PayPal-Request-Id", "value": "{{$guid}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{}", "options": { "raw": { "language": "json" } } },
+        "url": "{{paypal_base_url}}/v2/checkout/orders/{{paypal_order_id}}/capture"
+      }
+    },
+    {
+      "name": "5. Error case - repeat capture (expected 422)",
+      "description": "Run after Capture approved order. PayPal must reject a second capture.",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Duplicate capture is rejected', function () {",
+              "  pm.response.to.have.status(422);",
+              "  pm.expect(pm.response.json().name).to.eql('UNPROCESSABLE_ENTITY');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{paypal_access_token}}", "type": "string" }] },
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "PayPal-Request-Id", "value": "{{$guid}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{}", "options": { "raw": { "language": "json" } } },
+        "url": "{{paypal_base_url}}/v2/checkout/orders/{{paypal_order_id}}/capture"
+      }
+    },
+    {
+      "name": "6. Error case - nonexistent order",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Unknown order is rejected', function () {",
+              "  pm.expect(pm.response.code).to.be.oneOf([400, 404]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{paypal_access_token}}", "type": "string" }] },
+        "url": "{{paypal_base_url}}/v2/checkout/orders/INVALID-LIQUORSOFT-ORDER"
+      }
+    }
+  ]
+}

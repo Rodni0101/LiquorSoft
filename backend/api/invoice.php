@@ -12,7 +12,7 @@ $query = $connection->prepare(
     "SELECT p.id, p.numero, p.creado_en, p.total, p.metodo_pago, p.estado_pago, p.referencia_pago,
             p.moneda, p.direccion_entrega, u.nombre, u.apellido, u.correo
      FROM pedidos p JOIN usuarios u ON u.id = p.usuario_id
-     WHERE p.id = ? AND (p.usuario_id = ? OR ? = 1) AND p.estado_pago = 'APROBADO' LIMIT 1"
+     WHERE p.id = ? AND (p.usuario_id = ? OR ? = 1) AND p.estado_pago IN ('APROBADO', 'CAPTURADO') LIMIT 1"
 );
 $isAdmin = mb_strtolower((string) ($user['rol'] ?? '')) === 'administrador' ? 1 : 0;
 $query->bind_param('iii', $orderId, $userId, $isAdmin);

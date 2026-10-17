@@ -4,7 +4,7 @@ CREATE DATABASE IF NOT EXISTS liquorsoft CHARACTER SET utf8mb4 COLLATE utf8mb4_u
 USE liquorsoft;
 
 SET FOREIGN_KEY_CHECKS = 0;
-DROP TABLE IF EXISTS movimientos_inventario, detalle_venta, ventas, productos,
+DROP TABLE IF EXISTS paypal_checkout_intents, movimientos_inventario, detalle_venta, ventas, productos,
   clientes, proveedores, categorias, configuracion, usuarios, roles;
 SET FOREIGN_KEY_CHECKS = 1;
 
@@ -12,7 +12,7 @@ CREATE TABLE roles (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   nombre VARCHAR(50) NOT NULL UNIQUE
 ) ENGINE=InnoDB;
-INSERT INTO roles (id, nombre) VALUES (1, 'Administrador'), (2, 'Cliente');
+INSERT INTO roles (id, nombre) VALUES (1, 'Administrador'), (2, 'Cliente'), (3, 'Trabajador');
 
 CREATE TABLE usuarios (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -109,8 +109,9 @@ CREATE TABLE pedidos (
   subtotal DECIMAL(12,2) NOT NULL DEFAULT 0,
   descuento DECIMAL(12,2) NOT NULL DEFAULT 0,
   total DECIMAL(12,2) NOT NULL DEFAULT 0,
-  estado ENUM('PENDIENTE', 'CONFIRMADO', 'PREPARANDO', 'ENVIADO', 'ENTREGADO', 'CANCELADO') NOT NULL DEFAULT 'PENDIENTE',
+  estado ENUM('PENDIENTE', 'CONFIRMADO', 'PREPARANDO', 'LISTO_PARA_COORDINAR', 'COMPLETADO', 'ENVIADO', 'ENTREGADO', 'CANCELADO') NOT NULL DEFAULT 'PENDIENTE',
   metodo_pago VARCHAR(30) NULL,
+  metodo_entrega VARCHAR(30) NOT NULL DEFAULT 'POR_COORDINAR',
   direccion_entrega VARCHAR(255) NULL,
   notas VARCHAR(500) NULL,
   clave_idempotencia CHAR(36) NULL UNIQUE,
@@ -120,6 +121,21 @@ CREATE TABLE pedidos (
   CONSTRAINT fk_pedidos_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
   INDEX idx_pedidos_fecha (creado_en),
   INDEX idx_pedidos_estado (estado)
+) ENGINE=InnoDB;
+
+CREATE TABLE historial_pedido (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  pedido_id INT UNSIGNED NOT NULL,
+  usuario_id INT UNSIGNED NULL,
+  estado_anterior VARCHAR(40) NULL,
+  estado_nuevo VARCHAR(40) NOT NULL,
+  metodo_entrega_anterior VARCHAR(30) NULL,
+  metodo_entrega_nuevo VARCHAR(30) NOT NULL,
+  detalle_entrega VARCHAR(255) NULL,
+  creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_historial_pedido FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE,
+  CONSTRAINT fk_historial_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL,
+  INDEX idx_historial_pedido_fecha (pedido_id, creado_en)
 ) ENGINE=InnoDB;
 
 CREATE TABLE detalle_pedido (
@@ -132,6 +148,24 @@ CREATE TABLE detalle_pedido (
   CONSTRAINT fk_detalle_pedido FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE,
   CONSTRAINT fk_detalle_pedido_producto FOREIGN KEY (producto_id) REFERENCES productos(id),
   INDEX idx_detalle_pedido (pedido_id)
+) ENGINE=InnoDB;
+
+CREATE TABLE paypal_checkout_intents (
+  paypal_order_id VARCHAR(64) PRIMARY KEY,
+  usuario_id INT UNSIGNED NOT NULL,
+  clave_idempotencia CHAR(36) NOT NULL,
+  amount_cop DECIMAL(12,2) NOT NULL,
+  amount_usd DECIMAL(12,2) NOT NULL,
+  items_json JSON NOT NULL,
+  direccion_entrega VARCHAR(255) NOT NULL,
+  notas VARCHAR(500) NOT NULL DEFAULT '',
+  estado ENUM('CREATED', 'COMPLETED') NOT NULL DEFAULT 'CREATED',
+  capture_id VARCHAR(64) NULL,
+  creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  actualizado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_paypal_intent_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+  UNIQUE KEY uq_paypal_intent_usuario_idempotencia (usuario_id, clave_idempotencia),
+  INDEX idx_paypal_intent_estado (estado, creado_en)
 ) ENGINE=InnoDB;
 
 CREATE TABLE ventas (

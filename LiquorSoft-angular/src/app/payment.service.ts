@@ -11,6 +11,6 @@ export class PaymentService {
   getPendingMessage(method: PaymentMethod): string {
     return method === 'nequi_simulado'
       ? 'Nequi simulado solo para desarrollo. No mueve dinero real.'
-      : 'PayPal Sandbox requiere credenciales de prueba y aún no está habilitado.';
+      : 'PayPal Sandbox: usa credenciales de prueba y una tasa COP/USD configurada en el servidor.';
   }
 }

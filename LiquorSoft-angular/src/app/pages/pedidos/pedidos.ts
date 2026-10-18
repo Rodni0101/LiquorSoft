@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../../auth.service';
 import { formatCop } from '../../money';
 import { ThemeToggle } from '../../theme-toggle';
+import { NotificationBell } from '../../notification-bell';
 
 interface OrderItem {
   name: string;
@@ -25,7 +26,7 @@ interface Order {
 @Component({
   selector: 'app-pedidos',
   standalone: true,
-  imports: [RouterLink, ThemeToggle],
+  imports: [RouterLink, ThemeToggle, NotificationBell],
   templateUrl: './pedidos.html',
   styleUrl: './pedidos.css',
 })

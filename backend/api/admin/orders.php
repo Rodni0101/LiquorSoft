@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../notifications-helper.php';
 
 $connection = databaseConnection();
 $actor = requireRole($connection, ['Administrador', 'Trabajador']);
@@ -98,7 +99,7 @@ if ($nextMethod !== 'POR_COORDINAR' && $details === '') {
 
 try {
     $connection->begin_transaction();
-    $select = $connection->prepare('SELECT estado, estado_pago, metodo_entrega, direccion_entrega FROM pedidos WHERE id = ? FOR UPDATE');
+    $select = $connection->prepare('SELECT numero, usuario_id, estado, estado_pago, metodo_entrega, direccion_entrega FROM pedidos WHERE id = ? FOR UPDATE');
     $select->bind_param('i', $orderId);
     $select->execute();
     $current = $select->get_result()->fetch_assoc();
@@ -145,6 +146,27 @@ try {
     $history->bind_param('iisssss', $orderId, $actorId, $previousStatus, $nextStatus, $previousMethod, $nextMethod, $details);
     if (!$history->execute()) throw new RuntimeException('No fue posible guardar el historial del pedido.');
     $history->close();
+
+    // Notificar al cliente propietario del pedido
+    if ($statusChanged || $methodChanged) {
+        $customerUserId = (int) $current['usuario_id'];
+        $orderNumber = (string) $current['numero'];
+        $statusDescriptions = [
+            'CONFIRMADO' => ['title' => 'Pedido confirmado', 'msg' => "Tu pedido #$orderNumber ha sido confirmado."],
+            'PREPARANDO' => ['title' => 'Pedido en preparación', 'msg' => "Tu pedido #$orderNumber está siendo preparado para el envío."],
+            'LISTO_PARA_COORDINAR' => ['title' => 'Pedido listo para entrega o recogida', 'msg' => "Tu pedido #$orderNumber está listo. " . ($details !== '' ? "Detalles: $details." : "")],
+            'ENVIADO' => ['title' => 'Pedido en camino', 'msg' => "Tu pedido #$orderNumber ha sido despachado a tu dirección."],
+            'ENTREGADO' => ['title' => 'Pedido entregado', 'msg' => "Tu pedido #$orderNumber ha sido entregado exitosamente. ¡Que lo disfrutes!"],
+            'COMPLETADO' => ['title' => 'Pedido completado', 'msg' => "Tu pedido #$orderNumber se ha completado con éxito."],
+            'CANCELADO' => ['title' => 'Pedido cancelado', 'msg' => "Tu pedido #$orderNumber ha sido cancelado."],
+        ];
+        $info = $statusDescriptions[$nextStatus] ?? [
+            'title' => 'Actualización de pedido',
+            'msg' => "Tu pedido #$orderNumber ha cambiado a estado $nextStatus.",
+        ];
+        createNotification($connection, $customerUserId, 'ESTADO_PEDIDO', $info['title'], $info['msg'], $orderId);
+    }
+
     $connection->commit();
     $connection->close();
     jsonResponse(200, ['message' => 'Estado del pedido actualizado.', 'order' => [

@@ -5,6 +5,7 @@ import { AuthService } from '../../auth.service';
 import { RevealDirective } from '../../reveal.directive';
 import { ThemeToggle } from '../../theme-toggle';
 import { ProductVisual } from '../../product-visual';
+import { NotificationBell } from '../../notification-bell';
 
 interface PublicSummary {
   products: number;
@@ -26,7 +27,7 @@ interface PublicProduct {
 @Component({
   selector: 'app-inicio',
   standalone: true,
-  imports: [RouterLink, RevealDirective, ThemeToggle, ProductVisual],
+  imports: [RouterLink, RevealDirective, ThemeToggle, ProductVisual, NotificationBell],
   templateUrl: './inicio.html',
   styleUrl: './inicio.css'
 })

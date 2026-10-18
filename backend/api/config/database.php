@@ -30,6 +30,12 @@ function liquorsoftEnv(string $key, string $fallback): string
     static $fileValues;
     if ($fileValues === null) {
         $envFile = dirname(__DIR__, 2) . '/.env';
+        if (!is_file($envFile)) {
+            $rootEnv = dirname(__DIR__, 3) . '/.env';
+            if (is_file($rootEnv)) {
+                $envFile = $rootEnv;
+            }
+        }
         $fileValues = [];
         if (is_file($envFile) && is_readable($envFile)) {
             foreach (file($envFile, FILE_IGNORE_NEW_LINES) ?: [] as $line) {

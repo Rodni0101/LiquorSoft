@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/config/paypal.php';
+require_once __DIR__ . '/notifications-helper.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     jsonResponse(405, ['message' => 'Método no permitido.']);
@@ -280,6 +281,19 @@ try {
     $history->bind_param('iis', $orderId, $userId, $orderStatus);
     if (!$history->execute()) throw new RuntimeException('No fue posible guardar el historial del pedido.');
     $history->close();
+
+    // Notificación al cliente
+    $clientTitle = $outcome === 'approved' ? 'Compra registrada y pago confirmado' : 'Compra registrada';
+    $formattedTotal = '$' . number_format($total, 0, ',', '.') . ' COP';
+    $clientMsg = $outcome === 'approved'
+        ? "Tu pedido #$orderNumber ha sido confirmado con éxito por {$formattedTotal}. Pronto iniciaremos su preparación."
+        : "Tu pedido #$orderNumber ha sido registrado con estado {$orderStatus}. Total: {$formattedTotal}.";
+    createNotification($connection, $userId, 'COMPRA_REGISTRADA', $clientTitle, $clientMsg, $orderId);
+
+    // Notificación a administradores
+    $adminTitle = 'Nueva compra recibida';
+    $adminMsg = "Se ha registrado un nuevo pedido #$orderNumber por {$formattedTotal} que requiere revisión.";
+    notifyAdmins($connection, 'NUEVA_COMPRA_ADMIN', $adminTitle, $adminMsg, $orderId);
 
     $checkoutStage = 'commit_transaction';
     $connection->commit();

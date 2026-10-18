@@ -2,11 +2,12 @@ import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from './auth.service';
 import { ThemeToggle } from './theme-toggle';
+import { NotificationBell } from './notification-bell';
 
 @Component({
 selector: 'app-admin-shell',
 standalone: true,
-imports: [RouterLink, RouterLinkActive, ThemeToggle],
+imports: [RouterLink, RouterLinkActive, ThemeToggle, NotificationBell],
 template: ` <div class="admin-shell"> <aside class="sidebar"> <a routerLink="/inicio" class="brand logo" aria-label="LiquorSoft, inicio">
 <span class="logo-mark" aria-hidden="true">LS</span><span class="logo-word">Liquor<span>Soft</span></span> </a>
 
@@ -17,6 +18,7 @@ template: ` <div class="admin-shell"> <aside class="sidebar"> <a routerLink="/in
         <strong>{{ auth.user()?.name }}</strong>
         <small>Administrador</small>
       </div>
+      <app-notification-bell class="admin-bell"></app-notification-bell>
     </div>
 
     <p class="side-label">GESTIÓN</p>

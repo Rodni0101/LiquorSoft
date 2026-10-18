@@ -5,6 +5,7 @@ import { AuthService } from '../../auth.service';
 import { CartService } from '../../cart.service';
 import { ThemeToggle } from '../../theme-toggle';
 import { ProductVisual } from '../../product-visual';
+import { NotificationBell } from '../../notification-bell';
 
 interface CatalogProduct {
   id?: number;
@@ -21,7 +22,7 @@ interface CatalogProduct {
 @Component({
   selector: 'app-catalogo',
   standalone: true,
-  imports: [RouterLink, ThemeToggle, ProductVisual],
+  imports: [RouterLink, ThemeToggle, ProductVisual, NotificationBell],
   templateUrl: './catalogo.html',
   styleUrl: './catalogo.css',
 })

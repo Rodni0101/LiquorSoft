@@ -1,7 +1,309 @@
 <app-admin-shell>
   <section class="admin-page sales-page">
-    <header class="page-heading"><div><span class="eyebrow">OPERACIÓN COMERCIAL</span><h1>Ventas</h1><p>Consulta el historial real de ventas y sus productos asociados.</p></div><button type="button" class="refresh-button" (click)="load()" [disabled]="loading">↻ Actualizar</button></header>
-    @if (errorMessage) { <p class="notice error" role="alert">{{ errorMessage }}</p> }
-    <section class="panel sales-panel"><div class="panel-heading"><div><span class="eyebrow">HISTORIAL</span><h2>Ventas registradas</h2></div><span class="record-count">{{ sales.length }} registros</span></div>@if (loading) { <p class="empty-state" role="status">Cargando ventas…</p> } @else if (!sales.length) { <p class="empty-state">No existen ventas registradas todavía.</p> } @else { <div class="table-wrap"><table><thead><tr><th>Venta</th><th>Fecha</th><th>Cliente / usuario</th><th>Productos</th><th>Método</th><th>Total</th><th>Estado</th></tr></thead><tbody>@for (sale of sales; track sale.id) { <tr><td><strong>#{{ sale.id }}</strong></td><td>{{ formatDate(sale.createdAt) }}</td><td>{{ sale.customer }}</td><td><ul>@for (item of sale.items; track item.name) { <li>{{ item.quantity }} × {{ item.name }}</li> }</ul></td><td>{{ sale.paymentMethod || '—' }}</td><td><strong class="sale-total">{{ formatPrice(sale.total) }}</strong></td><td><span class="status" [class.cancelled]="sale.status !== 'completada'">{{ sale.status }}</span></td></tr> }</tbody></table></div> }</section>
+    <header class="page-heading">
+      <div>
+        <span class="eyebrow">OPERACIÓN COMERCIAL</span>
+        <h1>Gestión de Pedidos y Ventas</h1>
+        <p>Administra las compras de clientes, actualiza estados y revisa el historial de ventas.</p>
+      </div>
+      <div class="header-buttons">
+        <button type="button" class="refresh-button" (click)="activeTab === 'pedidos' ? loadOrders() : loadSales()" [disabled]="loadingOrders || loadingSales">
+          ↻ Actualizar
+        </button>
+      </div>
+    </header>
+
+    <!-- Pestañas de Navegación -->
+    <nav class="admin-tabs" role="tablist" aria-label="Secciones de ventas">
+      <button
+        type="button"
+        role="tab"
+        class="tab-btn"
+        [class.active]="activeTab === 'pedidos'"
+        [attr.aria-selected]="activeTab === 'pedidos'"
+        (click)="switchTab('pedidos')"
+      >
+        <span>📦 Pedidos de Clientes</span>
+        <span class="tab-badge">{{ orders.length }}</span>
+      </button>
+
+      <button
+        type="button"
+        role="tab"
+        class="tab-btn"
+        [class.active]="activeTab === 'ventas'"
+        [attr.aria-selected]="activeTab === 'ventas'"
+        (click)="switchTab('ventas')"
+      >
+        <span>🧾 Historial de Ventas</span>
+        <span class="tab-badge">{{ sales.length }}</span>
+      </button>
+    </nav>
+
+    @if (errorMessage) {
+      <p class="notice error" role="alert">{{ errorMessage }}</p>
+    }
+    @if (successMessage) {
+      <p class="notice success" role="status">✓ {{ successMessage }}</p>
+    }
+
+    <!-- TAB 1: PEDIDOS DE CLIENTES -->
+    @if (activeTab === 'pedidos') {
+      <section class="panel orders-panel">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">ATENCIÓN Y DESPACHO</span>
+            <h2>Pedidos Recibidos</h2>
+          </div>
+          <span class="record-count">{{ orders.length }} pedidos</span>
+        </div>
+
+        @if (loadingOrders) {
+          <p class="empty-state" role="status">Cargando pedidos de clientes…</p>
+        } @else if (!orders.length) {
+          <div class="empty-state">
+            <span class="empty-icon">📦</span>
+            <h3>No hay pedidos registrados</h3>
+            <p>Cuando los clientes completen compras en la tienda, aparecerán aquí para su gestión.</p>
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>N° Pedido</th>
+                  <th>Fecha</th>
+                  <th>Cliente</th>
+                  <th>Productos</th>
+                  <th>Total</th>
+                  <th>Pago</th>
+                  <th>Estado Actual</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (order of orders; track order.id) {
+                  <tr>
+                    <td>
+                      <strong class="order-code">#{{ order.number }}</strong>
+                    </td>
+                    <td>{{ formatDate(order.createdAt) }}</td>
+                    <td>
+                      <span class="customer-name">{{ order.customer }}</span>
+                      @if (order.notes) {
+                        <small class="order-note" title="{{ order.notes }}">📝 {{ order.notes }}</small>
+                      }
+                    </td>
+                    <td>
+                      <ul class="order-items-list">
+                        @for (item of order.items; track item.name) {
+                          <li>{{ item.quantity }} × {{ item.name }}</li>
+                        }
+                      </ul>
+                    </td>
+                    <td>
+                      <strong class="order-total">{{ formatPrice(order.total) }}</strong>
+                    </td>
+                    <td>
+                      <span class="badge-payment" [class.paid]="order.paymentStatus === 'APROBADO' || order.paymentStatus === 'CAPTURADO'">
+                        {{ order.paymentStatus }}
+                      </span>
+                    </td>
+                    <td>
+                      <span class="status-pill status-{{ order.status.toLowerCase() }}">
+                        {{ order.status }}
+                      </span>
+                    </td>
+                    <td>
+                      <button
+                        type="button"
+                        class="manage-btn"
+                        (click)="selectOrder(order)"
+                      >
+                        Gestionar
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    }
+
+    <!-- TAB 2: HISTORIAL DE VENTAS -->
+    @if (activeTab === 'ventas') {
+      <section class="panel sales-panel">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">REGISTRO CONTABLE</span>
+            <h2>Ventas Registradas</h2>
+          </div>
+          <span class="record-count">{{ sales.length }} ventas</span>
+        </div>
+
+        @if (loadingSales) {
+          <p class="empty-state" role="status">Cargando ventas…</p>
+        } @else if (!sales.length) {
+          <p class="empty-state">No existen ventas registradas todavía.</p>
+        } @else {
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Venta</th>
+                  <th>Fecha</th>
+                  <th>Cliente / usuario</th>
+                  <th>Productos</th>
+                  <th>Método</th>
+                  <th>Total</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (sale of sales; track sale.id) {
+                  <tr>
+                    <td><strong>#{{ sale.id }}</strong></td>
+                    <td>{{ formatDate(sale.createdAt) }}</td>
+                    <td>{{ sale.customer }}</td>
+                    <td>
+                      <ul class="order-items-list">
+                        @for (item of sale.items; track item.name) {
+                          <li>{{ item.quantity }} × {{ item.name }}</li>
+                        }
+                      </ul>
+                    </td>
+                    <td>{{ sale.paymentMethod || '—' }}</td>
+                    <td><strong class="order-total">{{ formatPrice(sale.total) }}</strong></td>
+                    <td>
+                      <span class="status-pill" [class.cancelled]="sale.status !== 'completada'">
+                        {{ sale.status }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    }
+
+    <!-- MODAL DE GESTIÓN DE ESTADO DE PEDIDO -->
+    @if (selectedOrder) {
+      <div class="modal-backdrop" (click)="closeOrderModal()" role="presentation">
+        <div class="modal-card" (click)="$event.stopPropagation()" role="dialog" aria-labelledby="modal-title" aria-modal="true">
+          <header class="modal-header">
+            <div>
+              <span class="eyebrow">GESTIÓN DE ESTADO</span>
+              <h2 id="modal-title">Pedido #{{ selectedOrder.number }}</h2>
+            </div>
+            <button type="button" class="modal-close" aria-label="Cerrar modal" (click)="closeOrderModal()">×</button>
+          </header>
+
+          <div class="modal-body">
+            <div class="order-summary-box">
+              <div class="summary-line">
+                <span>Cliente:</span>
+                <strong>{{ selectedOrder.customer }}</strong>
+              </div>
+              <div class="summary-line">
+                <span>Total pagado:</span>
+                <strong>{{ formatPrice(selectedOrder.total) }} ({{ selectedOrder.paymentStatus }})</strong>
+              </div>
+              <div class="summary-line">
+                <span>Estado actual:</span>
+                <span class="status-pill status-{{ selectedOrder.status.toLowerCase() }}">
+                  {{ selectedOrder.status }}
+                </span>
+              </div>
+              @if (selectedOrder.fulfillmentDetails) {
+                <div class="summary-line">
+                  <span>Entrega acordada:</span>
+                  <span>{{ selectedOrder.fulfillmentMethod }} - {{ selectedOrder.fulfillmentDetails }}</span>
+                </div>
+              }
+            </div>
+
+            <!-- Formulario de cambio de estado -->
+            <form class="status-form" (submit)="$event.preventDefault(); updateOrderStatus()">
+              <div class="form-group">
+                <label for="next-status">Nuevo estado del pedido</label>
+                @if (getAllowedTransitions(selectedOrder.status).length > 0) {
+                  <select id="next-status" [(ngModel)]="nextStatus" name="nextStatus" class="form-select">
+                    @for (st of getAllowedTransitions(selectedOrder.status); track st) {
+                      <option [value]="st">{{ st }}</option>
+                    }
+                  </select>
+                } @else {
+                  <p class="final-state-notice">
+                    Este pedido se encuentra en un estado terminal ({{ selectedOrder.status }}). No admite transiciones ordinarias.
+                  </p>
+                }
+              </div>
+
+              @if (getAllowedTransitions(selectedOrder.status).length > 0) {
+                <div class="form-group">
+                  <label for="next-method">Método de entrega / despacho</label>
+                  <select id="next-method" [(ngModel)]="nextMethod" name="nextMethod" class="form-select">
+                    <option value="POR_COORDINAR">POR_COORDINAR</option>
+                    <option value="DOMICILIO">DOMICILIO</option>
+                    <option value="RECOGIDA">RECOGIDA</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="next-details">Detalles de entrega / Dirección / Punto de recogida</label>
+                  <input
+                    type="text"
+                    id="next-details"
+                    [(ngModel)]="nextDetails"
+                    name="nextDetails"
+                    class="form-input"
+                    placeholder="Ej. Calle 45 # 12-34 o Punto sede principal"
+                    maxlength="255"
+                  />
+                  <small class="form-help">Obligatorio si el método es Domicilio o Recogida.</small>
+                </div>
+              }
+
+              <!-- Historial de cambios de estado del pedido -->
+              @if (selectedOrder.history && selectedOrder.history.length) {
+                <div class="history-section">
+                  <h4>Historial de cambios</h4>
+                  <ul class="history-list">
+                    @for (h of selectedOrder.history; track h.createdAt) {
+                      <li>
+                        <span class="history-badge">{{ h.status }}</span>
+                        <span class="history-details">
+                          {{ h.actor }} · {{ formatDate(h.createdAt) }}
+                          @if (h.fulfillmentDetails) {
+                            <small>({{ h.fulfillmentDetails }})</small>
+                          }
+                        </span>
+                      </li>
+                    }
+                  </ul>
+                </div>
+              }
+
+              <div class="modal-actions">
+                <button type="button" class="btn-cancel" (click)="closeOrderModal()">Cancelar</button>
+                @if (getAllowedTransitions(selectedOrder.status).length > 0) {
+                  <button
+                    type="submit"
+                    class="btn-save"
+                    [disabled]="updatingStatus || !nextStatus"
+                  >
+                    {{ updatingStatus ? 'Guardando y notificando…' : 'Actualizar estado y notificar cliente' }}
+                  </button>
+                }
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    }
   </section>
 </app-admin-shell>

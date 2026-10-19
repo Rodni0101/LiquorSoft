@@ -8,7 +8,7 @@
       </div>
       <div class="header-buttons">
         <button type="button" class="refresh-button" (click)="activeTab === 'pedidos' ? loadOrders() : loadSales()" [disabled]="loadingOrders || loadingSales">
-          ↻ Actualizar
+          <i class="bi bi-arrow-clockwise"></i> Actualizar
         </button>
       </div>
     </header>
@@ -23,8 +23,9 @@
         [attr.aria-selected]="activeTab === 'pedidos'"
         (click)="switchTab('pedidos')"
       >
-        <span>📦 Pedidos de Clientes</span>
-        <span class="tab-badge">{{ orders.length }}</span>
+        <i class="bi bi-box"></i>
+        <span>Pedidos de Clientes</span>
+        <span class="tab-badge">{{ filteredOrders().length }}</span>
       </button>
 
       <button
@@ -35,8 +36,9 @@
         [attr.aria-selected]="activeTab === 'ventas'"
         (click)="switchTab('ventas')"
       >
-        <span>🧾 Historial de Ventas</span>
-        <span class="tab-badge">{{ sales.length }}</span>
+        <i class="bi bi-receipt"></i>
+        <span>Historial de Ventas</span>
+        <span class="tab-badge">{{ filteredSales().length }}</span>
       </button>
     </nav>
 
@@ -44,31 +46,53 @@
       <p class="notice error" role="alert">{{ errorMessage }}</p>
     }
     @if (successMessage) {
-      <p class="notice success" role="status">✓ {{ successMessage }}</p>
+      <p class="notice success" role="status"><i class="bi bi-check-circle"></i> {{ successMessage }}</p>
     }
 
     <!-- TAB 1: PEDIDOS DE CLIENTES -->
     @if (activeTab === 'pedidos') {
       <section class="panel orders-panel">
         <div class="panel-heading">
-          <div>
-            <span class="eyebrow">ATENCIÓN Y DESPACHO</span>
-            <h2>Pedidos Recibidos</h2>
+          <div class="panel-toolbar">
+            <div>
+              <span class="eyebrow">ATENCIÓN Y DESPACHO</span>
+              <h2>Pedidos Recibidos</h2>
+            </div>
+            <div class="filters">
+              <label class="filter-label">
+                <i class="bi bi-search"></i> Buscar
+                <input type="search" [(ngModel)]="orderSearch" placeholder="N° pedido, cliente o estado" aria-label="Buscar pedidos" />
+              </label>
+              <label class="filter-label">
+                <i class="bi bi-funnel"></i> Estado
+                <select [(ngModel)]="orderStatusFilter" aria-label="Filtrar por estado">
+                  <option value="todos">Todos los estados</option>
+                  <option value="pendiente">Pendiente</option>
+                  <option value="confirmado">Confirmado</option>
+                  <option value="preparando">Preparando</option>
+                  <option value="listo_para_coordinar">Listo para coordinar</option>
+                  <option value="completado">Completado</option>
+                  <option value="enviado">Enviado</option>
+                  <option value="entregado">Entregado</option>
+                  <option value="cancelado">Cancelado</option>
+                </select>
+              </label>
+            </div>
           </div>
-          <span class="record-count">{{ orders.length }} pedidos</span>
+          <span class="record-count">{{ filteredOrders().length }} de {{ orders.length }} pedidos</span>
         </div>
 
         @if (loadingOrders) {
-          <p class="empty-state" role="status">Cargando pedidos de clientes…</p>
-        } @else if (!orders.length) {
+          <p class="empty-state" role="status"><i class="bi bi-arrow-repeat"></i> Cargando pedidos de clientes…</p>
+        } @else if (!filteredOrders().length) {
           <div class="empty-state">
-            <span class="empty-icon">📦</span>
+            <span class="empty-icon"><i class="bi bi-inbox"></i></span>
             <h3>No hay pedidos registrados</h3>
             <p>Cuando los clientes completen compras en la tienda, aparecerán aquí para su gestión.</p>
           </div>
         } @else {
           <div class="table-wrap">
-            <table class="data-table">
+            <table class="data-table" aria-label="Lista de pedidos">
               <thead>
                 <tr>
                   <th>N° Pedido</th>
@@ -82,7 +106,7 @@
                 </tr>
               </thead>
               <tbody>
-                @for (order of orders; track order.id) {
+                @for (order of filteredOrders(); track order.id) {
                   <tr>
                     <td>
                       <strong class="order-code">#{{ order.number }}</strong>
@@ -91,7 +115,7 @@
                     <td>
                       <span class="customer-name">{{ order.customer }}</span>
                       @if (order.notes) {
-                        <small class="order-note" title="{{ order.notes }}">📝 {{ order.notes }}</small>
+                        <small class="order-note" title="{{ order.notes }}"><i class="bi bi-chat-text"></i> {{ order.notes }}</small>
                       }
                     </td>
                     <td>
@@ -111,7 +135,7 @@
                     </td>
                     <td>
                       <span class="status-pill status-{{ order.status.toLowerCase() }}">
-                        {{ order.status }}
+                        {{ statusLabel(order.status) }}
                       </span>
                     </td>
                     <td>
@@ -119,8 +143,9 @@
                         type="button"
                         class="manage-btn"
                         (click)="selectOrder(order)"
+                        title="Gestionar pedido #{{ order.number }}"
                       >
-                        Gestionar
+                        <i class="bi bi-pencil"></i> Gestionar
                       </button>
                     </td>
                   </tr>
@@ -136,20 +161,41 @@
     @if (activeTab === 'ventas') {
       <section class="panel sales-panel">
         <div class="panel-heading">
-          <div>
-            <span class="eyebrow">REGISTRO CONTABLE</span>
-            <h2>Ventas Registradas</h2>
+          <div class="panel-toolbar">
+            <div>
+              <span class="eyebrow">REGISTRO CONTABLE</span>
+              <h2>Ventas Registradas</h2>
+            </div>
+            <div class="filters">
+              <label class="filter-label">
+                <i class="bi bi-search"></i> Buscar
+                <input type="search" [(ngModel)]="saleSearch" placeholder="Cliente, estado o método de pago" aria-label="Buscar ventas" />
+              </label>
+              <label class="filter-label">
+                <i class="bi bi-funnel"></i> Estado
+                <select [(ngModel)]="saleStatusFilter" aria-label="Filtrar por estado">
+                  <option value="todos">Todos los estados</option>
+                  <option value="pendiente">Pendiente</option>
+                  <option value="completada">Completada</option>
+                  <option value="cancelada">Cancelada</option>
+                </select>
+              </label>
+            </div>
           </div>
-          <span class="record-count">{{ sales.length }} ventas</span>
+          <span class="record-count">{{ filteredSales().length }} de {{ sales.length }} ventas</span>
         </div>
 
         @if (loadingSales) {
-          <p class="empty-state" role="status">Cargando ventas…</p>
-        } @else if (!sales.length) {
-          <p class="empty-state">No existen ventas registradas todavía.</p>
+          <p class="empty-state" role="status"><i class="bi bi-arrow-repeat"></i> Cargando ventas…</p>
+        } @else if (!filteredSales().length) {
+          <div class="empty-state">
+            <span class="empty-icon"><i class="bi bi-receipt-cutoff"></i></span>
+            <h3>No existen ventas registradas todavía.</h3>
+            <p>Las ventas se registran automáticamente al confirmar un pedido pagado.</p>
+          </div>
         } @else {
           <div class="table-wrap">
-            <table class="data-table">
+            <table class="data-table" aria-label="Lista de ventas">
               <thead>
                 <tr>
                   <th>Venta</th>
@@ -162,7 +208,7 @@
                 </tr>
               </thead>
               <tbody>
-                @for (sale of sales; track sale.id) {
+                @for (sale of filteredSales(); track sale.id) {
                   <tr>
                     <td><strong>#{{ sale.id }}</strong></td>
                     <td>{{ formatDate(sale.createdAt) }}</td>
@@ -178,7 +224,7 @@
                     <td><strong class="order-total">{{ formatPrice(sale.total) }}</strong></td>
                     <td>
                       <span class="status-pill" [class.cancelled]="sale.status !== 'completada'">
-                        {{ sale.status }}
+                        {{ statusLabel(sale.status) }}
                       </span>
                     </td>
                   </tr>
@@ -215,7 +261,7 @@
               <div class="summary-line">
                 <span>Estado actual:</span>
                 <span class="status-pill status-{{ selectedOrder.status.toLowerCase() }}">
-                  {{ selectedOrder.status }}
+                  {{ statusLabel(selectedOrder.status) }}
                 </span>
               </div>
               @if (selectedOrder.fulfillmentDetails) {
@@ -233,12 +279,12 @@
                 @if (getAllowedTransitions(selectedOrder.status).length > 0) {
                   <select id="next-status" [(ngModel)]="nextStatus" name="nextStatus" class="form-select">
                     @for (st of getAllowedTransitions(selectedOrder.status); track st) {
-                      <option [value]="st">{{ st }}</option>
+                      <option [value]="st">{{ statusLabel(st) }}</option>
                     }
                   </select>
                 } @else {
                   <p class="final-state-notice">
-                    Este pedido se encuentra en un estado terminal ({{ selectedOrder.status }}). No admite transiciones ordinarias.
+                    <i class="bi bi-exclamation-circle"></i> Este pedido se encuentra en un estado terminal ({{ statusLabel(selectedOrder.status) }}). No admite transiciones ordinarias.
                   </p>
                 }
               </div>
@@ -247,9 +293,9 @@
                 <div class="form-group">
                   <label for="next-method">Método de entrega / despacho</label>
                   <select id="next-method" [(ngModel)]="nextMethod" name="nextMethod" class="form-select">
-                    <option value="POR_COORDINAR">POR_COORDINAR</option>
-                    <option value="DOMICILIO">DOMICILIO</option>
-                    <option value="RECOGIDA">RECOGIDA</option>
+                    <option value="POR_COORDINAR"><i class="bi bi-question-circle"></i> Por coordinar</option>
+                    <option value="DOMICILIO"><i class="bi bi-truck"></i> Domicilio</option>
+                    <option value="RECOGIDA"><i class="bi bi-box-arrow-in-left"></i> Recogida</option>
                   </select>
                 </div>
 
@@ -271,7 +317,7 @@
               <!-- Historial de cambios de estado del pedido -->
               @if (selectedOrder.history && selectedOrder.history.length) {
                 <div class="history-section">
-                  <h4>Historial de cambios</h4>
+                  <h4><i class="bi bi-clock-history"></i> Historial de cambios</h4>
                   <ul class="history-list">
                     @for (h of selectedOrder.history; track h.createdAt) {
                       <li>
@@ -289,13 +335,16 @@
               }
 
               <div class="modal-actions">
-                <button type="button" class="btn-cancel" (click)="closeOrderModal()">Cancelar</button>
+                <button type="button" class="btn-cancel" (click)="closeOrderModal()">
+                  <i class="bi bi-x-lg"></i> Cancelar
+                </button>
                 @if (getAllowedTransitions(selectedOrder.status).length > 0) {
                   <button
                     type="submit"
                     class="btn-save"
                     [disabled]="updatingStatus || !nextStatus"
                   >
+                    <i class="bi bi-save"></i>
                     {{ updatingStatus ? 'Guardando y notificando…' : 'Actualizar estado y notificar cliente' }}
                   </button>
                 }

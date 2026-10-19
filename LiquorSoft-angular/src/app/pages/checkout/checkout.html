@@ -201,7 +201,7 @@
       </section>
     } @else if (status === 'success') {
       <section class="purchase-card state-card">
-        <span class="state-icon success">✓</span>
+        <span class="state-icon success"><i class="bi bi-check-lg"></i></span>
         <h2>Compra confirmada</h2>
         <p>{{ message }} Pedido: <strong>{{ orderNumber }}</strong>.</p>
         @if (invoiceUrl) { <a [href]="invoiceUrl" class="primary-action" download>Descargar comprobante PDF</a> }
@@ -210,7 +210,7 @@
       </section>
     } @else if (status === 'error') {
       <section class="purchase-card state-card">
-        <span class="state-icon error">!</span>
+        <span class="state-icon error"><i class="bi bi-exclamation-lg"></i></span>
         <h2>No pudimos confirmar el resultado del pago</h2>
         <p>{{ message }}</p>
         <p>No vuelvas a pagar hasta verificar el resultado. Puedes volver a consultar el mismo pago.</p>

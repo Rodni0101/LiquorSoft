@@ -36,6 +36,7 @@ import { AuthService } from './auth.service';
           class="dropdown-panel"
           [class.position-left]="panelPosition === 'left'"
           [class.position-right]="panelPosition === 'right'"
+          [style.top.px]="panelTop"
           role="region"
           aria-label="Panel de notificaciones"
         >
@@ -53,7 +54,7 @@ import { AuthService } from './auth.service';
                 </button>
               }
               <button type="button" class="close-btn" aria-label="Cerrar panel" (click)="service.closePanel()">
-                ×
+                <i class="bi bi-x-lg" aria-hidden="true"></i>
               </button>
             </div>
           </header>
@@ -66,7 +67,7 @@ import { AuthService } from './auth.service';
               </div>
             } @else if (service.notifications().length === 0) {
               <div class="panel-state empty-state">
-                <span class="empty-icon" aria-hidden="true">🔔</span>
+                <span class="empty-icon" aria-hidden="true"><i class="bi bi-bell"></i></span>
                 <h4>Sin notificaciones</h4>
                 <p>Te avisaremos cuando haya novedades sobre tus pedidos o compras.</p>
               </div>
@@ -164,22 +165,24 @@ export class NotificationBell implements AfterViewInit, OnDestroy {
   private updatePanelPosition(): void {
     if (!this.bellBtn) return;
     const btnRect = this.bellBtn.nativeElement.getBoundingClientRect();
-    const panelWidth = 380; // ancho máximo del panel
-    const spaceRight = window.innerWidth - btnRect.right;
-    const spaceLeft = btnRect.left;
+    const panelWidth = 420; // ancho máximo del panel
+    const spaceRight = window.innerWidth - btnRect.right - 14;
+    const spaceLeft = btnRect.left - 14;
     this.panelPosition = spaceRight >= panelWidth ? 'right' : 'left';
+    // Posicionar el panel justo debajo del botón de la campana
+    this.panelTop = btnRect.bottom + 10;
   }
 
   protected getIcon(type: string): string {
     switch (type) {
       case 'COMPRA_REGISTRADA':
-        return '🛍️';
+        return 'bi bi-bag';
       case 'ESTADO_PEDIDO':
-        return '📦';
+        return 'bi bi-truck';
       case 'NUEVA_COMPRA_ADMIN':
-        return '🔔';
+        return 'bi bi-bell';
       default:
-        return '💬';
+        return 'bi bi-chat';
     }
   }
 

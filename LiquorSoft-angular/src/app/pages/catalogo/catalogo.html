@@ -40,9 +40,9 @@
           </button>
         }
       </div>
-      <label class="search-box">
-        <span aria-hidden="true">⌕</span>
-        <input
+        <label class="search-box">
+          <i class="bi bi-search"></i>
+          <input
           type="search"
           placeholder="Buscar productos"
           [value]="searchTerm()"
@@ -98,7 +98,7 @@
                     {{ product.stock ? 'Agregar' : 'Agotado' }} <span>+</span>
                   </button>
                 </div>
-                <a class="product-link" [routerLink]="['/productos', product.id]">Ver producto →</a>
+                <a class="product-link" [routerLink]="['/productos', product.id]">Ver producto <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
               </div>
             </article>
           }

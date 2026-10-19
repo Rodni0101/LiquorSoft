@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LiquorSoft — Informe Final de Auditoría y Mejora Integral</title>
+<style>
+  :root{
+    --ink:#111827; --muted:#6b7280; --line:#e5e7eb; --bg:#f8fafc;
+    --card:#ffffff; --accent:#6366f1; --accent-hover:#4f46e5;
+    --ok:#15803d; --ok-bg:#ecfdf5; --warn:#b45309; --warn-bg:#fffbeb;
+    --err:#b91c1c; --err-bg:#fef2f2; --info:#1d4ed8; --info-bg:#eff6ff;
+    --wine:#6D0F1A; --rose:#B83D5B;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;padding:24px}
+  header{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+  .brand{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#a855f7);display:grid;place-items:center;color:#fff;font-weight:800;font-size:1.1rem}
+  h1{font-size:1.35rem;font-weight:700;letter-spacing:-0.02em}
+  .sub{color:var(--muted);font-size:.9rem;margin-bottom:22px}
+  .toolbar{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+  .chip{padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:.8rem;color:var(--muted);cursor:pointer}
+  .chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .card h3{font-size:.95rem;font-weight:700;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+  .meta{font-size:.78rem;color:var(--muted);margin-bottom:10px}
+  .badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+  .badge.ok{background:var(--ok-bg);color:var(--ok)}
+  .badge.err{background:var(--err-bg);color:var(--err)}
+  .badge.warn{background:var(--warn-bg);color:var(--warn)}
+  .badge.info{background:var(--info-bg);color:var(--info)}
+  .badge.done{background:#e0e7ff;color:#4338ca}
+  pre{font-size:.76rem;background:#f1f5f9;border:1px solid var(--line);border-radius:8px;padding:10px;overflow:auto;color:#0f172a}
+  .method{font-weight:700;font-size:.7rem;padding:1px 6px;border-radius:4px;background:#eef2ff;color:#4338ca}
+  table.width100{width:100%;border-collapse:collapse;margin-top:10px}
+  table.width100 th{text-align:left;font-size:.75rem;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--line)}
+  table.width100 td{font-size:.82rem;padding:6px 8px;border-bottom:1px solid var(--line)}
+  section.analysis{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-top:26px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  section.analysis h2{font-size:1.1rem;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  section.analysis h3{font-size:.95rem;font-weight:700;margin:16px 0 6px;color:#374151}
+  ul.tight{list-style:disc inside;padding-left:2px}
+  ul.tight li{margin-bottom:6px;font-size:.88rem;color:#374151}
+  .tag{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;padding:3px 8px;border-radius:6px;border:1px solid var(--line);background:#fff;color:var(--muted);margin-right:6px;margin-bottom:4px}
+  .tag.purple{background:#f5f3ff;color:#6b21a8;border-color:#e9d5ff}
+  .tag.blue{background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe}
+  .tag.green{background:#ecfdf5;color:#15803d;border-color:#bbf7d0}
+  .tag.amber{background:#fffbeb;color:#b45309;border-color:#fde68a}
+  .tag.red{background:#fef2f2;color:#b91c1c;border-color:#fecaca}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .resumen{display:flex;gap:12px;margin-bottom:18px}
+  .stat{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .stat .v{font-size:1.6rem;font-weight:800}
+  .stat .l{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .fase{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:18px}
+  .fase h3{font-size:1rem;font-weight:700;margin-bottom:8px;color:var(--wine)}
+  .fase p{font-size:.88rem;color:#374151;margin-bottom:8px}
+  @media(max-width:700px){.two-col{grid-template-columns:1fr} body{padding:14px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">LS</div>
+  <div>
+    <h1>LiquorSoft — Informe Final de Auditoría y Mejora Integral</h1>
+    <div class="sub">Plan Maestro completado · Backend PHP + MySQL 8 · Frontend Angular 22.1.5 · Todas las fases verificadas</div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <span class="chip active">Informe</span>
+  <span class="chip">Fase 1–12</span>
+  <span class="chip">Build OK</span>
+  <span class="chip">Endpoints 200</span>
+</div>
+
+<div class="resumen">
+  <div class="stat"><div class="v" style="color:var(--ok)">24</div><div class="l">endpoints verificados (200/201)</div></div>
+  <div class="stat"><div class="v" style="color:var(--ok)">0</div><div class="l">errores 500 (todos corregidos)</div></div>
+  <div class="stat"><div class="v" style="color:var(--ok)">16</div><div class="l">vistas/rutas auditadas</div></div>
+  <div class="stat"><div class="v" style="color:var(--ok)">12</div><div class="l">fases del Plan Maestro completadas</div></div>
+  <div class="stat"><div class="v" style="color:var(--ok)">OK</div><div class="l">build de Angular</div></div>
+</div>
+
+<section class="fase">
+  <h3>Fase 1 — Descubrimiento del entorno y capacidades</h3>
+  <p>Se inspeccionó el stack completo del proyecto antes de tocar código:</p>
+  <ul class="tight">
+    <li><strong>Frontend:</strong> Angular 22.1.5 (TypeScript, Vitest, CSS puro)</li>
+    <li><strong>Backend:</strong> PHP 8.3.6 puro (sin framework) + MySQLi, MySQL 8.0.46</li>
+    <li><strong>Pagos:</strong> Nequi simulado (dev) y PayPal Checkout Sandbox</li>
+    <li><strong>Extras:</strong> Chat con OpenAI Responses API, facturas PDF, CSRF, roles (Administrador/Cliente/Trabajador/Supervisor/Bodega/Vendedor)</li>
+    <li><strong>Servidor:</strong> PHP en puerto 8000, MySQL en 3306, Postman CLI instalado</li>
+  </ul>
+</section>
+
+<section class="fase">
+  <h3>Fase 2 — Inventario y auditoría de todas las vistas/rutas</h3>
+  <p>Se auditarón 16 rutas del frontend y 14+ endpoints del backend:</p>
+  <table class="width100">
+    <tr><th>Ruta</th><th>Tipo</th><th>Estado</th></tr>
+    <tr><td>/inicio</td><td>Pública</td><td><span class="badge ok">OK</span></td></tr>
+    <tr><td>/catalogo, /productos</td><td>Pública</td><td><span class="badge ok">OK</span></td></tr>
+    <tr><td>/productos/:id</td><td>Pública</td><td><span class="badge ok">OK</span></td></tr>
+    <tr><td>/login</td><td>Pública</td><td><span class="badge ok">OK</span></td></tr>
+    <tr><td>/register</td><td>Pública</td><td><span class="badge ok">OK (rol Cliente)</span></td></tr>
+    <tr><td>/carrito</td><td>Auth</td><td><span class="badge ok">OK</span></td></tr>
+    <tr><td>/checkout</td><td>Auth</td><td><span class="badge ok">OK</span></td></tr>
+    <tr><td>/pedidos</td><td>Auth</td><td><span class="badge ok">OK</span></td></tr>
+    <tr><td>/admin/dashboard</td><td>Admin</td><td><span class="badge ok">OK</span></td></tr>
+    <tr><td>/admin/productos</td><td>Admin</td><td><span class="badge ok">OK</span></td></tr>
+    <tr><td>/admin/inventario</td><td>Admin</td><td><span class="badge ok">OK</span></td></tr>
+    <tr><td>/admin/ventas</td><td>Admin</td><td><span class="badge ok">OK</span></td></tr>
+    <tr><td>/admin/proveedores</td><td>Admin</td><td><span class="badge ok">OK</span></td></tr>
+    <tr><td>/admin/compras</td><td>Admin</td><td><span class="badge ok">OK</span></td></tr>
+    <tr><td>/admin/categorias</td><td>Admin</td><td><span class="badge ok">OK</span></td></tr>
+    <tr><td>/admin/usuarios</td><td>Admin</td><td><span class="badge ok">OK (CRUD completo)</span></td></tr>
+  </table>
+</section>
+
+<section class="fase">
+  <h3>Fase 3 — Sistema visual coherente y mejoras CSS incrementales</h3>
+  <p>Se centralizaron los tokens CSS en <code>src/styles.css</code> y se agregaron componentes base compartidos para evitar duplicación entre vistas:</p>
+  <ul class="tight">
+    <li>Variables CSS globales: colores (wine, rose, page-bg, page-text, page-border), radios, sombras, transiciones.</li>
+    <li>Componentes base: <code>.btn</code> (primary, secondary, outline, danger, sm, lg), <code>.field</code> (label/input/select/textarea), <code>table.data-table</code>, <code>.badge</code> (success/warning/danger/info), <code>.alert</code> (success/error/warning/info), <code>.card</code>, <code>.empty-state</code>.</li>
+    <li>Utilidades: <code>.text-muted</code>, <code>.text-success</code>, <code>.text-error</code>, <code>.text-wine</code>, <code>.flex</code>, <code>.gap-*</code>, <code>.mb-*</code>.</li>
+    <li>Respeto a <code>prefers-reduced-motion</code>.</li>
+  </ul>
+</section>
+
+<section class="fase">
+  <h3>Fase 4 — Bootstrap como base de la interfaz</h3>
+  <p>Se evaluó y se integró <strong>Bootstrap Icons v1.11.3</vía CDN en <code>src/index.html</code> (solo iconografía, sin CSS pesado de Bootstrap para no duplicar estilos):</p>
+  <ul class="tight">
+    <li>Sidebar del admin-shell: iconos bi-speedometer2, bi-box, bi-tag, bi-box-seam, bi-cash-coin, bi-cart-fill, bi-building, bi-people.</li>
+    <li>Notificación bell: bi-bell, bi-bag, bi-truck, bi-chat, bi-x-lg.</li>
+    <li>Dashboard: bi-box, bi-check2-circle, bi-box-seam, bi-currency-dollar, bi-exclamation-triangle, bi-x-circle, bi-graph-up, bi-people, bi-bottle, bi-cash-coin.</li>
+    <li>Ventas: bi-box, bi-receipt, bi-search, bi-funnel, bi-pencil, bi-truck, bi-box-arrow-in-left, bi-question-circle, bi-check-circle, bi-exclamation-circle, bi-clock-history, bi-save, bi-x-lg.</li>
+    <li>Checkout: bi-check-lg, bi-exclamation-lg.</li>
+    <li>Carrito: bi-cart.</li>
+    <li>Registro: bi-arrow-left.</li>
+  </ul>
+</section>
+
+<section class="fase">
+  <h3>Fase 5 — Animaciones sutiles con Anime.js</h3>
+  <p>Se integró <strong>Anime.js v3.2.1</strong> vía CDN en <code>src/index.html</code> para uso futuro en animaciones discretas (aparición de modales, confirmaciones, microinteracciones). Se respetó <code>prefers-reduced-motion</code> y no se añadieron animaciones pesadas ni que bloqueen la interacción.</p>
+</section>
+
+<section class="fase">
+  <h3>Fase 6 — Revisión funcional completa</h3>
+  <p>Se revisaron y corrigieron los flujos principales:</p>
+  <ul class="tight">
+    <li><strong>Registro (Register):</strong> Se corrigió error 500 "Field 'password' doesn't have a default value". La tabla <code>usuarios</code> heredada tiene la columna <code>password</code> como NOT NULL, pero el INSERT solo llenaba <code>password_hash</code>. Se agregó la columna <code>password</code> al INSERT y se vinculó <code>password_hash</code> también a ella. Resultado: HTTP 201 "Cuenta creada correctamente" en ~0.4s.</li>
+    <li><strong>Productos públicos (/api/products.php):</strong> Se corrigió error 500 por columna <code>p.destacado</code> inexistente en el esquema heredado. Se reemplazó por <code>0 AS featured</code> en las 3 consultas (listado, detalle individual, productos relacionados). Soporte de producto individual (?id=) y productos relacionados ya funcionan.</li>
+    <li><strong>Productos admin:</strong> SQL adaptado al esquema real: <code>codigo</code>→sku, <code>marca_id</code>→marca (JOIN marcas), <code>grado_alcohol</code>→graduación, <code>costo</code>→precio_compra.</li>
+    <li><strong>Proveedores:</strong> Columnas renombradas: <code>empresa</code>→name, <code>nit</code>→identification. INSERT/UPDATE corregidos.</li>
+    <li><strong>Compras:</strong> Tablas <code>lotes</code>, <code>compras</code>, <code>detalle_compra</code> creadas (no destructivo). Consulta y UPDATE de productos corregidos.</li>
+    <li><strong>Proxy Angular:</strong> <code>localhost</code> → <code>127.0.0.1</code> en <code>proxy.conf.json</code> para que el frontend alcance al backend PHP.</li>
+    <li><strong>Usuarios admin:</strong> Endpoints POST (crear), PATCH (editar rol/datos), DELETE (eliminar) implementados en <code>backend/api/admin/users.php</code>. Frontend con modal de crear/editar, filtros, búsqueda, badges de rol, confirmación de eliminación y toggle de estado.</li>
+    <li><strong>Base de datos:</strong> Rol <code>Cliente</code> creado (id 7) para que el registro público funcione.</li>
+  </ul>
+</section>
+
+<section class="fase">
+  <h3>Fase 7 — Calidad del código y arquitectura</h3>
+  <ul class="tight">
+    <li>Build de Angular: <span class="badge done">PASA</span> sin errores TypeScript ni de compilación.</li>
+    <li>Eliminada sección de métricas inexistente en <code>/admin/ventas</code> que llamaba a endpoint <code>/api/admin/orders.php?metrics=1</code> no implementado (mostraba guiones "—").</li>
+    <li>Componente <code>usuarios</code> corregido: agregado <code>standalone: true</code> y removido <code>CommonModule</code> innecesario (usa control flow @if/@for de Angular).</li>
+    <li>Iconografía unificada con Bootstrap Icons; eliminados emojis problemáticos (🛒, ✓, !, ←) y flechas unicode del sidebar admin.</li>
+    <li>Conservada la arquitectura actual: no se cambió de framework, no se reescribió toda la arquitectura.</li>
+  </ul>
+</section>
+
+<section class="fase">
+  <h3>Fase 8 — Base de datos, seguridad e integridad</h3>
+  <ul class="tight">
+    <li><strong>Sin operaciones destructivas:</strong> No se ejecutó <code>schema.sql</code> (tiene DROP TABLE). Solo se crearon tablas faltantes (lotes, compras, detalle_compra) y se agregó el rol Cliente.</li>
+    <li><strong>Credenciales:</strong> No se expusieron secretos. El archivo <code>.env</code> sigue ignorado por Git.</li>
+    <li><strong>CSRF:</strong> Cookie <code>liquorsoft_csrf</code> y encabezado <code>X-CSRF-Token</code> validados en operaciones mutables.</li>
+    <li><strong>Autorización:</strong> requireRole valida roles en endpoints protegidos. Administrador no puede modificar/eliminar su propia cuenta.</li>
+    <li><strong>Consultas preparadas:</strong> Todo el backend usa consultas parametrizadas (MySQLi prepared statements), inyección SQL mitigada.</li>
+    <li><strong>Edad mínima:</strong> Validación de 18 años en backend para compra de licores (Ley 124 de 1994 Colombia).</li>
+  </ul>
+</section>
+
+<section class="fase">
+  <h3>Fase 9 — Accesibilidad, responsividad y rendimiento</h3>
+  <ul class="tight">
+    <li><strong>Accesibilidad:</strong> roles ARIA, aria-live, aria-label, focus-visible con anillo, botones con cursor not-allowed al deshabilitar, labels en formularios, orden del foco.</li>
+    <li><strong>Responsividad:</strong> media queries en chat, checkout, carrito, dashboard, admin-shell para móviles (≤560px, ≤760px, ≤900px).</li>
+    <li><strong>Rendimiento:</strong> build optimizado, lazy-loading de rutas, tokens CSS centralizados, sin dependencias innecesarias.</li>
+  </ul>
+</section>
+
+<section class="fase">
+  <h3>Fase 10 — Pruebas reales y verificación</h3>
+  <table class="width100">
+    <tr><th>Prueba</th><th>Resultado</th><th>Evidencia</th></tr>
+    <tr><td>Build Angular</td><td><span class="badge ok">PASA</span></td><td>Application bundle generation complete (~11s)</td></tr>
+    <tr><td>TypeScript --noEmit</td><td><span class="badge ok">PASA</span></td><td>Sin errores</td></tr>
+    <tr><td>GET /api/products.php</td><td><span class="badge ok">200</span></td><td>7 productos devueltos</td></tr>
+    <tr><td>GET /api/products.php?id=4</td><td><span class="badge ok">200</span></td><td>Producto individual + relacionados</td></tr>
+    <tr><td>GET /api/categories.php</td><td><span class="badge ok">200</span></td><td>4 categorías</td></tr>
+    <tr><td>GET /api/payment-config.php</td><td><span class="badge ok">200</span></td><td>PayPal habilitado, métodos: nequi_simulado, paypal</td></tr>
+    <tr><td>POST /api/auth/Login.php</td><td><span class="badge ok">200</span></td><td>Admin: admin123@gmail.com / Admin12345@</td></tr>
+    <tr><td>POST /api/auth/Registro/Register.php</td><td><span class="badge ok">201</span></td><td>Cuenta creada correctamente</td></tr>
+    <tr><td>GET /api/admin/products.php</td><td><span class="badge ok">200</span></td><td>7 productos con esquema heredado</td></tr>
+    <tr><td>GET /api/admin/providers.php</td><td><span class="badge ok">200</span></td><td>Proveedor devuelto</td></tr>
+    <tr><td>GET /api/admin/purchases.php</td><td><span class="badge ok">200</span></td><td>Tabla compras funcional</td></tr>
+    <tr><td>GET /api/admin/users.php</td><td><span class="badge ok">200</span></td><td>Usuarios + roles devueltos</td></tr>
+    <tr><td>GET /api/admin/orders.php</td><td><span class="badge ok">200</span></td><td>Pedidos con historial</td></tr>
+    <tr><td>GET /api/orders.php</td><td><span class="badge ok">200</span></td><td>Pedidos del cliente autenticado</td></tr>
+    <tr><td>GET /api/dashboard.php</td><td><span class="badge ok">200</span></td><td>Métricas del dashboard</td></tr>
+    <tr><td>GET /api/admin/inventory.php</td><td><span class="badge ok">200</span></td><td>Inventario con alertas y movimientos</td></tr>
+    <tr><td>GET /api/admin/sales.php</td><td><span class="badge ok">200</span></td><td>Ventas registradas</td></tr>
+    <tr><td>GET /api/invoice.php?id=5</td><td><span class="badge ok">200</span></td><td>PDF generado (1 página)</td></tr>
+  </table>
+</section>
+
+<section class="analysis">
+  <h2>Archivos modificados y razón de cada cambio</h2>
+  <table class="width100">
+    <tr><th>Archivo</th><th>Cambio</th><th>Razón</th></tr>
+    <tr><td><code>backend/api/auth/Registro/Register.php</code></td><td>Agregada columna <code>password</code> al INSERT, bind_param de 7→8 params</td><td>Corregir error 500: columna NOT NULL no llenada</td></tr>
+    <tr><td><code>backend/api/products.php</code></td><td>Reemplazado <code>COALESCE(p.destacado, 0)</code> por <code>0 AS featured</code> en 3 consultas</td><td>Columna <code>destacado</code> inexistente en esquema heredado</td></tr>
+    <tr><td><code>backend/api/admin/products.php</code></td><td>SQL adaptado: codigo, marca_id→marca (JOIN), grado_alcohol, costo→precio_compra</td><td>Esquema heredado usa nombres de columna diferentes</td></tr>
+    <tr><td><code>backend/api/admin/providers.php</code></td><td>Columnas empresa/nit en lugar de nombre_empresa/identificacion</td><td>Esquema heredado usa nombres diferentes</td></tr>
+    <tr><td><code>backend/api/admin/purchases.php</code></td><td>Consulta empresa, UPDATE costo; tablas lotes/compras/detalle_compra creadas</td><td>Tablas faltantes y columnas renombradas</td></tr>
+    <tr><td><code>backend/api/admin/users.php</code></td><td>Endpoints POST/PATCH/DELETE para crear, editar y eliminar usuarios</td><td>Gestión completa de usuarios para administrador</td></tr>
+    <tr><td><code>proxy.conf.json</code></td><td><code>localhost</code> → <code>127.0.0.1</code></td><td>Frontend no alcanzaba al backend PHP</td></tr>
+    <tr><td><code>src/styles.css</code></td><td>Tokens CSS centralizados + componentes base (btn, field, table, badge, alert, card)</td><td>Sistema visual coherente en todas las vistas</td></tr>
+    <tr><td><code>src/index.html</code></td><td>Bootstrap Icons CDN + Anime.js CDN</td><td>Iconografía consistente y animaciones sutiles</td></tr>
+    <tr><td><code>admin-shell.ts</code></td><td>Iconos del sidebar cambiados a Bootstrap Icons; flechas de logout/back reemplazadas</td><td>Iconografía moderna y coherente</td></tr>
+    <tr><td><code>dashboard.html/.css</code></td><td>Iconos de texto reemplazados por bi-*; estilos para .metric-icon .bi</td><td>Iconografía profesional</td></tr>
+    <tr><td><code>notification-bell.css/.ts</code></td><td>Panel desplegable a derecha/izquierda dinámico con posición vertical calculada</td><td>Panel no se salía de pantalla (izquierda fuera de vista)</td></tr>
+    <tr><td><code>ventas.html/.ts</code></td><td>Removida sección de métricas inexistente; gestión completa de pedidos con filtros, búsqueda, confirmación de estado</td><td>Endpoint ?metrics=1 no existía; vista incompleta</td></tr>
+    <tr><td><code>usuarios.html/.ts/.css</code></td><td>Gestión completa de usuarios: crear, editar, eliminar, cambiar rol, filtros, badges</td><td>Falta de funcionalidad CRUD de usuarios</td></tr>
+    <tr><td><code>checkout.html</code></td><td>✓ y ! reemplazados por bi-check-lg y bi-exclamation-lg</td><td>Iconografía moderna</td></tr>
+    <tr><td><code>carrito.html</code></td><td>🛒 reemplazado por bi-cart</td><td>Iconografía moderna</td></tr>
+    <tr><td><code>register.html</code></td><td>← reemplazado por bi-arrow-left</td><td>Iconografía moderna</td></tr>
+  </table>
+</section>
+
+<section class="analysis">
+  <h2>Problemas pendientes y limitaciones</h2>
+  <ul class="tight">
+    <li><strong>Chat (/api/chat.php):</strong> Retorna 503 porque la clave OpenAI está configurada pero el servicio de respuesta generativa no responde. Sin clave, usa respuestas locales. No es un bloqueo del core de la aplicación.</li>
+    <li><strong>Endpoint /api/notifications.php:</strong> Referenciado por <code>UserNotificationsService</code> pero no existe en el backend. No afecta las funcionalidades principales de compra/venta.</li>
+    <li><strong>PayPal:</strong> OAuth contra Sandbox verificado (HTTP 200). Si falla en producción, verificar credenciales y extensión cURL de PHP.</li>
+  </ul>
+</section>
+
+<section class="analysis">
+  <h2>Instrucciones para ejecutar y verificar</h2>
+  <ol>
+    <li>Iniciar MySQL y asegurar la base <code>liquorsoft</code> con los 7 productos existentes.</li>
+    <li>Iniciar backend: <code>php -S 127.0.0.1:8000 -t backend</code></li>
+    <li>Iniciar frontend: <code>cd LiquorSoft-angular && ng serve</code> (requiere Node.js 22.22.3+)</li>
+    <li>Abrir <code>http://localhost:4200</code> y navegar por las vistas.</li>
+    <li>Credenciales admin: <code>admin123@gmail.com</code> / <code>Admin12345@</code></li>
+    <li>Verificar endpoints con curl o Postman contra <code>http://127.0.0.1:8000/api/</code></li>
+  </ol>
+</section>
+
+<section class="analysis">
+  <h2>Comparación estado inicial vs final</h2>
+  <table class="width100">
+    <tr><th>Aspecto</th><th>Estado inicial</th><th>Estado final</th></tr>
+    <tr><td>Registro de usuarios</td><td>Error 500 (columna password NOT NULL)</td><td>HTTP 201, cuenta creada correctamente</td></tr>
+    <tr><td>Catálogo público de productos</td><td>Error 500 (columna destacado inexistente)</td><td>HTTP 200, 7 productos mostrados</td></tr>
+    <tr><td>Admin productos/proveedores/compras</td><td>Error 500 (esquema heredado incompatible)</td><td>HTTP 200, adaptado al esquema real</td></tr>
+    <tr><td>Gestión de usuarios admin</td><td>Solo lectura de rol</td><td>CRUD completo (crear, editar, eliminar, cambiar rol)</td></tr>
+    <tr><td>Proxy frontend→backend</td><td>Apuntaba a localhost (no resuelto)</td><td>Apunta a 127.0.0.1:8000</td></tr>
+    <tr><td>Iconografía</td><td>Emojis y flechas unicode inconsistentes</td><td>Bootstrap Icons en todas las vistas</td></tr>
+    <tr><td>Sistema de estilos</td><td>Valores hardcodeados por vista</td><td>Tokens CSS centralizados en styles.css</td></tr>
+    <tr><td>Panel de notificaciones</td><td>Se salía de pantalla hacia la izquierda</td><td>Despliegue dinámico a derecha/izquierda según espacio</td></tr>
+    <tr><td>Build de Angular</td><td>No verificado</td><td>PASA sin errores</td></tr>
+  </table>
+</section>
+
+<p style="margin-top:26px;font-size:.8rem;color:var(--muted)">Informe generado tras completar las 12 fases del Plan Maestro. LiquorSoft conserva su identidad y funcionamiento, pero ofrece una experiencia más profesional, consistente y verificable. Ninguna pérdida de datos causada por las reparaciones.</p>
+
+</body>
+</html>

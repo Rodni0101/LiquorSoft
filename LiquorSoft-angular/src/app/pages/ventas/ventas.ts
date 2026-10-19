@@ -55,12 +55,16 @@ export class Ventas implements OnInit {
   protected nextStatus = '';
   protected nextMethod = 'POR_COORDINAR';
   protected nextDetails = '';
+  protected orderSearch = '';
+  protected orderStatusFilter = 'todos';
 
   // Ventas
   protected sales: Sale[] = [];
   protected loadingSales = true;
   protected errorMessage = '';
   protected successMessage = '';
+  protected saleSearch = '';
+  protected saleStatusFilter = 'todos';
 
   ngOnInit(): void {
     this.loadOrders();
@@ -81,7 +85,6 @@ export class Ventas implements OnInit {
       next: response => {
         this.orders = response.orders;
         this.loadingOrders = false;
-        // Si hay una orden seleccionada, refrescarla
         if (this.selectedOrder) {
           this.selectedOrder = this.orders.find(o => o.id === this.selectedOrder?.id) ?? null;
         }
@@ -124,6 +127,7 @@ export class Ventas implements OnInit {
   protected closeOrderModal(): void {
     this.selectedOrder = null;
     this.errorMessage = '';
+    this.successMessage = '';
   }
 
   protected getAllowedTransitions(currentStatus: string): string[] {
@@ -140,13 +144,26 @@ export class Ventas implements OnInit {
     return transitions[currentStatus] ?? [];
   }
 
-  protected updateOrderStatus(): void {
+  protected async updateOrderStatus(): Promise<void> {
     if (!this.selectedOrder || !this.nextStatus) return;
 
     if (this.nextMethod !== 'POR_COORDINAR' && !this.nextDetails.trim()) {
       this.errorMessage = 'Indica la dirección o el punto de recogida acordado.';
       return;
     }
+
+    const transitions = this.getAllowedTransitions(this.selectedOrder.status);
+    if (!transitions.includes(this.nextStatus)) {
+      this.errorMessage = 'La transición de estado seleccionada no es válida.';
+      return;
+    }
+
+    const confirmado = await this.notification.confirm({
+      title: 'Confirmar cambio de estado',
+      message: `¿Cambiar el pedido #${this.selectedOrder.number} de "${this.selectedOrder.status}" a "${this.nextStatus}"? El cliente recibirá una notificación automática.`,
+      acceptLabel: 'Sí, cambiar estado',
+    });
+    if (!confirmado) return;
 
     this.updatingStatus = true;
     this.errorMessage = '';
@@ -165,6 +182,7 @@ export class Ventas implements OnInit {
         this.successMessage = `${res.message} Se envió una notificación automática al cliente.`;
         this.notification.showSuccess(this.successMessage);
         this.loadOrders();
+        this.closeOrderModal();
       },
       error: (err) => {
         this.updatingStatus = false;
@@ -175,6 +193,38 @@ export class Ventas implements OnInit {
     });
   }
 
+  protected filteredOrders(): AdminOrder[] {
+    let result = this.orders;
+    if (this.orderSearch.trim()) {
+      const term = this.orderSearch.trim().toLowerCase();
+      result = result.filter(o =>
+        o.number.toLowerCase().includes(term) ||
+        o.customer.toLowerCase().includes(term) ||
+        o.status.toLowerCase().includes(term)
+      );
+    }
+    if (this.orderStatusFilter !== 'todos') {
+      result = result.filter(o => o.status.toLowerCase() === this.orderStatusFilter);
+    }
+    return result;
+  }
+
+  protected filteredSales(): Sale[] {
+    let result = this.sales;
+    if (this.saleSearch.trim()) {
+      const term = this.saleSearch.trim().toLowerCase();
+      result = result.filter(s =>
+        s.customer.toLowerCase().includes(term) ||
+        s.status.toLowerCase().includes(term) ||
+        s.paymentMethod.toLowerCase().includes(term)
+      );
+    }
+    if (this.saleStatusFilter !== 'todos') {
+      result = result.filter(s => s.status.toLowerCase() === this.saleStatusFilter);
+    }
+    return result;
+  }
+
   protected formatPrice(value: number): string { return formatCop(value); }
   protected formatDate(value: string): string {
     if (!value) return '';
@@ -183,5 +233,19 @@ export class Ventas implements OnInit {
     } catch {
       return value;
     }
+  }
+
+  protected statusLabel(status: string): string {
+    const labels: Record<string, string> = {
+      PENDIENTE: 'Pendiente',
+      CONFIRMADO: 'Confirmado',
+      PREPARANDO: 'Preparando',
+      LISTO_PARA_COORDINAR: 'Listo para coordinar',
+      COMPLETADO: 'Completado',
+      ENVIADO: 'Enviado',
+      ENTREGADO: 'Entregado',
+      CANCELADO: 'Cancelado',
+    };
+    return labels[status] || status;
   }
 }

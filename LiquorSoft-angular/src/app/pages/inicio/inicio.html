@@ -15,7 +15,7 @@
       (click)="menuOpen = !menuOpen"
       (keydown.escape)="closeMenu()"
     >
-      <span aria-hidden="true">{{ menuOpen ? '×' : '☰' }}</span>
+      <i class="bi" [class.bi-x-lg]="menuOpen" [class.bi-list]="!menuOpen" aria-hidden="true"></i>
       <span class="sr-only">{{ menuOpen ? 'Cerrar menú' : 'Abrir menú' }}</span>
     </button>
 
@@ -53,10 +53,10 @@
     <div class="nav-actions">
       @if (!auth.user()) {
         <a routerLink="/login" class="nav-login">Ingresar</a>
-        <a routerLink="/register" class="button button-small button-light">Crear cuenta <span aria-hidden="true">↗</span></a>
+        <a routerLink="/register" class="button button-small button-light">Crear cuenta <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
       } @else if (auth.isClient()) {
         <a routerLink="/pedidos" class="nav-login">Mis pedidos</a>
-        <a routerLink="/carrito" class="button button-small button-light">Carrito <span aria-hidden="true">↗</span></a>
+        <a routerLink="/carrito" class="button button-small button-light">Carrito <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
       } @else {
         <a routerLink="/admin/dashboard" class="nav-login">Panel administrativo</a>
         <button type="button" class="nav-login button-reset" (click)="auth.logout()">Cerrar sesión</button>
@@ -77,10 +77,10 @@
           LiquorSoft reúne catálogo, inventario y ventas en una experiencia simple, elegante y lista para hacer crecer tu negocio.
         </p>
         <div class="hero-actions">
-          <a routerLink="/productos" class="button button-primary">Explorar catálogo <span aria-hidden="true">→</span></a>
+          <a routerLink="/productos" class="button button-primary">Explorar catálogo <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
           <a routerLink="/register" class="button button-ghost">Empieza gratis</a>
         </div>
-        <p class="hero-note"><span aria-hidden="true">✦</span> Diseñado para operar con claridad, desde el primer día.</p>
+        <p class="hero-note"><i class="bi bi-stars" aria-hidden="true"></i> Diseñado para operar con claridad, desde el primer día.</p>
       </div>
 
       <div class="hero-visual" aria-label="Vista previa del centro de operaciones LiquorSoft">
@@ -117,7 +117,7 @@
           </div>
           <div class="dashboard-list-head">
             <span>Actividad reciente</span>
-            <a routerLink="/productos">Ver catálogo <span aria-hidden="true">↗</span></a>
+            <a routerLink="/productos">Ver catálogo <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
           </div>
           @if (productsLoading) {
             <p class="dashboard-state" role="status">Cargando productos…</p>
@@ -158,21 +158,21 @@
           <span class="feature-number">01</span><span class="feature-symbol" aria-hidden="true">◒</span>
           <h3>Un catálogo<br><em>que trabaja por ti.</em></h3>
           <p>Presenta tus productos con una navegación rápida, clara y pensada para que cada visita termine en una decisión.</p>
-          <a routerLink="/productos" class="text-link">Ver catálogo <span aria-hidden="true">→</span></a>
+          <a routerLink="/productos" class="text-link">Ver catálogo <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
           <div class="mini-browser" aria-hidden="true"><span></span><span></span><span></span><b>Selección<br><em>para cada ocasión.</em></b></div>
         </article>
         <article class="feature-card feature-dark">
           <span class="feature-number">02</span><span class="feature-symbol" aria-hidden="true">⌁</span>
           <h3>Inventario<br><em>sin sorpresas.</em></h3>
           <p>Consulta existencias reales y actúa antes de que una oportunidad se convierta en una venta perdida.</p>
-          <a routerLink="/login" class="text-link">Gestionar inventario <span aria-hidden="true">↗</span></a>
+          <a routerLink="/login" class="text-link">Gestionar inventario <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
           <div class="rings" aria-hidden="true"><span></span><span></span><span></span></div>
         </article>
         <article class="feature-card feature-accent">
           <span class="feature-number">03</span><span class="feature-symbol" aria-hidden="true">✦</span>
           <h3>Decisiones<br><em>con contexto.</em></h3>
           <p>Las señales importantes, en el momento justo. Una operación más inteligente empieza con una buena vista.</p>
-          <a routerLink="/login" class="text-link">Entrar al sistema <span aria-hidden="true">→</span></a>
+          <a routerLink="/login" class="text-link">Entrar al sistema <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
           <div class="accent-grid" aria-hidden="true"></div>
         </article>
       </div>
@@ -205,7 +205,7 @@
                 <span class="row-arrow" aria-hidden="true">↗</span>
               </a>
             }
-            <a routerLink="/productos" class="all-products">Ver todo el catálogo <span aria-hidden="true">→</span></a>
+            <a routerLink="/productos" class="all-products">Ver todo el catálogo <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
           </div>
         </div>
       } @else {
@@ -222,7 +222,7 @@
     <section class="contact-section section-shell" id="contacto" aria-labelledby="contact-title" appReveal>
       <div class="contact-card">
         <div><span class="eyebrow">HABLEMOS</span><h2 id="contact-title">Tu próxima<br><em>gran decisión</em> empieza aquí.</h2></div>
-        <div class="contact-copy"><p>Configura tus canales de atención y convierte cada visita en una relación de largo plazo.</p><a routerLink="/register" class="button button-primary">Crear mi cuenta <span aria-hidden="true">↗</span></a></div>
+        <div class="contact-copy"><p>Configura tus canales de atención y convierte cada visita en una relación de largo plazo.</p><a routerLink="/register" class="button button-primary">Crear mi cuenta <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a></div>
       </div>
       <div class="contact-details">
         <span>Teléfono <b>Pendiente de configurar</b></span>

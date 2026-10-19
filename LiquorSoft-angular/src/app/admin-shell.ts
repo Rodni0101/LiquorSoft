@@ -26,56 +26,56 @@ template: ` <div class="admin-shell"> <aside class="sidebar"> <a routerLink="/in
     <nav aria-label="Menú de administración">
       @if (auth.can('dashboard')) {
         <a routerLink="/admin/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-          <span class="nav-icon">▦</span>
+          <span class="nav-icon"><i class="bi bi-speedometer2"></i></span>
           <span>Resumen</span>
         </a>
       }
 
       @if (auth.can('productos')) {
         <a routerLink="/admin/productos" routerLinkActive="active">
-          <span class="nav-icon">▣</span>
+          <span class="nav-icon"><i class="bi bi-box"></i></span>
           <span>Productos</span>
         </a>
       }
 
       @if (auth.can('categorias')) {
         <a routerLink="/admin/categorias" routerLinkActive="active">
-          <span class="nav-icon">◈</span>
+          <span class="nav-icon"><i class="bi bi-tag"></i></span>
           <span>Categorías</span>
         </a>
       }
 
       @if (auth.can('inventario')) {
         <a routerLink="/admin/inventario" routerLinkActive="active">
-          <span class="nav-icon">◫</span>
+          <span class="nav-icon"><i class="bi bi-box-seam"></i></span>
           <span>Inventario</span>
         </a>
       }
 
       @if (auth.can('ventas')) {
         <a routerLink="/admin/ventas" routerLinkActive="active">
-          <span class="nav-icon">◌</span>
+          <span class="nav-icon"><i class="bi bi-cash-coin"></i></span>
           <span>Ventas</span>
         </a>
       }
 
       @if (auth.can('compras')) {
         <a routerLink="/admin/compras" routerLinkActive="active">
-          <span class="nav-icon">▤</span>
+          <span class="nav-icon"><i class="bi bi-cart-fill"></i></span>
           <span>Compras</span>
         </a>
       }
 
       @if (auth.can('proveedores')) {
         <a routerLink="/admin/proveedores" routerLinkActive="active">
-          <span class="nav-icon">▥</span>
+          <span class="nav-icon"><i class="bi bi-building"></i></span>
           <span>Proveedores</span>
         </a>
       }
 
       @if (auth.can('usuarios')) {
         <a routerLink="/admin/usuarios" routerLinkActive="active">
-          <span class="nav-icon">♙</span>
+          <span class="nav-icon"><i class="bi bi-people"></i></span>
           <span>Usuarios</span>
         </a>
       }
@@ -85,13 +85,13 @@ template: ` <div class="admin-shell"> <aside class="sidebar"> <a routerLink="/in
       <app-theme-toggle class="admin-theme-toggle"></app-theme-toggle>
 
       <a routerLink="/productos" class="back-link">
-        <span aria-hidden="true">←</span>
-        Ver tienda
+        <i class="bi bi-arrow-left"></i>
+        <span>Ver tienda</span>
       </a>
 
       <button type="button" class="logout" (click)="auth.logout()">
-        <span aria-hidden="true">↪</span>
-        Cerrar sesión
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Cerrar sesión</span>
       </button>
     </div>
   </aside>

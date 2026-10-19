@@ -23,7 +23,7 @@
         <aside class="purchase-card order-summary"><span class="eyebrow">RESUMEN</span><h2>Tu pedido</h2><div class="summary-line"><span>Artículos</span><strong>{{ cart.count() }}</strong></div><div class="summary-line"><span>Subtotal</span><strong>{{ formatPrice(cart.total()) }}</strong></div><div class="summary-total"><span>Total</span><strong>{{ formatPrice(cart.total()) }}</strong></div><button type="button" class="primary-action" (click)="goToCheckout()">Continuar al checkout</button><a routerLink="/catalogo" class="secondary-action">Continuar comprando</a></aside>
       </div>
     } @else {
-      <section class="empty-cart purchase-card"><span class="empty-icon">🛒</span><h2>Tu carrito está vacío</h2><p>Explora el catálogo y agrega tus productos favoritos.</p><a routerLink="/catalogo" class="primary-action">Explorar productos</a></section>
+      <section class="empty-cart purchase-card"><span class="empty-icon"><i class="bi bi-cart"></i></span><h2>Tu carrito está vacío</h2><p>Explora el catálogo y agrega tus productos favoritos.</p><a routerLink="/catalogo" class="primary-action">Explorar productos</a></section>
     }
   </main>
 </div>

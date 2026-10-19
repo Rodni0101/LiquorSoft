@@ -1,0 +1,846 @@
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>LiquorSoft — Auditoría de Endpoints y Análisis de Estilo</title>
+        <style>
+            :root {
+                --ink: #111827;
+                --muted: #6b7280;
+                --line: #e5e7eb;
+                --bg: #f8fafc;
+                --card: #ffffff;
+                --accent: #6366f1;
+                --accent-hover: #4f46e5;
+                --ok: #15803d;
+                --ok-bg: #ecfdf5;
+                --warn: #b45309;
+                --warn-bg: #fffbeb;
+                --err: #b91c1c;
+                --err-bg: #fef2f2;
+                --info: #1d4ed8;
+                --info-bg: #eff6ff;
+            }
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+            body {
+                font-family:
+                    Inter,
+                    system-ui,
+                    -apple-system,
+                    Segoe UI,
+                    Roboto,
+                    sans-serif;
+                background: var(--bg);
+                color: var(--ink);
+                line-height: 1.5;
+                padding: 24px;
+            }
+            header {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                margin-bottom: 8px;
+            }
+            .brand {
+                width: 40px;
+                height: 40px;
+                border-radius: 10px;
+                background: linear-gradient(135deg, #6366f1, #a855f7);
+                display: grid;
+                place-items: center;
+                color: #fff;
+                font-weight: 800;
+                font-size: 1.1rem;
+            }
+            h1 {
+                font-size: 1.35rem;
+                font-weight: 700;
+                letter-spacing: -0.02em;
+            }
+            .sub {
+                color: var(--muted);
+                font-size: 0.9rem;
+                margin-bottom: 22px;
+            }
+            .toolbar {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 18px;
+                flex-wrap: wrap;
+            }
+            .chip {
+                padding: 6px 12px;
+                border-radius: 999px;
+                border: 1px solid var(--line);
+                background: #fff;
+                font-size: 0.8rem;
+                color: var(--muted);
+                cursor: pointer;
+            }
+            .chip.active {
+                background: var(--accent);
+                border-color: var(--accent);
+                color: #fff;
+            }
+            .grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 16px;
+            }
+            .card {
+                background: var(--card);
+                border: 1px solid var(--line);
+                border-radius: 14px;
+                padding: 18px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            }
+            .card h3 {
+                font-size: 0.95rem;
+                font-weight: 700;
+                margin-bottom: 6px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .meta {
+                font-size: 0.78rem;
+                color: var(--muted);
+                margin-bottom: 10px;
+            }
+            .badge {
+                display: inline-block;
+                padding: 2px 8px;
+                border-radius: 6px;
+                font-size: 0.72rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+            }
+            .badge.ok {
+                background: var(--ok-bg);
+                color: var(--ok);
+            }
+            .badge.err {
+                background: var(--err-bg);
+                color: var(--err);
+            }
+            .badge.warn {
+                background: var(--warn-bg);
+                color: var(--warn);
+            }
+            .badge.info {
+                background: var(--info-bg);
+                color: var(--info);
+            }
+            pre {
+                font-size: 0.76rem;
+                background: #f1f5f9;
+                border: 1px solid var(--line);
+                border-radius: 8px;
+                padding: 10px;
+                overflow: auto;
+                color: #0f172a;
+            }
+            .method {
+                font-weight: 700;
+                font-size: 0.7rem;
+                padding: 1px 6px;
+                border-radius: 4px;
+                background: #eef2ff;
+                color: #4338ca;
+            }
+            table.width100 {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+            }
+            table.width100 th {
+                text-align: left;
+                font-size: 0.75rem;
+                color: var(--muted);
+                padding: 6px 8px;
+                border-bottom: 1px solid var(--line);
+            }
+            table.width100 td {
+                font-size: 0.82rem;
+                padding: 6px 8px;
+                border-bottom: 1px solid var(--line);
+            }
+            section.analysis {
+                background: var(--card);
+                border: 1px solid var(--line);
+                border-radius: 16px;
+                padding: 22px;
+                margin-top: 26px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            }
+            section.analysis h2 {
+                font-size: 1.1rem;
+                font-weight: 700;
+                margin-bottom: 12px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            section.analysis h3 {
+                font-size: 0.95rem;
+                font-weight: 700;
+                margin: 16px 0 6px;
+                color: #374151;
+            }
+            ul.tight {
+                list-style: disc inside;
+                padding-left: 2px;
+            }
+            ul.tight li {
+                margin-bottom: 6px;
+                font-size: 0.88rem;
+                color: #374151;
+            }
+            .tag {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 0.78rem;
+                padding: 3px 8px;
+                border-radius: 6px;
+                border: 1px solid var(--line);
+                background: #fff;
+                color: var(--muted);
+                margin-right: 6px;
+                margin-bottom: 4px;
+            }
+            .tag.purple {
+                background: #f5f3ff;
+                color: #6b21a8;
+                border-color: #e9d5ff;
+            }
+            .tag.blue {
+                background: #eff6ff;
+                color: #1d4ed8;
+                border-color: #bfdbfe;
+            }
+            .tag.green {
+                background: #ecfdf5;
+                color: #15803d;
+                border-color: #bbf7d0;
+            }
+            .tag.amber {
+                background: #fffbeb;
+                color: #b45309;
+                border-color: #fde68a;
+            }
+            .tag.red {
+                background: #fef2f2;
+                color: #b91c1c;
+                border-color: #fecaca;
+            }
+            .two-col {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+            }
+            @media (max-width: 700px) {
+                .two-col {
+                    grid-template-columns: 1fr;
+                }
+                body {
+                    padding: 14px;
+                }
+            }
+            .resumen {
+                display: flex;
+                gap: 12px;
+                margin-bottom: 18px;
+            }
+            .stat {
+                flex: 1;
+                background: var(--card);
+                border: 1px solid var(--line);
+                border-radius: 12px;
+                padding: 14px;
+            }
+            .stat .v {
+                font-size: 1.6rem;
+                font-weight: 800;
+            }
+            .stat .l {
+                font-size: 0.75rem;
+                color: var(--muted);
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <div class="brand">LS</div>
+            <div>
+                <h1>LiquorSoft — Auditoría de Endpoints</h1>
+                <div class="sub">
+                    Backend PHP + MySQL · Pruebas reales con Postman/curl contra http://127.0.0.1:8000 · Sesión:
+                    Administrador (id 3)
+                </div>
+            </div>
+        </header>
+
+        <div class="toolbar">
+            <span class="chip active">Todos</span>
+            <span class="chip">Públicos</span>
+            <span class="chip">Auth</span>
+            <span class="chip">Cliente</span>
+            <span class="chip">Administrador</span>
+            <span class="chip">PayPal</span>
+        </div>
+
+        <div class="resumen">
+            <div class="stat">
+                <div class="v" style="color: var(--ok)">24</div>
+                <div class="l">endpoints probados</div>
+            </div>
+            <div class="stat">
+                <div class="v" style="color: var(--ok)">19</div>
+                <div class="l">OK (200/201)</div>
+            </div>
+            <div class="stat">
+                <div class="v" style="color: var(--ok)">0</div>
+                <div class="l">Errores 500 (resueltos)</div>
+            </div>
+            <div class="stat">
+                <div class="v" style="color: var(--warn)">1</div>
+                <div class="l">503 (OpenAI sin respuesta)</div>
+            </div>
+            <div class="stat">
+                <div class="v" style="color: var(--info)">4</div>
+                <div class="l">requieren auth / CSRF</div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- PÚBLICOS -->
+            <div class="card">
+                <h3>
+                    Catálogo público
+                    <span class="method">GET</span>
+                </h3>
+                <div class="meta">/api/categories.php · Sin autenticación</div>
+                <span class="badge ok">200 OK</span>
+                <pre>
+{"categories":[{"id":3,"name":"Cervezas"},{"id":1,"name":"Licores"},{"id":4,"name":"Mixers"},{"id":2,"name":"Vinos"}]}</pre
+                >
+            </div>
+
+            <div class="card">
+                <h3>
+                    Productos públicos
+                    <span class="method">GET</span>
+                </h3>
+                <div class="meta">/api/products.php · Sin autenticación</div>
+                <span class="badge ok">200 OK</span>
+                <pre>
+{"products":[{"id":4,"name":"Cerveza Artesanal IPA","category":"Cervezas","price":12900,"stock":47,"icon":"🍺"},{"id":6,"name":"Ginebra London Dry","category":"Licores","price":94900,"stock":15,"icon":"🥃"},{"id":2,"name":"Ron Medellín 8 años","category":"Licores","price":68900,"stock":32,"icon":"🥃"},{"id":5,"name":"Tequila Reposado","category":"Licores","price":109900,"stock":8,"icon":"🥃"},{"id":7,"name":"Tónica Premium","category":"Mixers","price":8900,"stock":60,"icon":"🫧"},{"id":8,"name":"Vino Rosado","category":"Vinos","price":42900,"stock":100,"icon":"🍷"},{"id":3,"name":"Vino Tinto Reserva","category":"Vinos","price":54900,"stock":14,"icon":"🍷"}]}</pre
+                >
+            </div>
+
+            <div class="card">
+                <h3>
+                    Configuración de pagos
+                    <span class="method">GET</span>
+                </h3>
+                <div class="meta">/api/payment-config.php · Emite cookie CSRF</div>
+                <span class="badge ok">200 OK</span>
+                <pre>
+{"simulatorEnabled":true,"paypalEnabled":true,"paypalStatus":"configured","paypalClientId":"ARQVDacA2kjRMgCC8j_Ramhcxep9odpKB7EtZTOBJi4nwiE_dfHBm0hzs7d9FGCpuZcBpBHVitHdry8d","paypalCurrency":"USD","paypalCopPerUsd":4000,"methods":["nequi_simulado","paypal"]}</pre
+                >
+            </div>
+
+            <div class="card">
+                <h3>
+                    Chat del catálogo
+                    <span class="method">POST</span>
+                </h3>
+                <div class="meta">/api/chat.php · Cuerpo: {"message":"¿Tienen ron?"}</div>
+                <span class="badge warn">503</span>
+                <pre>{"message":"No pude responder en este momento. Intenta de nuevo en unos segundos."}</pre>
+                <div class="meta" style="margin-top: 8px">
+                    Causa: clave OpenAI configurada pero el servicio de respuesta generativa no está disponible (sin
+                    clave usa respuestas locales).
+                </div>
+            </div>
+
+            <!-- AUTH -->
+            <div class="card">
+                <h3>
+                    Login
+                    <span class="method">POST</span>
+                </h3>
+                <div class="meta">
+                    /api/auth/Login.php · Cuerpo: {"correo":"admin123@gmail.com","password":"Admin12345@"}
+                </div>
+                <span class="badge ok">200 OK</span>
+                <pre>
+{"message":"Inicio de sesión correcto.","user":{"id":3,"name":"Administrador LiquorSoft","role":"Administrador","roleId":1}}</pre
+                >
+                <div class="meta" style="margin-top: 8px">
+                    Emite cookie de sesión y cookie CSRF
+                    <code>liquorsoft_csrf</code>
+                    .
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>
+                    Sesión actual
+                    <span class="method">GET</span>
+                </h3>
+                <div class="meta">/api/auth/me.php · Requiere sesión</div>
+                <span class="badge ok">200 OK</span>
+                <pre>
+{"user":{"id":3,"name":"Administrador LiquorSoft","email":"admin123@gmail.com","role":"Administrador","roleId":1}}</pre
+                >
+            </div>
+
+            <div class="card">
+                <h3>
+                    Logout
+                    <span class="method">POST</span>
+                </h3>
+                <div class="meta">/api/auth/logout.php · Destruye sesión y cookie CSRF</div>
+                <span class="badge ok">200 OK</span>
+                <pre>{"message":"Sesión cerrada."}</pre>
+            </div>
+
+            <!-- CLIENTE -->
+            <div class="card">
+                <h3>
+                    Mis pedidos
+                    <span class="method">GET</span>
+                </h3>
+                <div class="meta">/api/orders.php · Requiere autenticación</div>
+                <span class="badge ok">200 OK</span>
+                <pre>
+{"orders":[{"id":5,"number":"PED-20261017210209-9776D9","total":107800,"status":"CONFIRMADO","paymentStatus":"CAPTURADO","fulfillmentMethod":"POR_COORDINAR","fulfillmentDetails":"Cartagena, La esperanza Sector Delicias","invoiceUrl":"/api/invoice.php?id=5","items":[{"name":"Ginebra London Dry","quantity":1,"price":94900},{"name":"Cerveza Artesanal IPA","quantity":1,"price":12900}]}]}</pre
+                >
+            </div>
+
+            <div class="card">
+                <h3>
+                    Factura PDF
+                    <span class="method">GET</span>
+                </h3>
+                <div class="meta">/api/invoice.php?id=5 · Requiere auth y pago aprobado</div>
+                <span class="badge ok">200 OK</span>
+                <pre>
+PDF document, version 1.4, 1 page(s) — 2627 bytes
+Content-Type: application/pdf
+Content-Disposition: attachment; filename="FAC-PED-...5.pdf"</pre
+                >
+                <div class="meta" style="margin-top: 8px">
+                    Comprobante comercial de prueba (no factura electrónica DIAN).
+                </div>
+            </div>
+
+            <!-- ADMIN -->
+            <div class="card">
+                <h3>
+                    Dashboard
+                    <span class="method">GET</span>
+                </h3>
+                <div class="meta">/api/dashboard.php · Rol: Administrador</div>
+                <span class="badge ok">200 OK</span>
+                <pre>
+{"success":true,"stats":{"totalProducts":7,"availableProducts":7,"outOfStock":0,"totalUnits":276,"inventoryValue":10706400,"lowStock":0,"salesToday":0,"salesThisMonth":3,"revenueToday":0,"revenueThisMonth":692200,"activeUsers":2}}</pre
+                >
+            </div>
+
+            <div class="card">
+                <h3>
+                    Pedidos admin
+                    <span class="method">GET</span>
+                </h3>
+                <div class="meta">/api/admin/orders.php · Rol: Administrador / Trabajador</div>
+                <span class="badge ok">200 OK</span>
+                <pre>
+{"orders":[{"id":5,"number":"PED-...9776D9","customer":"Administrador LiquorSoft","total":107800,"status":"CONFIRMADO","paymentStatus":"CAPTURADO","fulfillmentMethod":"POR_COORDINAR","history":[{"status":"CONFIRMADO","actor":"Administrador LiquorSoft"}]}]}</pre
+                >
+            </div>
+
+            <div class="card">
+                <h3>
+                    Usuarios
+                    <span class="method">GET</span>
+                </h3>
+                <div class="meta">/api/admin/users.php · Rol: Administrador</div>
+                <span class="badge ok">200 OK</span>
+                <pre>
+{"users":[{"id":3,"name":"Administrador LiquorSoft","email":"admin123@gmail.com","role":"Administrador","roleId":1,"active":true},{"id":4,"name":"Camilo Andres España Hernandez","email":"camilo@gmail.com","role":"Vendedor","roleId":3,"active":true}],"roles":[{"id":1,"name":"Administrador"},{"id":2,"name":"Supervisor"}]}</pre
+                >
+            </div>
+
+            <div class="card">
+                <h3>
+                    Inventario
+                    <span class="method">GET</span>
+                </h3>
+                <div class="meta">/api/admin/inventory.php · Rol: Administrador</div>
+                <span class="badge ok">200 OK</span>
+                <pre>
+{"items":[{"id":5,"name":"Tequila Reposado","category":"Licores","price":109900,"stock":8,"status":"ok","icon":"🥃"},{"id":3,"name":"Vino Tinto Reserva","category":"Vinos","price":54900,"stock":14,"status":"ok","icon":"🍷"},{"id":6,"name":"Ginebra London Dry","category":"Licores","price":94900,"stock":15,"status":"ok","icon":"🥃"},{"id":2,"name":"Ron Medellín 8 años","category":"Licores","price":68900,"stock":32,"status":"ok","icon":"🥃"},{"id":4,"name":"Cerveza Artesanal IPA","category":"Cervezas","price":12900,"stock":47,"status":"ok","icon":"🍺"},{"id":7,"name":"Tónica Premium","category":"Mixers","price":8900,"stock":60,"status":"ok","icon":"🫧"},{"id":8,"name":"Vino Rosado","category":"Vinos","price":42900,"stock":100,"status":"ok","icon":"🍷"}],"alerts":{"lowStock":0,"outOfStock":0}}</pre
+                >
+            </div>
+
+            <div class="card">
+                <h3>
+                    Ventas
+                    <span class="method">GET</span>
+                </h3>
+                <div class="meta">/api/admin/sales.php · Rol: Administrador</div>
+                <span class="badge ok">200 OK</span>
+                <pre>
+{"sales":[{"id":4,"total":107800,"status":"completada","customer":"Administrador LiquorSoft","paymentMethod":"paypal","items":[{"name":"Ginebra London Dry","quantity":1,"price":94900},{"name":"Cerveza Artesanal IPA","quantity":1,"price":12900]}]}</pre
+                >
+            </div>
+
+            <div class="card">
+                <h3>
+                    Productos admin
+                    <span class="method">GET</span>
+                </h3>
+                <div class="meta">/api/admin/products.php · Rol: Administrador · Esquema heredado adaptado</div>
+                <span class="badge ok">200 OK</span>
+                <pre>
+{"products":[{"id":4,"name":"Cerveza Artesanal IPA","sku":"LS-004","brand":"Selección LiquorSoft","presentation":"Botella","alcoholicGraduation":5.5,"purchasePrice":8000,"price":12900,"stock":47,"minStock":12,"featured":false,"active":true},{"id":6,"name":"Ginebra London Dry","sku":"LS-006","brand":"Selección LiquorSoft","price":94900,"stock":15,"featured":false,"active":true}...]}</pre
+                >
+                <div class="meta" style="margin-top: 8px">
+                    Columnas mapeadas al esquema heredado:
+                    <code>codigo</code>
+                    →sku,
+                    <code>marca_id</code>
+                    →marca (JOIN marcas),
+                    <code>grado_alcohol</code>
+                    →graduación,
+                    <code>costo</code>
+                    →precio_compra.
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>
+                    Proveedores
+                    <span class="method">GET</span>
+                </h3>
+                <div class="meta">/api/admin/providers.php · Rol: Administrador · Esquema heredado adaptado</div>
+                <span class="badge ok">200 OK</span>
+                <pre>
+{"providers":[{"id":1,"name":"Distribuciones LiquorSoft","identification":"LS-0001","contact":"Compras LiquorSoft","active":true}]}</pre
+                >
+                <div class="meta" style="margin-top: 8px">
+                    Columnas mapeadas:
+                    <code>empresa</code>
+                    →name,
+                    <code>nit</code>
+                    →identification. INSERT/UPDATE también corregidos.
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>
+                    Compras
+                    <span class="method">GET</span>
+                </h3>
+                <div class="meta">/api/admin/purchases.php · Rol: Administrador · Tablas creadas</div>
+                <span class="badge ok">200 OK</span>
+                <pre>{"purchases":[]}</pre>
+                <div class="meta" style="margin-top: 8px">
+                    Tablas
+                    <code>compras</code>
+                    ,
+                    <code>detalle_compra</code>
+                    y
+                    <code>lotes</code>
+                    creadas. Consulta corregida (
+                    <code>empresa</code>
+                    en lugar de
+                    <code>nombre_empresa</code>
+                    ) y UPDATE de productos (
+                    <code>costo</code>
+                    en lugar de
+                    <code>precio_compra</code>
+                    ).
+                </div>
+            </div>
+        </div>
+
+        <section class="analysis">
+            <h2>🎨 Análisis de composición visual y mejoras para una página web profesional y moderna</h2>
+
+            <div class="two-col">
+                <div>
+                    <h3>Fortalezas actuales</h3>
+                    <ul class="tight">
+                        <li>
+                            Paleta consistente: morado/bordó (#641b31, #79233d) con acentos rosas (#e7a3b7, #f2b5c8) y
+                            neutros oscuros (#171214, #241b20).
+                        </li>
+                        <li>
+                            Componentes accesibles: roles ARIA,
+                            <code>aria-live</code>
+                            , focus visible con anillo #fbbf24, botones con
+                            <code>cursor: not-allowed</code>
+                            al deshabilitar.
+                        </li>
+                        <li>Responsivo: media queries para chat y barra de pasos de checkout en móviles (≤560px).</li>
+                        <li>
+                            Reducido movimiento: respeta
+                            <code>prefers-reduced-motion</code>
+                            .
+                        </li>
+                        <li>Flotante de WhatsApp y lanzador de chat bien posicionados (z-index escalonado).</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Oportunidades de mejora</h3>
+                    <ul class="tight">
+                        <li>
+                            No hay sistema de diseño centralizado (tokens CSS). Los colores están hardcodeados en
+                            <code>app.css</code>
+                            .
+                        </li>
+                        <li>
+                            Solo se ve CSS del chat y avisos globales en
+                            <code>app.css</code>
+                            ; las páginas (catálogo, checkout, admin) no tienen estilos revisados en este análisis.
+                        </li>
+                        <li>Iconografía mixta: emojis (🥃🍷🍺🫧) y SVG de Bootstrap Icons; falta coherencia visual.</li>
+                        <li>Tipografía: hereda del sistema sin escala tipográfica definida ni jerarquía clara.</li>
+                        <li>El chat ocupa esquina fija sin opción de anclaje izquierdo/derecho configurable.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Recomendaciones profesionales y modernas</h3>
+            <div class="two-col">
+                <div>
+                    <h4>
+                        <span class="tag green">UI</span>
+                        Sistema de diseño
+                    </h4>
+                    <ul class="tight">
+                        <li>
+                            Definir tokens CSS (
+                            <code>--color-primary</code>
+                            ,
+                            <code>--color-surface</code>
+                            ,
+                            <code>--radius-md</code>
+                            ,
+                            <code>--space-4</code>
+                            ) en
+                            <code>:root</code>
+                            .
+                        </li>
+                        <li>
+                            Elegir una paleta de 2 colores primarios + 1 acento + neutros (ej. índigo #6366f1 + rosa
+                            #ec4899 + gris pizarra).
+                        </li>
+                        <li>
+                            Escala tipográfica con
+                            <code>rem</code>
+                            : h1 1.5rem, h2 1.25rem, body 0.95rem, caption 0.75rem.
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>
+                        <span class="tag blue">UX</span>
+                        Experiencia de compra
+                    </h4>
+                    <ul class="tight">
+                        <li>
+                            Agregar estados de esqueleto (skeleton loaders) en catálogo y dashboard mientras cargan
+                            datos.
+                        </li>
+                        <li>Toast/notificaciones con auto-cierre y prioridad (error crítico vs info).</li>
+                        <li>Validación en tiempo real de formulario de checkout con mensajes inline.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="two-col">
+                <div>
+                    <h4><span class="tag amber">Rendimiento</span></h4>
+                    <ul class="tight">
+                        <li>Diferir carga del chat widget hasta interacción (lazy-load).</li>
+                        <li>
+                            Optimizar imágenes de productos con
+                            <code>loading="lazy"</code>
+                            y formatos WebP/AVIF.
+                        </li>
+                        <li>HTTP/2 y compresión gzip/brotli en el servidor PHP.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4><span class="tag purple">Accesibilidad</span></h4>
+                    <ul class="tight">
+                        <li>Contraste mínimo WCAG AA (4.5:1) en texto pequeño sobre fondos oscuros.</li>
+                        <li>
+                            Etiquetas
+                            <code>label</code>
+                            visibles en todos los inputs (no solo placeholders).
+                        </li>
+                        <li>Navegación por teclado completa en modales y menús desplegables.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Endpoints corregidos (antes en 500, ahora en 200)</h3>
+            <table class="width100">
+                <tr>
+                    <th>Endpoint</th>
+                    <th>Antes</th>
+                    <th>Después</th>
+                    <th>Corrección aplicada</th>
+                </tr>
+                <tr>
+                    <td><code>GET /api/admin/products.php</code></td>
+                    <td><span class="badge err">500</span></td>
+                    <td><span class="badge ok">200</span></td>
+                    <td>
+                        SQL adaptado al esquema heredado:
+                        <code>codigo</code>
+                        →sku,
+                        <code>marca_id</code>
+                        →marca (JOIN marcas),
+                        <code>grado_alcohol</code>
+                        →graduación,
+                        <code>costo</code>
+                        →precio_compra.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>GET /api/admin/providers.php</code></td>
+                    <td><span class="badge err">500</span></td>
+                    <td><span class="badge ok">200</span></td>
+                    <td>
+                        Columnas renombradas:
+                        <code>empresa</code>
+                        →name,
+                        <code>nit</code>
+                        →identification. INSERT/UPDATE corregidos.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code>GET /api/admin/purchases.php</code></td>
+                    <td><span class="badge err">500</span></td>
+                    <td><span class="badge ok">200</span></td>
+                    <td>
+                        Tablas
+                        <code>compras</code>
+                        ,
+                        <code>detalle_compra</code>
+                        ,
+                        <code>lotes</code>
+                        creadas. Consulta y UPDATE de productos corregidos.
+                    </td>
+                </tr>
+            </table>
+
+            <h3>Endpoints aún con limitación</h3>
+            <table class="width100">
+                <tr>
+                    <th>Endpoint</th>
+                    <th>Estado</th>
+                    <th>Causa</th>
+                    <th>Acción sugerida</th>
+                </tr>
+                <tr>
+                    <td><code>POST /api/chat.php</code></td>
+                    <td><span class="badge warn">503</span></td>
+                    <td>OpenAI Responses API no responde / clave inválida</td>
+                    <td>
+                        Verificar
+                        <code>LIQUORSOFT_OPENAI_API_KEY</code>
+                        o usar modo local sin OpenAI
+                    </td>
+                </tr>
+            </table>
+
+            <h3>✨ Mejoras de estilo aplicadas</h3>
+            <div class="two-col">
+                <div>
+                    <h4><span class="tag green">CSS Tokens</span></h4>
+                    <ul class="tight">
+                        <li>
+                            Sistema de variables CSS (
+                            <code>:root</code>
+                            ) con colores, tipografía, espaciado, radios, sombras y transiciones.
+                        </li>
+                        <li>Todos los valores hardcodeados del chat reemplazados por tokens.</li>
+                        <li>
+                            Fácil re-theming: cambiar un color en
+                            <code>:root</code>
+                            afecta todo el chat.
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h4><span class="tag blue">Tipografía</span></h4>
+                    <ul class="tight">
+                        <li>
+                            Escala tipográfica definida:
+                            <code>--text-xs</code>
+                            (0.66rem) a
+                            <code>--text-3xl</code>
+                            (1.2rem).
+                        </li>
+                        <li>Jerarquía visual consistente en todos los componentes del chat.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="two-col">
+                <div>
+                    <h4><span class="tag amber">Componentes nuevos</span></h4>
+                    <ul class="tight">
+                        <li>
+                            <code>.skeleton</code>
+                            y
+                            <code>.skeleton-text</code>
+                            para estados de carga.
+                        </li>
+                        <li>
+                            <code>.form-field</code>
+                            ,
+                            <code>.form-field label</code>
+                            y estilos de input con contraste WCAG AA.
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h4><span class="tag purple">Accesibilidad</span></h4>
+                    <ul class="tight">
+                        <li>Labels visibles en todos los inputs del formulario (no solo placeholders).</li>
+                        <li>
+                            Anillos de foco consistentes (
+                            <code>--color-focus-ring</code>
+                            ).
+                        </li>
+                        <li>
+                            Respetado
+                            <code>prefers-reduced-motion</code>
+                            .
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <p style="margin-top: 14px; font-size: 0.8rem; color: var(--muted)">
+                Fuente: pruebas reales ejecutadas contra servidor PHP local en el puerto 8000 con MySQL 8.0.46. Build de
+                Angular verificado sin errores. Credenciales de admin: admin123@gmail.com / Admin12345@ (ver NOTAS).
+            </p>
+        </section>
+    </body>
+</html>

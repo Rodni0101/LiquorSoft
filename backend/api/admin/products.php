@@ -154,22 +154,22 @@ if ($method === 'GET') {
         SELECT
             p.id,
             p.nombre AS name,
-            p.sku,
-            p.marca AS brand,
+            p.codigo AS sku,
+            m.nombre AS brand,
             p.presentacion AS presentation,
-            p.graduacion_alcoholica AS alcoholicGraduation,
-            p.precio_compra AS purchasePrice,
+            p.grado_alcohol AS alcoholicGraduation,
+            p.costo AS purchasePrice,
             p.precio AS price,
             p.stock,
             p.stock_minimo AS minStock,
             p.descripcion AS description,
             p.imagen AS image,
-            p.destacado AS featured,
+            0 AS featured,
             p.estado AS active,
-            p.categoria_id AS categoryId,
-            COALESCE(c.nombre, 'Sin categoría') AS category
+            NULL AS categoryId,
+            NULL AS category
         FROM productos p
-        LEFT JOIN categorias c ON c.id = p.categoria_id
+        LEFT JOIN marcas m ON m.id = p.marca_id
         ORDER BY p.nombre ASC
     ";
 

@@ -7,10 +7,10 @@ $actor = requireRole($connection, ['Administrador']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $result = $connection->query(
-        'SELECT c.id, c.numero_factura AS invoice, c.fecha_compra AS purchaseDate,
-                c.total, c.estado AS status, p.nombre_empresa AS supplier
-         FROM compras c INNER JOIN proveedores p ON p.id = c.proveedor_id
-         ORDER BY c.fecha_compra DESC, c.id DESC LIMIT 100'
+         'SELECT c.id, c.numero_factura AS invoice, c.fecha_compra AS purchaseDate,
+                 c.total, c.estado AS status, p.empresa AS supplier
+          FROM compras c INNER JOIN proveedores p ON p.id = c.proveedor_id
+          ORDER BY c.fecha_compra DESC, c.id DESC LIMIT 100'
     );
     if (!$result) {
         $connection->close();
@@ -95,7 +95,7 @@ try {
     $purchase->close();
 
     $detail = $connection->prepare('INSERT INTO detalle_compra (compra_id, producto_id, cantidad, costo_unitario, lote_id) VALUES (?, ?, ?, ?, ?)');
-    $update = $connection->prepare('UPDATE productos SET stock = stock + ?, precio_compra = ? WHERE id = ?');
+    $update = $connection->prepare('UPDATE productos SET stock = stock + ?, costo = ? WHERE id = ?');
     $lot = $connection->prepare('INSERT INTO lotes (producto_id, proveedor_id, codigo, fecha_ingreso, fecha_vencimiento, cantidad_inicial, cantidad_disponible) VALUES (?, ?, ?, ?, ?, ?, ?)');
     $movement = $connection->prepare('INSERT INTO movimientos_inventario (producto_id, usuario_id, tipo, cantidad, stock_anterior, stock_nuevo, lote_id, referencia, motivo) VALUES (?, ?, \'ENTRADA\', ?, ?, ?, ?, ?, \'Compra recibida\')');
     if (!$detail || !$update || !$lot || !$movement) {

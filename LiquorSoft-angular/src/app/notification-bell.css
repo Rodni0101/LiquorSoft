@@ -74,8 +74,8 @@
 }
 
 .dropdown-panel {
-  position: absolute;
-  top: calc(100% + 12px);
+  position: fixed;
+  top: auto;
   right: 0;
   width: min(380px, 92vw);
   max-height: 520px;
@@ -88,6 +88,19 @@
   z-index: 1000;
   overflow: hidden;
   animation: slide-in 200ms ease;
+  transform-origin: top right;
+}
+
+.dropdown-panel.position-left {
+  right: auto;
+  left: 0;
+  transform-origin: top left;
+}
+
+.dropdown-panel.position-right {
+  right: 0;
+  left: auto;
+  transform-origin: top right;
 }
 
 @keyframes slide-in {

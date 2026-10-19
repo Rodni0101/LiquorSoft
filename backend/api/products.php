@@ -20,7 +20,7 @@ if (isset($_GET['id'])) {
     $stmt = $connection->prepare(
         "SELECT p.id, p.nombre AS name, COALESCE(c.nombre, 'Sin categoría') AS category,
                 COALESCE(p.descripcion, '') AS description, p.precio AS price, p.stock, p.imagen AS image,
-                COALESCE(p.destacado, 0) AS featured
+                0 AS featured
          FROM productos p
          LEFT JOIN categorias c ON c.id = p.categoria_id
          WHERE p.id = ? AND p.estado = 1
@@ -58,7 +58,7 @@ if (isset($_GET['id'])) {
     $relStmt = $connection->prepare(
         "SELECT p.id, p.nombre AS name, COALESCE(c.nombre, 'Sin categoría') AS category,
                 COALESCE(p.descripcion, '') AS description, p.precio AS price, p.stock, p.imagen AS image,
-                COALESCE(p.destacado, 0) AS featured
+                0 AS featured
          FROM productos p
          LEFT JOIN categorias c ON c.id = p.categoria_id
          WHERE p.id != ? AND p.estado = 1 AND COALESCE(c.nombre, '') = ?
@@ -93,7 +93,7 @@ if (isset($_GET['id'])) {
 $result = $connection->query(
     "SELECT p.id, p.nombre AS name, COALESCE(c.nombre, 'Sin categoría') AS category,
             COALESCE(p.descripcion, '') AS description, p.precio AS price, p.stock, p.imagen AS image,
-            COALESCE(p.destacado, 0) AS featured
+            0 AS featured
      FROM productos p
      LEFT JOIN categorias c ON c.id = p.categoria_id
      WHERE p.estado = 1 ORDER BY p.nombre ASC"

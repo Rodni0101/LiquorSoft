@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewChild, ElementRef, AfterViewInit, effect, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { UserNotificationsService, UserNotification } from './user-notifications.service';
@@ -34,6 +34,8 @@ import { AuthService } from './auth.service';
 
         <section
           class="dropdown-panel"
+          [class.position-left]="panelPosition === 'left'"
+          [class.position-right]="panelPosition === 'right'"
           role="region"
           aria-label="Panel de notificaciones"
         >
@@ -101,7 +103,8 @@ import { AuthService } from './auth.service';
 
                         @if (!item.read) {
                           <button
-                            type="button"
+        #bellBtn
+        type="button"
                             class="item-mark-btn"
                             (click)="$event.stopPropagation(); service.markAsRead(item.id)"
                             title="Marcar como leída"
@@ -132,10 +135,40 @@ import { AuthService } from './auth.service';
   `,
   styleUrl: './notification-bell.css'
 })
-export class NotificationBell {
+export class NotificationBell implements AfterViewInit, OnDestroy {
   protected readonly service = inject(UserNotificationsService);
   protected readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  @ViewChild('bellBtn') bellBtn!: ElementRef<HTMLButtonElement>;
+  protected panelPosition: 'left' | 'right' = 'right';
+  protected panelTop = 0;
+  private readonly resizeHandler = () => this.updatePanelPosition();
+
+  ngAfterViewInit(): void {
+    // Calculamos la posición inicial del panel
+    this.updatePanelPosition();
+    // Recalculamos si cambia el tamaño de la ventana
+    window.addEventListener('resize', this.resizeHandler);
+    // Recalculamos cuando el panel se abre
+    effect(() => {
+      if (this.service.isOpen()) {
+        this.updatePanelPosition();
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('resize', this.resizeHandler);
+  }
+
+  private updatePanelPosition(): void {
+    if (!this.bellBtn) return;
+    const btnRect = this.bellBtn.nativeElement.getBoundingClientRect();
+    const panelWidth = 380; // ancho máximo del panel
+    const spaceRight = window.innerWidth - btnRect.right;
+    const spaceLeft = btnRect.left;
+    this.panelPosition = spaceRight >= panelWidth ? 'right' : 'left';
+  }
 
   protected getIcon(type: string): string {
     switch (type) {

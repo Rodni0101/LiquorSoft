@@ -17,42 +17,42 @@
     @if (data; as dashboard) {
       <section class="metrics-grid" aria-label="Métricas principales">
         <article class="metric-card accent">
-          <span class="metric-icon">▣</span><small>Productos activos</small
+          <span class="metric-icon bi bi-box"></span><small>Productos activos</small
           ><strong>{{ dashboard.stats.totalProducts }}</strong
           ><em>En catálogo</em>
         </article>
         <article class="metric-card">
-          <span class="metric-icon green">✓</span><small>Productos disponibles</small
+          <span class="metric-icon green bi bi-check2-circle"></span><small>Productos disponibles</small
           ><strong>{{ dashboard.stats.availableProducts }}</strong
           ><em>Sobre el mínimo</em>
         </article>
         <article class="metric-card">
-          <span class="metric-icon blue">◫</span><small>Unidades en stock</small
+          <span class="metric-icon blue bi bi-box-seam"></span><small>Unidades en stock</small
           ><strong>{{ dashboard.stats.totalUnits }}</strong
           ><em>Disponibles</em>
         </article>
         <article class="metric-card">
-          <span class="metric-icon blue">$</span><small>Valor inventario</small
+          <span class="metric-icon blue bi bi-currency-dollar"></span><small>Valor inventario</small
           ><strong>{{ formatPrice(dashboard.stats.inventoryValue) }}</strong
           ><em>Valor total</em>
         </article>
         <article class="metric-card">
-          <span class="metric-icon red">!</span><small>Stock bajo</small
+          <span class="metric-icon red bi bi-exclamation-triangle"></span><small>Stock bajo</small
           ><strong>{{ dashboard.stats.lowStock }}</strong
           ><em>Requieren atención</em>
         </article>
         <article class="metric-card">
-          <span class="metric-icon red">∅</span><small>Agotados</small
+          <span class="metric-icon red bi bi-x-circle"></span><small>Agotados</small
           ><strong>{{ dashboard.stats.outOfStock }}</strong
           ><em>Sin existencias</em>
         </article>
         <article class="metric-card">
-          <span class="metric-icon green">↗</span><small>Ventas del mes</small
+          <span class="metric-icon green bi bi-graph-up"></span><small>Ventas del mes</small
           ><strong>{{ dashboard.stats.salesThisMonth }}</strong
           ><em>{{ formatPrice(dashboard.stats.revenueThisMonth) }}</em>
         </article>
         <article class="metric-card">
-          <span class="metric-icon">♙</span><small>Usuarios activos</small
+          <span class="metric-icon bi bi-people"></span><small>Usuarios activos</small
           ><strong>{{ dashboard.stats.activeUsers }}</strong
           ><em>Con acceso al sistema</em>
         </article>
@@ -69,7 +69,7 @@
           <div class="product-list">
             @for (product of dashboard.recentProducts; track product.name) {
               <div class="product-row">
-                <span class="product-avatar">🍾</span>
+                <span class="product-avatar"><i class="bi bi-bottle"></i></span>
                 <div>
                   <strong>{{ product.name }}</strong
                   ><small>{{ product.category }}</small>
@@ -86,7 +86,7 @@
               <span class="eyebrow">VENTAS</span>
               <h2>Hoy</h2>
             </div>
-            <span class="sales-icon">↗</span>
+            <span class="sales-icon"><i class="bi bi-cash-coin"></i></span>
           </div>
           <strong class="sales-total">{{ formatPrice(dashboard.stats.revenueToday) }}</strong>
           <p>{{ dashboard.stats.salesToday }} ventas registradas hoy</p>

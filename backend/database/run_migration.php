@@ -10,17 +10,27 @@ if (!$sql) {
     exit(1);
 }
 
+$error = null;
 if ($connection->multi_query($sql)) {
     do {
         if ($result = $connection->store_result()) {
             $result->free();
         }
+        if ($connection->errno) {
+            $error = $connection->error;
+            break;
+        }
     } while ($connection->more_results() && $connection->next_result());
-    echo "Migración 012 ejecutada correctamente.\n";
 } else {
-    echo "Error ejecutando migración: " . $connection->error . "\n";
+    $error = $connection->error;
+}
+
+if ($error !== null) {
+    echo "Error ejecutando migración: {$error}\n";
     exit(1);
 }
+
+echo "Migración 012 ejecutada correctamente.\n";
 
 $connection->close();
 

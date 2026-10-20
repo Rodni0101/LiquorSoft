@@ -234,11 +234,13 @@ if ($passSec1 && $passSec2 && $passSec3 && $passSec4) {
 
 // 4. FLUJO D: PRODUCTO INDIVIDUAL
 echo "--- FLUJO D: PRODUCTO INDIVIDUAL ---\n";
-$prod1 = apiRequest('GET', '/api/products.php?id=1');
-$passD1 = $prod1['status'] === 200 && ($prod1['data']['product']['id'] ?? 0) === 1;
-echo ($passD1 ? "[✓]" : "[✗]") . " D.1: Consulta de producto existente (/api/products.php?id=1) responde 200 con datos de '{$prod1['data']['product']['name']}'.\n";
+$prodList = apiRequest('GET', '/api/products.php');
+$testProductId = (int) ($prodList['data']['products'][0]['id'] ?? 0);
+$prod1 = apiRequest('GET', '/api/products.php?id=' . $testProductId);
+$passD1 = $testProductId > 0 && $prod1['status'] === 200 && ($prod1['data']['product']['id'] ?? 0) === $testProductId;
+echo ($passD1 ? "[✓]" : "[✗]") . " D.1: Consulta de producto existente (/api/products.php?id={$testProductId}) responde 200 con datos de '{$prod1['data']['product']['name']}'.\n";
 
-$prod1Repeat = apiRequest('GET', '/api/products.php?id=1');
+$prod1Repeat = apiRequest('GET', '/api/products.php?id=' . $testProductId);
 $passD2 = $prod1Repeat['status'] === 200 && ($prod1Repeat['data']['product']['name'] ?? '') === ($prod1['data']['product']['name'] ?? '');
 echo ($passD2 ? "[✓]" : "[✗]") . " D.2: Recarga/consultas consecutivas son idempotentes y consistentes.\n";
 

@@ -28,12 +28,11 @@ if ($openAiKey !== '') {
     $_SESSION['chat_last_products'] = [];
     try {
         $response = chatWithOpenAi($connection, $message, $openAiKey);
-    } catch (Throwable $error) {
         $connection->close();
-        jsonResponse(503, ['message' => 'No pude responder en este momento. Intenta de nuevo en unos segundos.']);
+        jsonResponse(200, $response);
+    } catch (Throwable $error) {
+        error_log('LiquorSoft chat: OpenAI no disponible, se usa el asistente local (' . $error->getMessage() . ').');
     }
-    $connection->close();
-    jsonResponse(200, $response);
 }
 
 $normalized = chatNormalize($message);

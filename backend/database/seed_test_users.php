@@ -39,6 +39,8 @@ $users = [
     ],
 ];
 
+$legacyPasswordColumn = tableHasColumn($connection, 'usuarios', 'password');
+
 foreach ($users as $u) {
     $check = $connection->prepare('SELECT id FROM usuarios WHERE correo = ?');
     $check->bind_param('s', $u['correo']);
@@ -48,9 +50,14 @@ foreach ($users as $u) {
 
     $hash = password_hash($u['password'], PASSWORD_DEFAULT);
     if ($existing) {
-        $update = $connection->prepare('UPDATE usuarios SET password_hash = ?, password = ?, nombre = ?, apellido = ?, rol_id = ?, estado = 1 WHERE id = ?');
         $id = (int) $existing['id'];
-        $update->bind_param('ssssii', $hash, $hash, $u['nombre'], $u['apellido'], $u['rol_id'], $id);
+        if ($legacyPasswordColumn) {
+            $update = $connection->prepare('UPDATE usuarios SET password_hash = ?, password = ?, nombre = ?, apellido = ?, rol_id = ?, estado = 1 WHERE id = ?');
+            $update->bind_param('ssssii', $hash, $hash, $u['nombre'], $u['apellido'], $u['rol_id'], $id);
+        } else {
+            $update = $connection->prepare('UPDATE usuarios SET password_hash = ?, nombre = ?, apellido = ?, rol_id = ?, estado = 1 WHERE id = ?');
+            $update->bind_param('sssii', $hash, $u['nombre'], $u['apellido'], $u['rol_id'], $id);
+        }
         if (!$update->execute()) {
             fwrite(STDERR, "No fue posible actualizar {$u['correo']}: {$update->error}\n");
             exit(1);
@@ -58,11 +65,19 @@ foreach ($users as $u) {
         $update->close();
         echo "Usuario actualizado: {$u['correo']} (ID: $id)\n";
     } else {
-        $insert = $connection->prepare(
-            'INSERT INTO usuarios (rol_id, nombre, apellido, telefono, correo, password_hash, password, usuario, estado)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)'
-        );
-        $insert->bind_param('isssssss', $u['rol_id'], $u['nombre'], $u['apellido'], $u['telefono'], $u['correo'], $hash, $hash, $u['usuario']);
+        if ($legacyPasswordColumn) {
+            $insert = $connection->prepare(
+                'INSERT INTO usuarios (rol_id, nombre, apellido, telefono, correo, password_hash, password, usuario, estado)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)'
+            );
+            $insert->bind_param('isssssss', $u['rol_id'], $u['nombre'], $u['apellido'], $u['telefono'], $u['correo'], $hash, $hash, $u['usuario']);
+        } else {
+            $insert = $connection->prepare(
+                'INSERT INTO usuarios (rol_id, nombre, apellido, telefono, correo, password_hash, usuario, estado)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, 1)'
+            );
+            $insert->bind_param('issssss', $u['rol_id'], $u['nombre'], $u['apellido'], $u['telefono'], $u['correo'], $hash, $u['usuario']);
+        }
         if (!$insert->execute()) {
             fwrite(STDERR, "No fue posible crear {$u['correo']}: {$insert->error}\n");
             exit(1);

@@ -43,7 +43,8 @@ de muestra. **Es destructivo**: elimina las tablas indicadas al inicio y solo
 debe usarse para una base descartable vacía.
 
 ```bash
-mysql -u root -p < backend/database/schema.sql
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS liquorsoft CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+mysql -u root -p liquorsoft < backend/database/schema.sql
 php -S 127.0.0.1:8000 -t backend
 ```
 
@@ -67,9 +68,10 @@ export LIQURSOFT_DB_NAME=liquorsoft
 php -S 127.0.0.1:8000 -t backend
 ```
 
-No uses ni guardes credenciales dentro del código. Copia `backend/.env.example`
-a `backend/.env` y reemplaza los valores localmente. El archivo `.env` no debe
-versionarse.
+No uses ni guardes credenciales dentro del código. Copia `.env.example` (en la raíz
+del repositorio) a `backend/.env` y reemplaza los valores localmente. El archivo
+`.env` no debe versionarse. Para desplegar en un hosting gratuito consulta
+`DEPLOYMENT.md`.
 
 ## Chat del catálogo
 

@@ -67,10 +67,15 @@ $usernameBase = strtolower((string) strstr($correo, '@', true));
 $usernameBase = preg_replace('/[^a-z0-9._-]/', '', $usernameBase) ?: 'usuario';
 $usuario = substr($usernameBase, 0, 40) . '_' . bin2hex(random_bytes(4));
 
-    $statement = $connection->prepare(
-    'INSERT INTO usuarios
-      (rol_id, nombre, apellido, telefono, correo, password_hash, password, usuario, estado)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)'
+$legacyPasswordColumn = tableHasColumn($connection, 'usuarios', 'password');
+$columns = 'rol_id, nombre, apellido, telefono, correo, password_hash, usuario, estado';
+$placeholders = '?, ?, ?, ?, ?, ?, ?, 1';
+if ($legacyPasswordColumn) {
+    $columns = 'rol_id, nombre, apellido, telefono, correo, password_hash, password, usuario, estado';
+    $placeholders = '?, ?, ?, ?, ?, ?, ?, ?, 1';
+}
+$statement = $connection->prepare(
+    "INSERT INTO usuarios ({$columns}) VALUES ({$placeholders})"
 );
 if (!$statement) {
     error_log('LiquorSoft register prepare failed: ' . $connection->error);
@@ -78,7 +83,11 @@ if (!$statement) {
     respond(500, ['message' => 'No fue posible procesar el registro.']);
 }
 
+if ($legacyPasswordColumn) {
     $statement->bind_param('isssssss', $rolId, $nombre, $apellido, $telefono, $correo, $passwordHash, $passwordHash, $usuario);
+} else {
+    $statement->bind_param('issssss', $rolId, $nombre, $apellido, $telefono, $correo, $passwordHash, $usuario);
+}
 if (!$statement->execute()) {
     error_log('LiquorSoft register execute failed: ' . $statement->error);
     $duplicate = $statement->errno === 1062;

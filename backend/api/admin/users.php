@@ -98,11 +98,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_GET['action'])) {
     $usernameBase = preg_replace('/[^a-z0-9._-]/', '', strtolower((string) strstr($correo, '@', true))) ?: 'usuario';
     $username = substr($usernameBase, 0, 40) . '_' . bin2hex(random_bytes(4));
 
-    $stmt = $connection->prepare(
-        'INSERT INTO usuarios (rol_id, nombre, apellido, telefono, correo, password_hash, usuario, estado)
-         VALUES (?, ?, ?, ?, ?, ?, ?, 1)'
-    );
-    $stmt->bind_param('issssss', $roleId, $nombre, $apellido, $telefono, $correo, $passwordHash, $username);
+    if (tableHasColumn($connection, 'usuarios', 'password')) {
+        $stmt = $connection->prepare(
+            'INSERT INTO usuarios (rol_id, nombre, apellido, telefono, correo, password_hash, password, usuario, estado)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)'
+        );
+        $stmt->bind_param('isssssss', $roleId, $nombre, $apellido, $telefono, $correo, $passwordHash, $passwordHash, $username);
+    } else {
+        $stmt = $connection->prepare(
+            'INSERT INTO usuarios (rol_id, nombre, apellido, telefono, correo, password_hash, usuario, estado)
+             VALUES (?, ?, ?, ?, ?, ?, ?, 1)'
+        );
+        $stmt->bind_param('issssss', $roleId, $nombre, $apellido, $telefono, $correo, $passwordHash, $username);
+    }
     if (!$stmt->execute()) {
         $stmt->close();
         $connection->close();

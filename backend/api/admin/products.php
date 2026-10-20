@@ -50,6 +50,10 @@ function productPayload(array $body, mysqli $connection): array
         ? null
         : filter_var($rawGraduation, FILTER_VALIDATE_FLOAT);
 
+    $active = array_key_exists('active', $body)
+        ? (int) (bool) $body['active']
+        : 1;
+
     if (mb_strlen($name) < 2 || mb_strlen($name) > 150) {
         jsonResponse(422, [
             'message' => 'El nombre debe tener entre 2 y 150 caracteres.'
@@ -57,9 +61,9 @@ function productPayload(array $body, mysqli $connection): array
     }
 
     if (
-        mb_strlen($sku) > 60 ||
-        mb_strlen($brand) > 100 ||
-        mb_strlen($presentation) > 100 ||
+        mb_strlen($sku) > 40 ||
+        mb_strlen($brand) > 80 ||
+        mb_strlen($presentation) > 60 ||
         mb_strlen($image) > 255 ||
         mb_strlen($description) > 500
     ) {
@@ -126,10 +130,18 @@ function productPayload(array $body, mysqli $connection): array
         ]);
     }
 
+    $brandId = resolveBrandId($connection, $brand);
+    $providerId = resolveProviderId($connection);
+
+    if ($sku === '') {
+        $sku = 'LS-' . strtoupper(bin2hex(random_bytes(5)));
+    }
+
     return [
         'name' => $name,
-        'sku' => $sku !== '' ? $sku : null,
-        'brand' => $brand !== '' ? $brand : null,
+        'sku' => $sku,
+        'brandId' => $brandId,
+        'providerId' => $providerId,
         'presentation' => $presentation !== '' ? $presentation : null,
         'description' => $description !== '' ? $description : null,
         'categoryId' => (int) $categoryId,
@@ -138,12 +150,61 @@ function productPayload(array $body, mysqli $connection): array
         'price' => (float) $price,
         'stock' => (int) $stock,
         'minStock' => (int) $minStock,
+        'maxStock' => max(100, (int) $stock * 2, (int) $minStock * 3),
         'image' => $image !== '' ? $image : null,
-        'featured' => !empty($body['featured'] ?? $body['destacado'] ?? false) ? 1 : 0,
-        'active' => array_key_exists('active', $body)
-            ? (int) (bool) $body['active']
-            : 1,
+        'active' => $active,
     ];
+}
+
+function resolveBrandId(mysqli $connection, string $brand): int
+{
+    if ($brand !== '') {
+        $statement = $connection->prepare('SELECT id FROM marcas WHERE nombre = ? LIMIT 1');
+        $statement->bind_param('s', $brand);
+        $statement->execute();
+        $row = $statement->get_result()->fetch_assoc();
+        $statement->close();
+        if ($row) {
+            return (int) $row['id'];
+        }
+        $insert = $connection->prepare('INSERT INTO marcas (nombre, estado) VALUES (?, 1)');
+        $insert->bind_param('s', $brand);
+        if ($insert->execute()) {
+            $id = (int) $insert->insert_id;
+            $insert->close();
+            return $id;
+        }
+        $insert->close();
+        // Otra petición pudo crearla entre la consulta y el insert.
+        $retry = $connection->prepare('SELECT id FROM marcas WHERE nombre = ? LIMIT 1');
+        $retry->bind_param('s', $brand);
+        $retry->execute();
+        $row = $retry->get_result()->fetch_assoc();
+        $retry->close();
+        if ($row) {
+            return (int) $row['id'];
+        }
+        jsonResponse(500, ['message' => 'No fue posible registrar la marca.']);
+    }
+
+    $result = $connection->query('SELECT id FROM marcas ORDER BY id LIMIT 1');
+    if ($result && ($row = $result->fetch_assoc())) {
+        return (int) $row['id'];
+    }
+
+    $connection->query("INSERT INTO marcas (nombre, estado) VALUES ('General', 1)");
+    return (int) $connection->insert_id;
+}
+
+function resolveProviderId(mysqli $connection): int
+{
+    $result = $connection->query('SELECT id FROM proveedores ORDER BY id LIMIT 1');
+    if ($result && ($row = $result->fetch_assoc())) {
+        return (int) $row['id'];
+    }
+
+    $connection->query("INSERT INTO proveedores (empresa, nit, estado) VALUES ('Proveedor general', 'LS-GENERAL', 1)");
+    return (int) $connection->insert_id;
 }
 
 /**
@@ -166,10 +227,11 @@ if ($method === 'GET') {
             p.imagen AS image,
             0 AS featured,
             p.estado AS active,
-            NULL AS categoryId,
-            NULL AS category
+            p.categoria_id AS categoryId,
+            c.nombre AS category
         FROM productos p
         LEFT JOIN marcas m ON m.id = p.marca_id
+        LEFT JOIN categorias c ON c.id = p.categoria_id
         ORDER BY p.nombre ASC
     ";
 
@@ -217,10 +279,32 @@ if ($method === 'GET') {
     ]);
 }
 
-/**
- * Solo se aceptan solicitudes POST para registrar productos.
- */
-if ($method !== 'POST') {
+if ($method === 'DELETE') {
+    $id = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT);
+    if (!$id) {
+        $connection->close();
+        jsonResponse(422, ['message' => 'El producto es obligatorio.']);
+    }
+
+    $statement = $connection->prepare('UPDATE productos SET estado = 0 WHERE id = ?');
+    $statement->bind_param('i', $id);
+    if (!$statement->execute()) {
+        $statement->close();
+        $connection->close();
+        jsonResponse(500, ['message' => 'No fue posible eliminar el producto.']);
+    }
+    $affected = $statement->affected_rows;
+    $statement->close();
+    $connection->close();
+
+    if ($affected < 1) {
+        jsonResponse(404, ['message' => 'El producto no existe.']);
+    }
+
+    jsonResponse(200, ['message' => 'Producto eliminado correctamente.']);
+}
+
+if ($method !== 'POST' && $method !== 'PUT') {
     $connection->close();
 
     jsonResponse(405, [
@@ -241,60 +325,114 @@ if (!is_array($body)) {
 
 $data = productPayload($body, $connection);
 
+if ($method === 'POST') {
+    $sql = "
+        INSERT INTO productos (
+            categoria_id, marca_id, proveedor_id, codigo, nombre, descripcion,
+            presentacion, grado_alcohol, stock, stock_minimo, stock_maximo,
+            costo, precio, imagen, estado
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ";
+
+    $statement = $connection->prepare($sql);
+
+    if (!$statement) {
+        $connection->close();
+        jsonResponse(500, [
+            'message' => 'No fue posible preparar el registro del producto.'
+        ]);
+    }
+
+    $statement->bind_param(
+        'iiissssdiiiddsi',
+        $data['categoryId'],
+        $data['brandId'],
+        $data['providerId'],
+        $data['sku'],
+        $data['name'],
+        $data['description'],
+        $data['presentation'],
+        $data['graduation'],
+        $data['stock'],
+        $data['minStock'],
+        $data['maxStock'],
+        $data['purchasePrice'],
+        $data['price'],
+        $data['image'],
+        $data['active']
+    );
+
+    if (!$statement->execute()) {
+        $errno = $statement->errno;
+        $statement->close();
+        $connection->close();
+
+        if ($errno === 1062) {
+            jsonResponse(409, [
+                'message' => 'Ese SKU ya está registrado. Utiliza otra referencia.'
+            ]);
+        }
+
+        jsonResponse(500, [
+            'message' => 'No fue posible guardar el producto en la base de datos.'
+        ]);
+    }
+
+    $id = $connection->insert_id;
+    $statement->close();
+    $connection->close();
+
+    jsonResponse(201, [
+        'success' => true,
+        'id' => $id,
+        'message' => 'Producto registrado correctamente.',
+    ]);
+}
+
+$id = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT);
+if (!$id) {
+    $connection->close();
+    jsonResponse(422, ['message' => 'El producto es obligatorio.']);
+}
+
 $sql = "
-    INSERT INTO productos (
-        sku,
-        nombre,
-        descripcion,
-        marca,
-        presentacion,
-        graduacion_alcoholica,
-        precio_compra,
-        precio,
-        stock,
-        stock_minimo,
-        destacado,
-        estado,
-        categoria_id,
-        imagen
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    UPDATE productos SET
+        categoria_id = ?, marca_id = ?, proveedor_id = ?, codigo = ?, nombre = ?,
+        descripcion = ?, presentacion = ?, grado_alcohol = ?, stock = ?,
+        stock_minimo = ?, stock_maximo = ?, costo = ?, precio = ?, imagen = ?,
+        estado = ?
+    WHERE id = ?
 ";
 
 $statement = $connection->prepare($sql);
 
 if (!$statement) {
     $connection->close();
-
-    jsonResponse(500, [
-        'message' => 'No fue posible preparar el registro del producto.'
-    ]);
+    jsonResponse(500, ['message' => 'No fue posible preparar la actualización.']);
 }
 
-/*
- * 14 parámetros:
- * 5 textos, 3 decimales, 5 enteros y 1 texto.
- */
 $statement->bind_param(
-    'sssssdddiiiiis',
+    'iiissssdiiiddsii',
+    $data['categoryId'],
+    $data['brandId'],
+    $data['providerId'],
     $data['sku'],
     $data['name'],
     $data['description'],
-    $data['brand'],
     $data['presentation'],
     $data['graduation'],
-    $data['purchasePrice'],
-    $data['price'],
     $data['stock'],
     $data['minStock'],
-    $data['featured'],
+    $data['maxStock'],
+    $data['purchasePrice'],
+    $data['price'],
+    $data['image'],
     $data['active'],
-    $data['categoryId'],
-    $data['image']
+    $id
 );
 
 if (!$statement->execute()) {
     $errno = $statement->errno;
-
     $statement->close();
     $connection->close();
 
@@ -304,18 +442,19 @@ if (!$statement->execute()) {
         ]);
     }
 
-    jsonResponse(500, [
-        'message' => 'No fue posible guardar el producto en la base de datos.'
-    ]);
+    jsonResponse(500, ['message' => 'No fue posible actualizar el producto.']);
 }
 
-$id = $connection->insert_id;
-
+$affected = $statement->affected_rows;
 $statement->close();
 $connection->close();
 
-jsonResponse(201, [
+if ($affected < 1) {
+    jsonResponse(404, ['message' => 'El producto no existe o no tiene cambios.']);
+}
+
+jsonResponse(200, [
     'success' => true,
     'id' => $id,
-    'message' => 'Producto registrado correctamente.'
+    'message' => 'Producto actualizado correctamente.',
 ]);

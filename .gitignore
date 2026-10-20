@@ -3,3 +3,10 @@ node_modules
 .vscode/
 .env
 backend/.env
+
+# Artefactos de compilación y despliegue
+deploy/htdocs/
+deploy/liquorsoft-htdocs.zip
+LiquorSoft-angular/dist/
+LiquorSoft-angular/.angular/
+BackupLiquorSoft/

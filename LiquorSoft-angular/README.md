@@ -44,7 +44,7 @@ debe usarse para una base descartable vacía.
 
 ```bash
 mysql -u root -p < backend/database/schema.sql
-php -S localhost:8000 -t backend
+php -S 127.0.0.1:8000 -t backend
 ```
 
 Las credenciales se configuran con `LIQURSOFT_DB_HOST`, `LIQURSOFT_DB_USER`,

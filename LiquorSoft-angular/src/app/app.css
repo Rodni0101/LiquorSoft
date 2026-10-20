@@ -1,4 +1,7 @@
-:root {
+.store-chat,
+.whatsapp-float,
+.global-notices,
+.confirm-backdrop {
   /* Colores primarios */
   --color-primary: #641b31;
   --color-primary-hover: #79233d;

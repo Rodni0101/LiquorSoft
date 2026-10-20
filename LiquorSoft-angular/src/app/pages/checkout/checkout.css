@@ -44,6 +44,9 @@
 .summary-product, .summary-line, .summary-total { display: flex; justify-content: space-between; gap: 1rem; padding: .68rem 0; border-bottom: 1px solid var(--purchase-border); font-size: .76rem; }
 .summary-product span { min-width: 0; }
 .summary-product strong { color: var(--purchase-accent); font-size: .76rem; }
+.summary-prices { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.summary-usd { color: var(--purchase-muted); font-size: .64rem; }
+.summary-unit { color: var(--purchase-muted); font-size: .62rem; line-height: 1.3; }
 .summary-line { color: var(--purchase-muted); }
 .summary-total { margin: .4rem 0 1rem; border-top: 1px solid var(--purchase-border); border-bottom: 0; color: var(--purchase-text); font-size: .95rem; }
 .summary-total strong { color: var(--purchase-accent); }

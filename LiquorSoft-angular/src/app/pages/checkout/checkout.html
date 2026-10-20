@@ -160,7 +160,11 @@
               <span
                 >{{ item.icon }} {{ item.name }} <small>× {{ item.quantity }}</small></span
               >
-              <strong>{{ formatPrice(item.price * item.quantity) }}</strong>
+              <div class="summary-prices">
+                <strong>{{ formatPrice(item.price * item.quantity) }}</strong>
+                <span class="summary-usd">{{ formatUsd(item.price * item.quantity) }}</span>
+              </div>
+              <small class="summary-unit">{{ formatPrice(item.price) }} c/u · aprox. {{ formatUsd(item.price) }} USD c/u</small>
             </div>
           }
           <div class="summary-line">

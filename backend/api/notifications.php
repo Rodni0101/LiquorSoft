@@ -15,6 +15,11 @@ if (!$user) {
 $userId = (int) $user['id'];
 $method = $_SERVER['REQUEST_METHOD'];
 
+if (!tableHasColumn($connection, 'notificaciones', 'id')) {
+    $connection->close();
+    jsonResponse(503, ['message' => 'El módulo de notificaciones no está disponible en esta base de datos.']);
+}
+
 if ($method === 'GET') {
     $statement = $connection->prepare(
         'SELECT n.id, n.tipo, n.titulo, n.mensaje, n.pedido_id, n.leida, n.creado_en, n.leida_en,
@@ -108,4 +113,3 @@ if ($method === 'PATCH' || $method === 'POST') {
 
 $connection->close();
 jsonResponse(405, ['message' => 'Método no permitido.']);
-

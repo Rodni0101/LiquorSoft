@@ -279,8 +279,8 @@ INSERT INTO categorias (nombre, descripcion) VALUES
   ('Gin', 'Ginebras y botánicos.'),
   ('Mixers', 'Tónicas y mezcladores.');
 
-INSERT INTO productos (sku, nombre, descripcion, precio_compra, precio, stock, stock_minimo, destacado, categoria_id) VALUES
-  ('LS-WH-001', 'Whisky Black Label', 'Suave, elegante y con notas ahumadas.', 98000, 139900, 12, 5, 1, 1),
-  ('LS-RN-001', 'Ron Medellín 8 años', 'Un clásico colombiano para compartir.', 45000, 68900, 18, 5, 0, 2),
-  ('LS-VN-001', 'Vino Tinto Reserva', 'Cuerpo medio con final de frutos rojos.', 35000, 54900, 9, 4, 1, 5),
-  ('LS-CV-001', 'Cerveza Artesanal IPA', 'Aromática y de amargor equilibrado.', 8000, 12900, 30, 10, 0, 6);
+INSERT INTO productos (sku, nombre, descripcion, precio_compra, precio, stock, stock_minimo, destacado, categoria_id, imagen) VALUES
+  ('LS-WH-001', 'Whisky Black Label', 'Johnnie Walker Black Label, blended Scotch whisky, 750 ml, 40% vol.', 98000, 139900, 12, 5, 1, 1, 'https://images.ctfassets.net/vvbow7h7clgh/QXA3D5R1hMljFQZHbxQm2/d64afef35db2c9cc0f278a584a4dbfb0/black-750ml_producthero_fullfront_desktop.webp?fm=avif&w=1900&q=60'),
+  ('LS-RN-001', 'Ron Medellín 8 años', 'Ron Medellín Añejo 8 Años, ron colombiano, 750 ml, 35% ABV.', 45000, 84400, 18, 5, 0, 2, 'https://kyva.co/wp-content/uploads/2025/07/Ron-Medellin-8-Anos-750-ml_FOR-WEB_-800x1000PX.webp'),
+  ('LS-VN-001', 'Vino Tinto Reserva', 'Vino Tinto Pata Negra Reserva Tempranillo, 750 ml, 13% vol.', 35000, 59990, 9, 4, 1, 5, 'https://dislicores.com/cdn/shop/files/115082-VINO-TTO-PATA-NEGRA-RESERVA-750ML-1.png?v=1775840491&width=1946'),
+  ('LS-CV-001', 'Cerveza Artesanal IPA', 'Cerveza artesanal 4S tipo IPA, 330 ml, 6% ABV, envase de vidrio.', 8000, 14300, 30, 10, 0, 6, 'https://carulla.vteximg.com.br/arquivos/ids/24324771/Cerveza-4S-Cerveza-Artesanal-Medellin-Artesanal-Ipa-330-ml-3638262_a.jpg?v=639044495431070000');

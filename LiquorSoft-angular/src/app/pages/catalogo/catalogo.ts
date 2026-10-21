@@ -24,7 +24,7 @@ interface CatalogProduct {
   standalone: true,
   imports: [RouterLink, ThemeToggle, ProductVisual, NotificationBell],
   templateUrl: './catalogo.html',
-  styleUrl: './catalogo.css',
+  styleUrls: ['./catalogo.css', '../../shared/product-card.css']
 })
 export class Catalogo implements OnInit {
   private readonly http = inject(HttpClient);

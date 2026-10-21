@@ -251,7 +251,7 @@
   background: #241019;
 }
 
-.product-image app-product-visual { width: 100%; height: 100%; }
+/* Product image uses app-product-visual component */
 
 .cart-item small {
   display: block;

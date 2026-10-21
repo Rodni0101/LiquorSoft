@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300" width="200" height="300">
+  <defs>
+    <linearGradient id="glassGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FFF8E1;stop-opacity:0.4" />
+      <stop offset="50%" style="stop-color:#FFFDE7;stop-opacity:0.6" />
+      <stop offset="100%" style="stop-color:#FFF8E1;stop-opacity:0.4" />
+    </linearGradient>
+    <linearGradient id="liquidGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFDE7" />
+      <stop offset="30%" style="stop-color:#FFF9C4" />
+      <stop offset="100%" style="stop-color:#FFF59D" />
+    </linearGradient>
+    <linearGradient id="capGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD600" />
+      <stop offset="100%" style="stop-color:#F9A825" />
+    </linearGradient>
+    <linearGradient id="labelGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFDE7" />
+      <stop offset="100%" style="stop-color:#FFF8E1" />
+    </linearGradient>
+    <filter id="bubbles" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="glassGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <ellipse cx="100" cy="295" rx="45" ry="6" fill="#000" opacity="0.1"/>
+  
+  <g filter="url(#glassGlow)">
+    <path d="M60 250 Q60 265 65 265 L65 280 Q65 290 73 290 L127 290 Q135 290 135 280 L135 265 Q140 265 140 250 L140 50 Q140 30 125 20 Q110 10 100 10 Q90 10 75 20 Q60 30 60 50 Z" 
+          fill="url(#glassGradient)" stroke="#FFF59D" stroke-width="0.5" opacity="0.7"/>
+    
+    <path d="M70 245 Q70 248 73 248 L73 277 Q73 285 79 285 L121 285 Q127 285 127 277 L127 248 Q130 248 130 245 Z"
+          fill="url(#liquidGradient)" opacity="0.8"/>
+    
+    <!-- Bubbles -->
+    <circle cx="85" cy="260" r="2.5" fill="#FFFFFF" opacity="0.6">
+      <animate attributeName="cy" from="260" to="100" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" from="0.6" to="0" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="115" cy="255" r="2" fill="#FFFFFF" opacity="0.5">
+      <animate attributeName="cy" from="255" to="95" dur="2.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" from="0.5" to="0" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="95" cy="265" r="1.5" fill="#FFFFFF" opacity="0.4">
+      <animate attributeName="cy" from="265" to="105" dur="3.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" from="0.4" to="0" dur="3.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="105" cy="270" r="2" fill="#FFFFFF" opacity="0.5">
+      <animate attributeName="cy" from="270" to="110" dur="2.8s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" from="0.5" to="0" dur="2.8s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="80" cy="275" r="1.5" fill="#FFFFFF" opacity="0.4">
+      <animate attributeName="cy" from="275" to="115" dur="3.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" from="0.4" to="0" dur="3.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="110" cy="280" r="2" fill="#FFFFFF" opacity="0.5">
+      <animate attributeName="cy" from="280" to="120" dur="2.7s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" from="0.5" to="0" dur="2.7s" repeatCount="indefinite"/>
+    </circle>
+    
+    <path d="M88 50 L92 35 Q93 28 98 25 Q103 22 108 22 Q113 22 118 25 Q123 28 122 35 L128 50" 
+          fill="url(#glassGradient)" stroke="#FFF59D" stroke-width="0.5" opacity="0.7"/>
+    
+    <path d="M85 35 L92 22 Q93 17 98 14 Q108 11 112 11 Q118 11 121 14 Q123 17 124 22 L128 35 Q128 32 122 30 Q100 28 100 30 Q80 28 75 30 Q70 32 70 35 Z"
+          fill="url(#capGradient)" stroke="#F9A825" stroke-width="0.5"/>
+    
+    <ellipse cx="100" cy="14" rx="18" ry="2.5" fill="#F9A825"/>
+    <ellipse cx="100" cy="14" rx="16" ry="2" fill="#FFD600"/>
+    
+    <rect x="72" y="80" width="56" height="110" rx="3" fill="url(#labelGradient)" opacity="0.95" stroke="#FFF59D" stroke-width="0.5"/>
+    
+    <text x="100" y="110" text-anchor="middle" font-family="Georgia, serif" font-size="10" font-weight="bold" fill="#F9A825">ESPUMOSO</text>
+    <text x="100" y="128" text-anchor="middle" font-family="Georgia, serif" font-size="7" fill="#F9A825">BRUT</text>
+    <text x="100" y="148" text-anchor="middle" font-family="Georgia, serif" font-size="6" fill="#F57F17">MÉTODO TRADICIONAL</text>
+    <text x="100" y="168" text-anchor="middle" font-family="Georgia, serif" font-size="5" fill="#F57F17">12% ALC/VOL</text>
+    <text x="100" y="182" text-anchor="middle" font-family="Georgia, serif" font-size="5" fill="#F57F17">750 ML</text>
+    
+    <path d="M72 80 Q72 77 75 77 L125 77 Q128 77 128 80" fill="#FFD600" opacity="0.8"/>
+    
+    <path d="M58 75 Q66 95 62 125 Q58 155 55 185" stroke="#FFFFFF" stroke-width="1.5" fill="none" opacity="0.15" stroke-linecap="round"/>
+    <path d="M66 85 Q74 105 71 135 Q68 165 64 175" stroke="#FFFFFF" stroke-width="1" fill="none" opacity="0.1" stroke-linecap="round"/>
+    <path d="M140 80 Q133 100 135 130 Q138 160 140 170" stroke="#FFFFFF" stroke-width="1" fill="none" opacity="0.08" stroke-linecap="round"/>
+  </g>
+</svg>

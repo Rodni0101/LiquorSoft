@@ -85,7 +85,7 @@
               <div class="product-image">
                 <app-product-visual [category]="product.category" [imageUrl]="product.image || null" [altText]="product.name" />
                 @if (product.featured) {
-                  <b>Destacado</b>
+                  <span class="featured-badge">Destacado</span>
                 }
               </div>
               <div class="product-content">
@@ -105,7 +105,7 @@
         </div>
       } @else {
         <div class="empty-state">
-          <span>⌕</span>
+          <span class="empty-icon"><i class="bi bi-search" aria-hidden="true"></i></span>
           <h3>No encontramos productos</h3>
           <p>Prueba con otra búsqueda o categoría.</p>
         </div>

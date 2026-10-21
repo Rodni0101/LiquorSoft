@@ -136,7 +136,7 @@
           }
         </section>
         <div class="floating-stat stat-top"><span aria-hidden="true">+</span><div><strong>24/7</strong><small>Visibilidad</small></div></div>
-        <div class="floating-stat stat-bottom"><span class="check-icon" aria-hidden="true">✓</span><div><strong>Todo en orden</strong><small>Tu operación respira</small></div></div>
+        <div class="floating-stat stat-bottom"><span class="check-icon" aria-hidden="true"><i class="bi bi-check-circle-fill" aria-hidden="true"></i></span><div><strong>Todo en orden</strong><small>Tu operación respira</small></div></div>
       </div>
     </section>
 
@@ -155,21 +155,21 @@
       </div>
       <div class="feature-grid">
         <article class="feature-card feature-large">
-          <span class="feature-number">01</span><span class="feature-symbol" aria-hidden="true">◒</span>
+          <span class="feature-number">01</span><span class="feature-symbol" aria-hidden="true"><i class="bi bi-grid-3x3-gap-fill" aria-hidden="true"></i></span>
           <h3>Un catálogo<br><em>que trabaja por ti.</em></h3>
           <p>Presenta tus productos con una navegación rápida, clara y pensada para que cada visita termine en una decisión.</p>
           <a routerLink="/productos" class="text-link">Ver catálogo <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
           <div class="mini-browser" aria-hidden="true"><span></span><span></span><span></span><b>Selección<br><em>para cada ocasión.</em></b></div>
         </article>
         <article class="feature-card feature-dark">
-          <span class="feature-number">02</span><span class="feature-symbol" aria-hidden="true">⌁</span>
+          <span class="feature-number">02</span><span class="feature-symbol" aria-hidden="true"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
           <h3>Inventario<br><em>sin sorpresas.</em></h3>
           <p>Consulta existencias reales y actúa antes de que una oportunidad se convierta en una venta perdida.</p>
           <a routerLink="/login" class="text-link">Gestionar inventario <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
           <div class="rings" aria-hidden="true"><span></span><span></span><span></span></div>
         </article>
         <article class="feature-card feature-accent">
-          <span class="feature-number">03</span><span class="feature-symbol" aria-hidden="true">✦</span>
+          <span class="feature-number">03</span><span class="feature-symbol" aria-hidden="true"><i class="bi bi-graph-up" aria-hidden="true"></i></span>
           <h3>Decisiones<br><em>con contexto.</em></h3>
           <p>Las señales importantes, en el momento justo. Una operación más inteligente empieza con una buena vista.</p>
           <a routerLink="/login" class="text-link">Entrar al sistema <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
@@ -184,30 +184,30 @@
         <div><span class="eyebrow">SELECCIÓN EN VIVO</span><h2 id="catalog-title">Lo que hay<br><em>para elegir.</em></h2></div>
         <p>Tu catálogo público, conectado directamente con la operación. Descubre una selección pensada para cada ocasión.</p>
       </div>
-      @if (productsLoading) {
-        <p class="catalog-state" role="status">Cargando selección…</p>
-      } @else if (productsError) {
-        <p class="catalog-state" role="alert">No fue posible cargar el catálogo en este momento.</p>
-      } @else if (products.length) {
-        <div class="product-layout">
-          <a routerLink="/productos" class="featured-product">
-            <span class="product-tag">DESTACADO</span>
-            <app-product-visual class="product-emoji" [category]="products[0].category" [imageUrl]="products[0].image || null" [altText]="products[0].name" />
-            <div class="featured-info"><span>{{ products[0].category }}</span><h3>{{ products[0].name }}</h3><strong>{{ formatPrice(products[0].price) }}</strong></div>
-            <span class="round-arrow" aria-hidden="true">↗</span>
-          </a>
-          <div class="product-list">
-            @for (product of products.slice(1, 5); track product.name) {
-              <a routerLink="/productos" class="product-row">
-                <app-product-visual class="row-emoji" [category]="product.category" [imageUrl]="product.image || null" [altText]="product.name" />
-                <span><small>{{ product.category }}</small><b>{{ product.name }}</b></span>
-                <strong>{{ formatPrice(product.price) }}</strong>
-                <span class="row-arrow" aria-hidden="true">↗</span>
+@if (productsLoading) {
+            <p class="catalog-state" role="status">Cargando selección…</p>
+          } @else if (productsError) {
+            <p class="catalog-state" role="alert">No fue posible cargar el catálogo en este momento.</p>
+          } @else if (products.length) {
+            <div class="product-layout">
+              <a routerLink="/productos" class="featured-product">
+                <span class="product-tag">DESTACADO</span>
+                <app-product-visual class="featured-image" [category]="products[0].category" [imageUrl]="products[0].image || null" [altText]="products[0].name" />
+                <div class="featured-info"><span>{{ products[0].category }}</span><h3>{{ products[0].name }}</h3><strong>{{ formatPrice(products[0].price) }}</strong></div>
+                <span class="round-arrow" aria-hidden="true"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
               </a>
-            }
-            <a routerLink="/productos" class="all-products">Ver todo el catálogo <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
-          </div>
-        </div>
+              <div class="product-list">
+                @for (product of products.slice(1, 5); track product.name) {
+                  <a routerLink="/productos" class="product-row">
+                    <app-product-visual class="row-icon" [category]="product.category" [imageUrl]="product.image || null" [altText]="product.name" />
+                    <span><small>{{ product.category }}</small><b>{{ product.name }}</b></span>
+                    <strong>{{ formatPrice(product.price) }}</strong>
+                    <span class="row-arrow" aria-hidden="true"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
+                  </a>
+                }
+                <a routerLink="/productos" class="all-products-link">Ver todo el catálogo <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+              </div>
+            </div>
       } @else {
         <p class="catalog-state">No hay productos disponibles por ahora.</p>
       }

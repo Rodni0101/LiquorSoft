@@ -1,4 +1,4 @@
-import { Component, inject, ViewChild, ElementRef, AfterViewInit, effect, OnDestroy } from '@angular/core';
+import { Component, inject, ViewChild, ElementRef, AfterViewInit, OnDestroy, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { UserNotificationsService, UserNotification } from './user-notifications.service';
@@ -80,7 +80,7 @@ import { AuthService } from './auth.service';
                     (click)="handleItemClick(item)"
                   >
                     <div class="item-icon-wrapper" aria-hidden="true">
-                      <span class="type-icon">{{ getIcon(item.type) }}</span>
+                      <i class="type-icon {{ getIcon(item.type) }}"></i>
                     </div>
 
                     <div class="item-content">
@@ -145,17 +145,19 @@ export class NotificationBell implements AfterViewInit, OnDestroy {
   protected panelTop = 0;
   private readonly resizeHandler = () => this.updatePanelPosition();
 
-  ngAfterViewInit(): void {
-    // Calculamos la posición inicial del panel
-    this.updatePanelPosition();
-    // Recalculamos si cambia el tamaño de la ventana
-    window.addEventListener('resize', this.resizeHandler);
-    // Recalculamos cuando el panel se abre
+  constructor() {
     effect(() => {
       if (this.service.isOpen()) {
         this.updatePanelPosition();
       }
     });
+  }
+
+  ngAfterViewInit(): void {
+    // Calculamos la posición inicial del panel
+    this.updatePanelPosition();
+    // Recalculamos si cambia el tamaño de la ventana
+    window.addEventListener('resize', this.resizeHandler);
   }
 
   ngOnDestroy(): void {

@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300" width="200" height="300">
+  <defs>
+    <linearGradient id="glassGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#E8F5E9;stop-opacity:0.4" />
+      <stop offset="50%" style="stop-color:#F0FFF0;stop-opacity:0.6" />
+      <stop offset="100%" style="stop-color:#E0F2E1;stop-opacity:0.4" />
+    </linearGradient>
+    <linearGradient id="liquidGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8F5E9" />
+      <stop offset="100%" style="stop-color:#C8E6C9" />
+    </linearGradient>
+    <linearGradient id="capGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1B5E20" />
+      <stop offset="100%" style="stop-color:#0D3B0F" />
+    </linearGradient>
+    <linearGradient id="labelGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#F0FFF0" />
+      <stop offset="100%" style="stop-color:#E0F2E1" />
+    </linearGradient>
+    <filter id="glassGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <ellipse cx="100" cy="295" rx="58" ry="8" fill="#000" opacity="0.12"/>
+  
+  <g filter="url(#glassGlow)">
+    <path d="M50 250 Q50 270 55 270 L55 285 Q55 295 65 295 L135 295 Q145 295 145 285 L145 270 Q150 270 150 250 L150 60 Q150 40 135 30 Q115 20 100 20 Q85 20 65 30 Q50 40 50 60 Z" 
+          fill="url(#glassGradient)" stroke="#C8E6C9" stroke-width="0.5" opacity="0.8"/>
+    
+    <path d="M63 245 Q63 248 67 248 L67 282 Q67 290 75 290 L125 290 Q133 290 133 282 L133 248 Q137 248 137 245 Z"
+          fill="url(#liquidGradient)" opacity="0.9"/>
+    
+    <path d="M88 60 L93 42 Q94 35 99 32 Q104 29 109 29 Q114 29 119 32 Q124 35 124 42 L130 60" 
+          fill="url(#glassGradient)" stroke="#C8E6C9" stroke-width="0.5" opacity="0.8"/>
+    
+    <path d="M85 42 L92 28 Q93 23 98 20 Q108 17 112 17 Q118 17 121 20 Q124 23 124 28 L132 42 Q132 39 126 37 Q100 35 100 37 Q76 35 70 37 Q66 39 66 42 Z"
+          fill="url(#capGradient)" stroke="#0D3B0F" stroke-width="0.5"/>
+    
+    <ellipse cx="100" cy="20" rx="24" ry="3" fill="#0D3B0F"/>
+    <ellipse cx="100" cy="20" rx="22" ry="2.5" fill="#1B5E20"/>
+    
+    <rect x="65" y="70" width="70" height="120" rx="3" fill="url(#labelGradient)" opacity="0.95" stroke="#C8E6C9" stroke-width="0.5"/>
+    
+    <text x="100" y="100" text-anchor="middle" font-family="Georgia, serif" font-size="10" font-weight="bold" fill="#1B5E20">AGUARDIENTE</text>
+    <text x="100" y="118" text-anchor="middle" font-family="Georgia, serif" font-size="8" fill="#2E7D32">ANTIOQUEÑO</text>
+    <text x="100" y="138" text-anchor="middle" font-family="Georgia, serif" font-size="7" fill="#4A8A4E">SIN AZÚCAR</text>
+    <text x="100" y="155" text-anchor="middle" font-family="Georgia, serif" font-size="6" fill="#6A9A6E">35% ALC/VOL</text>
+    <text x="100" y="170" text-anchor="middle" font-family="Georgia, serif" font-size="5" fill="#6A9A6E">750 ML</text>
+    
+    <path d="M65 70 Q65 67 68 67 L132 67 Q135 67 135 70" fill="#81C784" opacity="0.8"/>
+    
+    <path d="M58 65 Q66 85 62 115 Q58 145 55 175" stroke="#FFFFFF" stroke-width="2" fill="none" opacity="0.2" stroke-linecap="round"/>
+    <path d="M66 75 Q74 95 71 125 Q68 155 64 185" stroke="#FFFFFF" stroke-width="1.5" fill="none" opacity="0.15" stroke-linecap="round"/>
+    <path d="M140 70 Q133 90 135 120 Q138 150 140 185" stroke="#FFFFFF" stroke-width="1.5" fill="none" opacity="0.1" stroke-linecap="round"/>
+  </g>
+</svg>

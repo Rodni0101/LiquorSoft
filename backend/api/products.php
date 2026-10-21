@@ -50,7 +50,10 @@ if (isset($_GET['id'])) {
         : null;
     $product['featured'] = (bool) $product['featured'];
     $product['icon'] = match ($product['category']) {
-        'Vinos' => '🍷', 'Cervezas' => '🍺', 'Mixers' => '🫧', default => '🥃',
+        'Vinos' => 'bi bi-wine',
+        'Cervezas' => 'bi bi-cup-straw',
+        'Mixers' => 'bi bi-droplet-half',
+        default => 'bi bi-cup',
     };
 
     // Productos relacionados de la misma categoría
@@ -78,7 +81,10 @@ if (isset($_GET['id'])) {
                 : null;
             $rel['featured'] = (bool) $rel['featured'];
             $rel['icon'] = match ($rel['category']) {
-                'Vinos' => '🍷', 'Cervezas' => '🍺', 'Mixers' => '🫧', default => '🥃',
+                'Vinos' => 'bi bi-wine',
+                'Cervezas' => 'bi bi-cup-straw',
+                'Mixers' => 'bi bi-droplet-half',
+                default => 'bi bi-cup',
             };
             $related[] = $rel;
         }
@@ -113,7 +119,10 @@ while ($product = $result->fetch_assoc()) {
         : null;
     $product['featured'] = (bool) $product['featured'];
     $product['icon'] = match ($product['category']) {
-        'Vinos' => '🍷', 'Cervezas' => '🍺', 'Mixers' => '🫧', default => '🥃',
+        'Vinos' => 'bi bi-wine',
+        'Cervezas' => 'bi bi-cup-straw',
+        'Mixers' => 'bi bi-droplet-half',
+        default => 'bi bi-cup',
     };
     $products[] = $product;
 }

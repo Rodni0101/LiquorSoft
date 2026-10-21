@@ -180,11 +180,11 @@ function requireCsrfToken(): void
 function productIcon(string $category): string
 {
     return match (mb_strtolower(trim($category))) {
-        'vino', 'vinos' => '🍷',
-        'cerveza', 'cervezas' => '🍺',
-        'mixer', 'mixers' => '🫧',
-        'gin', 'ginebra' => '🍸',
-        default => '🥃',
+        'vino', 'vinos' => 'bi bi-wine',
+        'cerveza', 'cervezas' => 'bi bi-cup-straw',
+        'mixer', 'mixers' => 'bi bi-droplet-half',
+        'gin', 'ginebra' => 'bi bi-cup-hot',
+        default => 'bi bi-cup',
     };
 }
 

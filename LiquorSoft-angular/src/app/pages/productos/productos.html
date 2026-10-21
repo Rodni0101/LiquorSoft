@@ -141,13 +141,13 @@
 
         @if (loading) {
           <div class="state">Cargando productos…</div>
-        } @else if (products.length === 0) {
-          <div class="empty-state">
-            <span class="empty-icon">◇</span>
-            <h3>Aún no hay productos registrados</h3>
-            <p>Agrega la primera referencia para comenzar tu catálogo.</p>
-            <button class="btn-primary" type="button" (click)="openForm()">Registrar primer producto</button>
-          </div>
+} @else if (products.length === 0) {
+           <div class="empty-state">
+             <span class="empty-icon"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
+             <h3>Aún no hay productos registrados</h3>
+             <p>Agrega la primera referencia para comenzar tu catálogo.</p>
+             <button class="btn-primary" type="button" (click)="openForm()">Registrar primer producto</button>
+           </div>
         } @else {
           <div class="table-wrap">
             <table>

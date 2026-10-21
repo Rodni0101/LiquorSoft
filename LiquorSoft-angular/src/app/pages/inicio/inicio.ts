@@ -29,7 +29,7 @@ interface PublicProduct {
   standalone: true,
   imports: [RouterLink, RevealDirective, ThemeToggle, ProductVisual, NotificationBell],
   templateUrl: './inicio.html',
-  styleUrl: './inicio.css'
+  styleUrls: ['./inicio.css', '../../shared/product-card.css']
 })
 export class Inicio implements OnInit {
   private readonly http = inject(HttpClient);

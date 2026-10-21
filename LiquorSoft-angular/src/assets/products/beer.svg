@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300" width="200" height="300">
+  <defs>
+    <linearGradient id="glassGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#E3F2FD;stop-opacity:0.4" />
+      <stop offset="50%" style="stop-color:#E8F5E9;stop-opacity:0.5" />
+      <stop offset="100%" style="stop-color:#E3F2FD;stop-opacity:0.4" />
+    </linearGradient>
+    <linearGradient id="liquidGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFF9C4" />
+      <stop offset="30%" style="stop-color:#FFF59D" />
+      <stop offset="60%" style="stop-color:#FFD54F" />
+      <stop offset="100%" style="stop-color:#FFB300" />
+    </linearGradient>
+    <linearGradient id="capGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD600" />
+      <stop offset="100%" style="stop-color:#F9A825" />
+    </linearGradient>
+    <linearGradient id="labelGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFDE7" />
+      <stop offset="100%" style="stop-color:#FFF8E1" />
+    </linearGradient>
+    <filter id="bubbles" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="glassGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <ellipse cx="100" cy="295" rx="38" ry="6" fill="#000" opacity="0.1"/>
+  
+  <g filter="url(#glassGlow)">
+    <path d="M70 250 Q70 265 75 265 L75 280 Q75 290 82 290 L118 290 Q125 290 125 280 L125 265 Q130 265 130 250 L130 60 Q130 40 115 30 Q100 20 100 20 Q85 30 70 60 Z" 
+          fill="url(#glassGradient)" stroke="#FFD54F" stroke-width="0.5" opacity="0.7"/>
+    
+    <path d="M80 245 Q80 248 82 248 L82 277 Q82 285 88 285 L112 285 Q118 285 118 277 L118 248 Q120 248 120 245 Z"
+          fill="url(#liquidGradient)" opacity="0.9"/>
+    
+    <circle cx="88" cy="265" r="2" fill="#FFFFFF" opacity="0.6">
+      <animate attributeName="cy" from="265" to="100" dur="2.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" from="0.6" to="0" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="105" cy="260" r="1.5" fill="#FFFFFF" opacity="0.5">
+      <animate attributeName="cy" from="260" to="95" dur="2.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" from="0.5" to="0" dur="2.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="95" cy="270" r="2" fill="#FFFFFF" opacity="0.5">
+      <animate attributeName="cy" from="270" to="105" dur="2.8s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" from="0.5" to="0" dur="2.8s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="83" cy="275" r="1.5" fill="#FFFFFF" opacity="0.4">
+      <animate attributeName="cy" from="275" to="110" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" from="0.4" to="0" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="110" cy="275" r="1.5" fill="#FFFFFF" opacity="0.4">
+      <animate attributeName="cy" from="275" to="115" dur="2.8s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" from="0.4" to="0" dur="2.8s" repeatCount="indefinite"/>
+    </circle>
+    
+    <path d="M78 70 Q78 60 82 55 Q95 50 110 55 Q115 60 115 70 Z" fill="#FFFDE7" opacity="0.9"/>
+    <path d="M80 72 Q80 65 84 60 Q95 55 108 60 Q112 65 112 72 Z" fill="#FFF8E1" opacity="0.7"/>
+    
+    <path d="M85 60 L88 48 Q89 42 92 38 Q100 35 104 35 Q108 35 112 38 Q115 42 115 48 L118 60" 
+          fill="url(#glassGradient)" stroke="#FFD54F" stroke-width="0.5" opacity="0.7"/>
+    
+    <path d="M83 48 L88 36 Q89 31 92 28 Q100 25 104 25 Q108 25 112 28 Q115 31 115 36 L120 48 Q120 45 114 43 Q100 41 100 43 Q86 41 80 43 Q76 45 76 48 Z"
+          fill="url(#capGradient)" stroke="#F9A825" stroke-width="0.5"/>
+    
+    <ellipse cx="100" cy="28" rx="18" ry="2.5" fill="#F9A825"/>
+    <ellipse cx="100" cy="28" rx="16" ry="2" fill="#FFD600"/>
+    
+    <rect x="72" y="85" width="56" height="110" rx="3" fill="url(#labelGradient)" opacity="0.95" stroke="#FFD54F" stroke-width="0.5"/>
+    
+    <text x="100" y="115" text-anchor="middle" font-family="Georgia, serif" font-size="10" font-weight="bold" fill="#F9A825">CERVEZA</text>
+    <text x="100" y="132" text-anchor="middle" font-family="Georgia, serif" font-size="7" fill="#F57F17">ARTESANAL</text>
+    <text x="100" y="150" text-anchor="middle" font-family="Georgia, serif" font-size="6" fill="#F57F17">IPA / ALE</text>
+    <text x="100" y="170" text-anchor="middle" font-family="Georgia, serif" font-size="5" fill="#F57F17">5-6.5% ALC/VOL</text>
+    <text x="100" y="185" text-anchor="middle" font-family="Georgia, serif" font-size="5" fill="#F57F17">330 ML</text>
+    
+    <path d="M72 85 Q72 82 75 82 L125 82 Q128 82 128 85" fill="#FFD600" opacity="0.8"/>
+    
+    <path d="M62 80 Q70 100 65 130 Q60 160 58 190" stroke="#FFFFFF" stroke-width="2" fill="none" opacity="0.2" stroke-linecap="round"/>
+    <path d="M70 90 Q78 110 75 140 Q72 170 68 200" stroke="#FFFFFF" stroke-width="1.5" fill="none" opacity="0.15" stroke-linecap="round"/>
+    <path d="M135 85 Q128 105 130 135 Q133 165 135 200" stroke="#FFFFFF" stroke-width="1.5" fill="none" opacity="0.1" stroke-linecap="round"/>
+  </g>
+</svg>

@@ -134,7 +134,7 @@
           <!-- Mensaje de Carrito / Feedback -->
           @if (cartMessage) {
             <div class="cart-feedback" role="status" aria-live="polite">
-              <span>✓ {{ cartMessage }}</span>
+              <span><i class="bi bi-check-lg"></i> {{ cartMessage }}</span>
               <a routerLink="/carrito" class="cart-link">Ver carrito →</a>
             </div>
           }

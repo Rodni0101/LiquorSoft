@@ -61,7 +61,7 @@
       <p class="catalog-notice" role="status">{{ errorMessage }}</p>
     }
     @if (cartMessage) {
-      <p class="catalog-notice success-notice" role="status" aria-live="polite">✓ {{ cartMessage }} <a routerLink="/carrito">Ver carrito</a></p>
+      <p class="catalog-notice success-notice" role="status" aria-live="polite"><i class="bi bi-check-lg"></i> {{ cartMessage }} <a routerLink="/carrito">Ver carrito</a></p>
     }
     @if (loading) {
       <p class="catalog-notice" role="status" aria-live="polite">Cargando productos…</p>

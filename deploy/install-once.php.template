@@ -1,0 +1,254 @@
+<?php
+declare(strict_types=1);
+
+const INSTALL_TOKEN = '__INSTALL_TOKEN__';
+
+header('X-Robots-Tag: noindex, nofollow');
+header('Cache-Control: no-store');
+header('Referrer-Policy: no-referrer');
+header('X-Content-Type-Options: nosniff');
+
+$token = (string) ($_GET['token'] ?? $_POST['token'] ?? '');
+if (!hash_equals(INSTALL_TOKEN, $token)) {
+    http_response_code(404);
+    exit('No encontrado.');
+}
+
+$root = __DIR__;
+$schemaFile = $root . '/schema.sql';
+$envFile = $root . '/.env';
+if (is_file($root . '/.installed')) {
+    http_response_code(404);
+    exit('No encontrado.');
+}
+
+$errors = [];
+$success = false;
+$isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+
+$form = [
+    'db_host' => trim((string) ($_POST['db_host'] ?? '')),
+    'db_name' => trim((string) ($_POST['db_name'] ?? '')),
+    'db_user' => trim((string) ($_POST['db_user'] ?? '')),
+    'admin_email' => trim((string) ($_POST['admin_email'] ?? '')),
+    'admin_nombre' => trim((string) ($_POST['admin_nombre'] ?? 'Administrador')),
+    'admin_apellido' => trim((string) ($_POST['admin_apellido'] ?? 'LiquorSoft')),
+];
+
+function envValue(string $value): string
+{
+    return '"' . str_replace(['\\', '"', "\n", "\r"], ['\\\\', '\\"', '', ''], $value) . '"';
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $dbPass = (string) ($_POST['db_pass'] ?? '');
+    $adminPass = (string) ($_POST['admin_password'] ?? '');
+
+    if ($form['db_host'] === '' || $form['db_name'] === '' || $form['db_user'] === '') {
+        $errors[] = 'Completa el host, el nombre de la base y el usuario.';
+    }
+    if (!filter_var($form['admin_email'], FILTER_VALIDATE_EMAIL)) {
+        $errors[] = 'El correo del administrador no es válido.';
+    }
+    if (strlen($adminPass) < 8 || strlen($adminPass) > 72) {
+        $errors[] = 'La contraseña del administrador debe tener entre 8 y 72 caracteres.';
+    }
+    if (!is_file($schemaFile)) {
+        $errors[] = 'No se encontró schema.sql junto al instalador. Vuelve a subir el ZIP.';
+    }
+
+    if (!$errors) {
+        mysqli_report(MYSQLI_REPORT_OFF);
+        $connection = @new mysqli($form['db_host'], $form['db_user'], $dbPass, $form['db_name']);
+
+        if ($connection->connect_errno) {
+            $errors[] = 'No se pudo conectar a la base de datos. Revisa host, nombre, usuario y contraseña.';
+        } else {
+            $connection->set_charset('utf8mb4');
+
+            $existingSchema = $connection->query("SHOW TABLES LIKE 'usuarios'");
+            $schemaExists = $existingSchema && $existingSchema->num_rows > 0;
+
+            if (!$schemaExists) {
+                $sql = (string) file_get_contents($schemaFile);
+                if ($connection->multi_query($sql)) {
+                    do {
+                        if ($result = $connection->store_result()) {
+                            $result->free();
+                        }
+                    } while ($connection->more_results() && $connection->next_result());
+                }
+                if ($connection->errno) {
+                    $errors[] = 'Error al importar el esquema: ' . $connection->error;
+                }
+            }
+        }
+
+        if (!$errors) {
+            $roleResult = $connection->query("SELECT id FROM roles WHERE LOWER(TRIM(nombre)) = 'administrador' LIMIT 1");
+            $role = $roleResult ? $roleResult->fetch_assoc() : null;
+            if (!$role) {
+                $errors[] = 'El esquema no creó el rol Administrador.';
+            }
+        }
+
+        if (!$errors) {
+            $roleId = (int) $role['id'];
+            $email = strtolower($form['admin_email']);
+            $hash = password_hash($adminPass, PASSWORD_DEFAULT);
+            $hasLegacyPassword = false;
+            $legacyCheck = $connection->query("SHOW COLUMNS FROM usuarios LIKE 'password'");
+            if ($legacyCheck) {
+                $hasLegacyPassword = $legacyCheck->num_rows > 0;
+            }
+
+            $existing = $connection->prepare('SELECT id FROM usuarios WHERE correo = ? LIMIT 1');
+            if (!$existing) {
+                $errors[] = 'No se pudo consultar la tabla de usuarios.';
+            } else {
+                $existing->bind_param('s', $email);
+                $existing->execute();
+                $user = $existing->get_result()->fetch_assoc();
+                $existing->close();
+
+                if ($user) {
+                    $userId = (int) $user['id'];
+                    if ($hasLegacyPassword) {
+                        $update = $connection->prepare('UPDATE usuarios SET rol_id = ?, password_hash = ?, password = ?, estado = 1 WHERE id = ?');
+                        $update->bind_param('issi', $roleId, $hash, $hash, $userId);
+                    } else {
+                        $update = $connection->prepare('UPDATE usuarios SET rol_id = ?, password_hash = ?, estado = 1 WHERE id = ?');
+                        $update->bind_param('isi', $roleId, $hash, $userId);
+                    }
+                    if (!$update->execute()) {
+                        $errors[] = 'No se pudo actualizar la cuenta administrador.';
+                    }
+                    $update->close();
+                } else {
+                    $base = preg_replace('/[^a-z0-9._-]/', '', (string) strstr($email, '@', true)) ?: 'admin';
+                    $username = substr($base, 0, 40) . '_' . bin2hex(random_bytes(4));
+                    $nombre = $form['admin_nombre'] !== '' ? $form['admin_nombre'] : 'Administrador';
+                    $apellido = $form['admin_apellido'] !== '' ? $form['admin_apellido'] : 'LiquorSoft';
+                    $phone = '';
+
+                    if ($hasLegacyPassword) {
+                        $insert = $connection->prepare(
+                            'INSERT INTO usuarios (rol_id, nombre, apellido, telefono, correo, password_hash, password, usuario, estado)
+                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)'
+                        );
+                        $insert->bind_param('isssssss', $roleId, $nombre, $apellido, $phone, $email, $hash, $hash, $username);
+                    } else {
+                        $insert = $connection->prepare(
+                            'INSERT INTO usuarios (rol_id, nombre, apellido, telefono, correo, password_hash, usuario, estado)
+                             VALUES (?, ?, ?, ?, ?, ?, ?, 1)'
+                        );
+                        $insert->bind_param('issssss', $roleId, $nombre, $apellido, $phone, $email, $hash, $username);
+                    }
+                    if (!$insert->execute()) {
+                        $errors[] = 'No se pudo crear la cuenta administrador: ' . $insert->error;
+                    }
+                    $insert->close();
+                }
+            }
+        }
+
+        if (!$errors) {
+            $env = "LIQUORSOFT_APP_ENV=development\n"
+                . 'LIQURSOFT_DB_HOST=' . envValue($form['db_host']) . "\n"
+                . 'LIQURSOFT_DB_USER=' . envValue($form['db_user']) . "\n"
+                . 'LIQURSOFT_DB_PASSWORD=' . envValue($dbPass) . "\n"
+                . 'LIQURSOFT_DB_NAME=' . envValue($form['db_name']) . "\n"
+                . 'LIQUORSOFT_COOKIE_SECURE=' . ($isHttps ? '1' : '0') . "\n"
+                . "LIQUORSOFT_PAYMENT_SIMULATOR=1\n"
+                . "PAYPAL_CLIENT_ID=\n"
+                . "PAYPAL_CLIENT_SECRET=\n"
+                . "PAYPAL_ENVIRONMENT=sandbox\n"
+                . "PAYPAL_COP_PER_USD=4000\n"
+                . "LIQUORSOFT_OPENAI_API_KEY=\n"
+                . "LIQUORSOFT_OPENAI_MODEL=gpt-4.1-mini\n";
+
+            $temporary = $envFile . '.tmp';
+            if (file_put_contents($temporary, $env) === false || !rename($temporary, $envFile)) {
+                @unlink($temporary);
+                $errors[] = 'No se pudo escribir .env. Revisa los permisos de la carpeta.';
+            } else {
+                @chmod($envFile, 0600);
+            }
+        }
+
+        $connection->close();
+
+        if (!$errors) {
+            $success = true;
+            @file_put_contents($root . '/.installed', date('c'));
+            @chmod($root . '/.installed', 0600);
+            @unlink($schemaFile);
+            @unlink(__FILE__);
+        }
+    }
+}
+
+$tokenUrl = htmlspecialchars(INSTALL_TOKEN, ENT_QUOTES, 'UTF-8');
+$e = static fn (string $value): string => htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+?>
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instalación de LiquorSoft</title>
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#111;color:#f4f4f4;margin:0;padding:24px}
+main{max-width:640px;margin:0 auto;background:#1c1c1c;border:1px solid #333;border-radius:14px;padding:24px}
+h1{margin:0 0 8px;font-size:1.5rem}
+p{color:#bbb;line-height:1.5}
+label{display:block;margin:14px 0 6px;font-weight:600}
+input{width:100%;box-sizing:border-box;padding:10px;border-radius:8px;border:1px solid #444;background:#0f0f0f;color:#fff}
+button{margin-top:18px;width:100%;padding:12px;border:0;border-radius:8px;background:#c8a24a;color:#111;font-weight:700;font-size:1rem;cursor:pointer}
+.error{background:#3a1717;border:1px solid #7a2a2a;padding:12px;border-radius:8px;margin:16px 0}
+.ok{background:#173a22;border:1px solid #2a7a44;padding:12px;border-radius:8px;margin:16px 0}
+a{color:#e0bf6a}
+small{color:#888}
+</style>
+</head>
+<body>
+<main>
+<h1>Instalación de LiquorSoft</h1>
+<?php if ($success): ?>
+    <div class="ok"><strong>Instalación completada.</strong></div>
+    <p>La base de datos se importó, el archivo <code>.env</code> quedó configurado y la cuenta administrador está lista.</p>
+    <p>El instalador y <code>schema.sql</code> se eliminaron del servidor.</p>
+    <p><a href="./">Abrir la tienda</a></p>
+    <p><a href="./admin/dashboard">Ir al panel de administración</a></p>
+    <p><small>Si el instalador sigue existiendo, bórralo manualmente desde el File Manager.</small></p>
+<?php else: ?>
+    <p>Completa los datos de la base MySQL y la cuenta administrador. Este formulario se puede usar una sola vez.</p>
+    <?php foreach ($errors as $error): ?>
+        <div class="error"><?= $e($error) ?></div>
+    <?php endforeach; ?>
+    <form method="post" action="install-once.php?token=<?= $tokenUrl ?>">
+        <input type="hidden" name="token" value="<?= $tokenUrl ?>">
+        <label>Host de la base de datos</label>
+        <input name="db_host" required value="<?= $e($form['db_host']) ?>" placeholder="sqlXXX.infinityfree.com">
+        <label>Nombre de la base de datos</label>
+        <input name="db_name" required value="<?= $e($form['db_name']) ?>" placeholder="if0_12345678_liquorsoft">
+        <label>Usuario de la base de datos</label>
+        <input name="db_user" required value="<?= $e($form['db_user']) ?>" placeholder="if0_12345678">
+        <label>Contraseña de la base de datos</label>
+        <input type="password" name="db_pass" required autocomplete="new-password">
+        <label>Correo del administrador</label>
+        <input type="email" name="admin_email" required value="<?= $e($form['admin_email']) ?>" placeholder="tu@correo.com">
+        <label>Nombre</label>
+        <input name="admin_nombre" value="<?= $e($form['admin_nombre']) ?>">
+        <label>Apellido</label>
+        <input name="admin_apellido" value="<?= $e($form['admin_apellido']) ?>">
+        <label>Contraseña del administrador</label>
+        <input type="password" name="admin_password" required minlength="8" maxlength="72" autocomplete="new-password">
+        <button type="submit">Instalar LiquorSoft</button>
+    </form>
+    <p><small>El instalador se elimina automáticamente al terminar. No compartas esta URL con token.</small></p>
+<?php endif; ?>
+</main>
+</body>
+</html>

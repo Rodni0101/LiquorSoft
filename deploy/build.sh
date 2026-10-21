@@ -28,6 +28,12 @@ cp -a "$ROOT/backend/api" "$OUT/api"
 cp "$ROOT/deploy/htaccess.txt" "$OUT/.htaccess"
 cp "$ROOT/deploy/env.production.example" "$OUT/.env.example"
 
+TOKEN="$(php -r 'echo bin2hex(random_bytes(16));')"
+php -r '$template = file_get_contents($argv[1]); $output = str_replace("__INSTALL_TOKEN__", $argv[2], $template); file_put_contents($argv[3], $output);' \
+  "$ROOT/deploy/install-once.php.template" "$TOKEN" "$OUT/install-once.php"
+cp "$ROOT/backend/database/schema.sql" "$OUT/schema.sql"
+chmod 0644 "$OUT/install-once.php"
+
 # Nunca empaquetar credenciales locales ni archivos de desarrollo.
 rm -f "$OUT/.env" "$OUT/.env.local"
 find "$OUT" -name '*.map' -delete
@@ -43,4 +49,5 @@ echo "  ZIP:     $ZIP"
 echo "  Tamaño:  $(du -sh "$OUT" | cut -f1)"
 echo
 echo "Sube el CONTENIDO de la carpeta (o el ZIP descomprimido) a htdocs/public_html."
-echo "Luego crea .env en esa raíz desde .env.example y configura la base de datos."
+echo "Luego abre en el navegador:"
+echo "  https://TU-SUBDOMINIO/install-once.php?token=$TOKEN"

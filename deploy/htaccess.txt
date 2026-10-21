@@ -5,7 +5,7 @@ Options -Indexes
 DirectoryIndex index.html
 
 # Bloquear archivos sensibles aunque se suban por error.
-<FilesMatch "(^\.env|^\.git|^\.htaccess|\.sql$|\.md$|composer\.(json|lock)$)">
+<FilesMatch "(^\.env|^\.git|^\.htaccess|^\.installed|\.sql$|\.md$|composer\.(json|lock)$)">
   Require all denied
 </FilesMatch>
 

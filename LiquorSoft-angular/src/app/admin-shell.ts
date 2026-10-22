@@ -221,7 +221,7 @@ nav a {
   display: flex;
   align-items: center;
   gap: 12px;
-  min-height: 44px;
+  min-height: 46px;
   padding: 11px 13px;
   color: #D0C2C8;
   background: transparent;
@@ -230,7 +230,7 @@ nav a {
   font-size: 0.86rem;
   font-weight: 550;
   text-decoration: none;
-  transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+  transition: background 160ms ease, color 160ms ease, border-color 160ms ease, transform 160ms ease;
 }
 
 .nav-icon {
@@ -238,12 +238,16 @@ nav a {
   align-items: center;
   justify-content: center;
   width: 23px;
+  height: 23px;
   flex: 0 0 23px;
   color: #D99AA9;
   font-size: 1.05rem;
+  border-radius: 7px;
+  transition: color 160ms ease, background 160ms ease;
 }
 
 nav a:hover {
+  transform: translateX(2px);
   color: #FFFFFF;
   background: rgba(141, 27, 48, 0.25);
   border-color: rgba(184, 61, 91, 0.38);
@@ -251,18 +255,20 @@ nav a:hover {
 
 nav a:hover .nav-icon {
   color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 nav a.active {
   color: #FFFFFF;
-  background: #6D0F1A;
-  border-color: #8D1B30;
+  background: linear-gradient(110deg, #6D0F1A, #45131D);
+  border-color: rgba(184, 61, 91, 0.65);
   font-weight: 700;
-  box-shadow: 0 4px 14px rgba(109, 15, 26, 0.2);
+  box-shadow: inset 3px 0 #E58DA3, 0 4px 14px rgba(109, 15, 26, 0.2);
 }
 
 nav a.active .nav-icon {
   color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.12);
 }
 
 nav a:focus-visible,
@@ -314,16 +320,18 @@ nav a:focus-visible,
 
 .logout {
   width: 100%;
-  color: #FFB8C3;
-  background: transparent;
-  border: 1px solid transparent;
+  color: #FFD7DE;
+  background: linear-gradient(110deg, rgba(109, 15, 26, 0.42), rgba(69, 19, 29, 0.72));
+  border: 1px solid rgba(255, 184, 195, 0.25);
+  font-weight: 700;
   cursor: pointer;
 }
 
 .logout:hover {
   color: #FFFFFF;
-  background: rgba(141, 27, 48, 0.25);
-  border-color: rgba(255, 184, 195, 0.18);
+  background: linear-gradient(110deg, #8D1B30, #64101F);
+  border-color: rgba(255, 184, 195, 0.55);
+  box-shadow: 0 4px 14px rgba(109, 15, 26, 0.25);
 }
 
 .admin-content {
@@ -386,7 +394,7 @@ nav a:focus-visible,
 
 :host-context([data-theme='light']) nav a.active {
   color: #FFFFFF;
-  background: #6D0F1A;
+  background: linear-gradient(110deg, #6D0F1A, #45131D);
   border-color: #6D0F1A;
 }
 
@@ -405,12 +413,14 @@ nav a:focus-visible,
 
 :host-context([data-theme='light']) .logout {
   color: #8F243A;
+  background: #F9EDF1;
+  border-color: #E7CCD5;
 }
 
 :host-context([data-theme='light']) .logout:hover {
-  color: #6D0F1A;
-  background: #F9EDF1;
-  border-color: #E7CCD5;
+  color: #FFFFFF;
+  background: #6D0F1A;
+  border-color: #6D0F1A;
 }
 
 :host-context([data-theme='light']) .admin-content {

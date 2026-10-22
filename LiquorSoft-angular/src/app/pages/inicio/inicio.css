@@ -211,6 +211,26 @@
   padding-inline: 0;
 }
 
+.nav-actions button.nav-login.button-reset {
+  padding: 0.7rem 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--home-muted);
+  font: inherit;
+  font-size: .78rem;
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.nav-actions button.nav-login.button-reset:hover,
+.nav-actions button.nav-login.button-reset:focus-visible {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  color: var(--home-text);
+}
+
 .menu-toggle {
   display: none;
   width: 40px;

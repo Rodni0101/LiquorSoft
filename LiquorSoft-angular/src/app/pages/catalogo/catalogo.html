@@ -7,10 +7,16 @@
     </nav>
     <div class="nav-actions">
       @if (!auth.user()) {
-        <a routerLink="/login" class="login-link">Iniciar sesión</a><a routerLink="/register" class="register-link">Registrarse</a>
+        <a routerLink="/login" class="login-link">Iniciar sesión</a>
+        <a routerLink="/register" class="register-link">Registrarse</a>
       } @else {
-        @if (auth.isClient()) { <a routerLink="/pedidos" class="login-link">Mis pedidos</a><a routerLink="/carrito" class="register-link">Carrito</a> }
-        <button type="button" class="register-link" (click)="auth.logout()">Cerrar sesión</button>
+        @if (auth.isClient()) {
+          <a routerLink="/pedidos" class="login-link">Mis pedidos</a>
+          <a routerLink="/carrito" class="cart-btn">Carrito</a>
+        } @else {
+          <a routerLink="/admin/dashboard" class="login-link admin-tag">Panel administrativo</a>
+        }
+        <button type="button" class="logout-btn" (click)="auth.logout()">Cerrar sesión</button>
       }
       @if (auth.user()) {
         <app-notification-bell></app-notification-bell>

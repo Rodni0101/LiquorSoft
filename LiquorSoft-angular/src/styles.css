@@ -531,3 +531,101 @@ table.data-table tbody tr:hover {
   clip: rect(0, 0, 0, 0);
   border: 0;
 }
+/* ===================================================
+   ADAPTABILIDAD RESPONSIVE: MÓVILES (360px+) Y TELEVISORES (Full HD, 2K, 4K)
+   =================================================== */
+
+/* Dispositivos móviles pequeños y estándar (360px a 480px) */
+@media (max-width: 480px) {
+  html {
+    font-size: 15px;
+  }
+
+  button, a.button, input, select, textarea {
+    min-height: 44px; /* Touch target accesible mínimo */
+  }
+
+  /* Evitar desbordamiento horizontal en tablas y tarjetas */
+  .table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Modales en teléfonos: ocupan el ancho completo con padding seguro */
+  .modal-card {
+    width: 95vw !important;
+    max-height: 92vh !important;
+    margin: auto !important;
+    padding: 16px !important;
+  }
+
+  /* Barras de navegación compactas */
+  .navbar, .catalog-navbar, .product-navbar {
+    padding: 12px 14px !important;
+    gap: 10px !important;
+  }
+
+  .nav-actions {
+    gap: 6px !important;
+  }
+}
+
+/* Pantallas grandes y televisores para presentaciones (1920px Full HD) */
+@media (min-width: 1920px) {
+  html {
+    font-size: 17px;
+  }
+
+  /* Contenedores centrados con márgenes equilibrados para no estirarse desproporcionadamente */
+  .home-page,
+  .catalog-page,
+  .product-page,
+  .admin-shell,
+  .purchase-page,
+  .checkout-page {
+    max-width: 1720px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero, .catalog-hero, .product-detail-layout {
+    gap: 64px;
+  }
+}
+
+/* Pantallas 2K y proyectores de alta resolución (2560px+) */
+@media (min-width: 2560px) {
+  html {
+    font-size: 19px;
+  }
+
+  .home-page,
+  .catalog-page,
+  .product-page,
+  .admin-shell,
+  .purchase-page,
+  .checkout-page {
+    max-width: 2160px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Televisores 4K para presentaciones de sala (3840px+) */
+@media (min-width: 3840px) {
+  html {
+    font-size: 23px;
+  }
+
+  .home-page,
+  .catalog-page,
+  .product-page,
+  .admin-shell,
+  .purchase-page,
+  .checkout-page {
+    max-width: 2800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}

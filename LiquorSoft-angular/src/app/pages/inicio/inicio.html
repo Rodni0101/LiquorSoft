@@ -57,6 +57,7 @@
       } @else if (auth.isClient()) {
         <a routerLink="/pedidos" class="nav-login">Mis pedidos</a>
         <a routerLink="/carrito" class="button button-small button-light">Carrito <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
+        <button type="button" class="nav-login button-reset nav-logout-btn" (click)="auth.logout()">Cerrar sesión</button>
       } @else {
         <a routerLink="/admin/dashboard" class="nav-login">Panel administrativo</a>
         <button type="button" class="nav-login button-reset" (click)="auth.logout()">Cerrar sesión</button>

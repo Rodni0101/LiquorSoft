@@ -160,13 +160,14 @@
 }
 
 .unread-pill {
-  font-size: 0.7rem;
-  font-weight: 600;
-  background: rgba(184, 61, 91, 0.2);
-  color: var(--rose, #b83d5b);
-  border: 1px solid rgba(184, 61, 91, 0.35);
-  padding: 2px 7px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(244, 63, 94, 0.22);
+  color: #fecdd3;
+  border: 1px solid #f43f5e;
+  padding: 3px 8px;
   border-radius: 12px;
+  letter-spacing: 0.02em;
 }
 
 .header-actions {
@@ -402,3 +403,9 @@
   }
 }
 
+
+:host-context([data-theme="light"]) .unread-pill {
+  background: #ffe4e6;
+  border-color: #f43f5e;
+  color: #9f1239;
+}

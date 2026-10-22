@@ -103,10 +103,7 @@ import { AuthService } from './auth.service';
                         }
 
                         @if (!item.read) {
-                          <button
-        #bellBtn
-        type="button"
-                            class="item-mark-btn"
+                          <button type="button" class="item-mark-btn"
                             (click)="$event.stopPropagation(); service.markAsRead(item.id)"
                             title="Marcar como leída"
                           >

@@ -1,6 +1,7 @@
 import { Component, ElementRef, ViewChild, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs';
 import { CartService } from './cart.service';
 import { ProductVisual } from './product-visual';
 import { NotificationService } from './notification.service';
@@ -19,6 +20,21 @@ interface ChatMessage { role: 'assistant' | 'user'; text: string; products?: Cha
   templateUrl: './app.html',
 })
 export class App {
+  private readonly router = inject(Router);
+  protected readonly isAuthRoute = signal(false);
+
+  constructor() {
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd)
+    ).subscribe((event) => {
+      const url = event.urlAfterRedirects.split('?')[0].split('#')[0];
+      const isAuth = url === '/login' || url === '/register';
+      this.isAuthRoute.set(isAuth);
+      if (isAuth) {
+        this.chatOpen.set(false);
+      }
+    });
+  }
   protected readonly title = signal('LiquorSoft-angular');
   private readonly http = inject(HttpClient);
   private readonly cart = inject(CartService);

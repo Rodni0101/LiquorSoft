@@ -810,3 +810,147 @@
     align-items: flex-start;
   }
 }
+
+/* ===================================================
+   MODO CLARO UNIFICADO CON PÁGINA DE INICIO (LIQUORSOFT)
+   =================================================== */
+:host-context([data-theme='light']) .product-page {
+  background: #f8f3f4;
+  color: #25151b;
+}
+
+:host-context([data-theme='light']) .product-navbar {
+  background: rgba(248, 243, 244, 0.94);
+  border-color: rgba(111, 45, 65, 0.15);
+  backdrop-filter: blur(16px);
+}
+
+:host-context([data-theme='light']) .product-navbar .logo {
+  color: #25151b;
+}
+
+:host-context([data-theme='light']) .nav-links a,
+:host-context([data-theme='light']) .nav-login,
+:host-context([data-theme='light']) .breadcrumbs,
+:host-context([data-theme='light']) .breadcrumbs a,
+:host-context([data-theme='light']) .crumb-category,
+:host-context([data-theme='light']) .product-description,
+:host-context([data-theme='light']) .trust-card p,
+:host-context([data-theme='light']) .rel-meta {
+  color: #65565c;
+}
+
+:host-context([data-theme='light']) .nav-links a:hover,
+:host-context([data-theme='light']) .breadcrumbs a:hover,
+:host-context([data-theme='light']) .back-link {
+  color: #6d0f1a;
+}
+
+:host-context([data-theme='light']) .crumb-current,
+:host-context([data-theme='light']) .product-title,
+:host-context([data-theme='light']) .section-heading h2,
+:host-context([data-theme='light']) .rel-name,
+:host-context([data-theme='light']) .trust-card strong,
+:host-context([data-theme='light']) .footer-brand h4 {
+  color: #25151b;
+}
+
+:host-context([data-theme='light']) .visual-card {
+  background: linear-gradient(145deg, #f7edf0, #ffffff);
+  border-color: rgba(111, 45, 65, 0.15);
+  box-shadow: 0 16px 45px rgba(64, 27, 39, 0.08);
+}
+
+:host-context([data-theme='light']) .eyebrow-category,
+:host-context([data-theme='light']) .rel-cat,
+:host-context([data-theme='light']) .eyebrow-sub {
+  color: #b83d5b;
+}
+
+:host-context([data-theme='light']) .price-current {
+  color: #6d0f1a;
+}
+
+:host-context([data-theme='light']) .pricing-card {
+  background: #ffffff;
+  border-color: rgba(111, 45, 65, 0.15);
+  box-shadow: 0 10px 30px rgba(64, 27, 39, 0.05);
+}
+
+:host-context([data-theme='light']) .qty-selector {
+  background: #f8f3f4;
+  border-color: rgba(111, 45, 65, 0.18);
+}
+
+:host-context([data-theme='light']) .qty-btn {
+  color: #25151b;
+}
+
+:host-context([data-theme='light']) .qty-btn:hover:not(:disabled) {
+  background: #f4eaed;
+  color: #6d0f1a;
+}
+
+:host-context([data-theme='light']) .qty-input {
+  color: #25151b;
+  background: transparent;
+}
+
+:host-context([data-theme='light']) .btn-add-cart {
+  background: linear-gradient(135deg, #8d1b30, #6d0f1a);
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(109, 15, 26, 0.35);
+}
+
+:host-context([data-theme='light']) .btn-add-cart:hover:not(:disabled) {
+  background: linear-gradient(135deg, #9c2442, #8d1b30);
+  box-shadow: 0 8px 24px rgba(109, 15, 26, 0.45);
+}
+
+:host-context([data-theme='light']) .trust-card {
+  background: #ffffff;
+  border-color: rgba(111, 45, 65, 0.12);
+  box-shadow: 0 4px 16px rgba(64, 27, 39, 0.04);
+}
+
+:host-context([data-theme='light']) .related-card {
+  background: #ffffff;
+  border-color: rgba(111, 45, 65, 0.12);
+  box-shadow: 0 4px 20px rgba(64, 27, 39, 0.05);
+}
+
+:host-context([data-theme='light']) .related-card:hover {
+  border-color: rgba(109, 15, 26, 0.35);
+  box-shadow: 0 16px 40px rgba(64, 27, 39, 0.12);
+}
+
+:host-context([data-theme='light']) .rel-image-box {
+  background: linear-gradient(145deg, #f7edf0, #ffffff);
+}
+
+:host-context([data-theme='light']) .product-footer {
+  background: rgba(248, 243, 244, 0.94);
+  border-color: rgba(111, 45, 65, 0.15);
+}
+
+:host-context([data-theme='light']) .footer-copy,
+:host-context([data-theme='light']) .footer-note {
+  color: #74646a;
+}
+
+:host-context([data-theme='light']) .nav-logout {
+  border-color: rgba(111, 45, 65, 0.2);
+  color: #74646a;
+}
+
+:host-context([data-theme='light']) .nav-logout:hover {
+  background: #f4eaed;
+  color: #25151b;
+  border-color: #6d0f1a;
+}
+
+:host-context([data-theme='light']) .nav-cart {
+  background: #fdf2f4;
+  border-color: rgba(109, 15, 26, 0.2);
+  color: #6d0f1a;
+}

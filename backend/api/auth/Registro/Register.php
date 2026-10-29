@@ -42,6 +42,10 @@ if (strlen($password) < 8 || strlen($password) > 72) {
     respond(422, ['message' => 'La contraseña debe tener entre 8 y 72 caracteres.']);
 }
 
+if (!liquorsoftRateLimitCheck('register', (string) ($_SERVER['REMOTE_ADDR'] ?? 'unknown'), 5, 3600)) {
+    respond(429, ['message' => 'Demasiadas solicitudes de registro. Inténtalo más tarde.']);
+}
+
 // Configure these values in the server environment; no credentials belong in source control.
 $host = liquorsoftEnv('LIQURSOFT_DB_HOST', '127.0.0.1');
 $user = liquorsoftEnv('LIQURSOFT_DB_USER', 'root');

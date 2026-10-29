@@ -46,7 +46,7 @@
             <div class="customer-data">
               <div>
                 <small>Nombre</small>
-                <strong>{{ auth.user()?.name ?? 'Compra como invitado' }}</strong>
+                <strong>{{ auth.user()?.name ?? 'Cuenta en proceso' }}</strong>
               </div>
               <div>
                 <small>Correo</small>
@@ -64,17 +64,18 @@
             </div>
             <label class="checkout-field">
               Dirección de entrega <span aria-hidden="true">*</span>
-              <input [(ngModel)]="deliveryAddress" maxlength="255" required autocomplete="street-address" placeholder="Dirección completa" />
+              <input id="deliveryAddress" [ngModel]="deliveryAddress" (ngModelChange)="onDeliveryAddressChange($event)" maxlength="255" required autocomplete="street-address" placeholder="Dirección completa" />
             </label>
             <label class="checkout-field">
               Fecha de nacimiento <span aria-hidden="true">*</span>
-              <input [(ngModel)]="birthDate" type="date" required autocomplete="bday" />
+              <input id="birthDate" [ngModel]="birthDate" (ngModelChange)="onBirthDateChange($event)" type="date" required autocomplete="bday" />
               <small>La ley colombiana prohíbe la venta de bebidas alcohólicas a menores de 18 años. No guardamos esta fecha.</small>
             </label>
             <label class="checkout-field">
               Notas <span>(opcional)</span>
               <textarea
-                [(ngModel)]="notes"
+                [ngModel]="notes"
+                (ngModelChange)="onNotesChange($event)"
                 maxlength="500"
                 rows="3"
                 placeholder="Indicaciones adicionales"
@@ -174,11 +175,14 @@
             <span>Total</span><strong>{{ formatPrice(cart.total()) }}</strong>
           </div>
           @if (method === 'nequi_simulado' && simulatorEnabled) {
+            @if (message) {
+              <p class="checkout-error" role="alert">{{ message }}</p>
+            }
             <button
               type="button"
               class="primary-action"
-              [disabled]="!!stockError || !deliveryAddress.trim() || !birthDate || purchaseSubmitting"
-              (click)="registerPurchase()"
+              [disabled]="purchaseSubmitting"
+              (click)="submitPurchase()"
             >
               {{ purchaseSubmitting ? 'Procesando…' : 'Confirmar compra de prueba' }}
             </button>

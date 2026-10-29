@@ -201,3 +201,54 @@ function requireRole(mysqli $connection, array $allowedRoles): array
     }
     return $user;
 }
+
+function liquorsoftRateLimitCheck(string $scope, string $identity, int $maxAttempts, int $windowSeconds): bool
+{
+    $directory = sys_get_temp_dir() . '/liquorsoft-ratelimit';
+    if (!is_dir($directory)) {
+        @mkdir($directory, 0770, true);
+    }
+    $filePath = $directory . '/' . md5($scope . '|' . $identity) . '.json';
+    $attempts = [];
+    if (is_file($filePath)) {
+        $decoded = json_decode((string) file_get_contents($filePath), true);
+        if (is_array($decoded)) {
+            $now = time();
+            $attempts = array_values(array_filter(
+                $decoded,
+                static fn (mixed $timestamp): bool => is_int($timestamp) && $timestamp > $now - $windowSeconds
+            ));
+        }
+    }
+    return count($attempts) < $maxAttempts;
+}
+
+function liquorsoftRateLimitHit(string $scope, string $identity, int $windowSeconds): void
+{
+    $directory = sys_get_temp_dir() . '/liquorsoft-ratelimit';
+    if (!is_dir($directory)) {
+        @mkdir($directory, 0770, true);
+    }
+    $filePath = $directory . '/' . md5($scope . '|' . $identity) . '.json';
+    $attempts = [];
+    if (is_file($filePath)) {
+        $decoded = json_decode((string) file_get_contents($filePath), true);
+        if (is_array($decoded)) {
+            $now = time();
+            $attempts = array_values(array_filter(
+                $decoded,
+                static fn (mixed $timestamp): bool => is_int($timestamp) && $timestamp > $now - $windowSeconds
+            ));
+        }
+    }
+    $attempts[] = time();
+    file_put_contents($filePath, json_encode($attempts), LOCK_EX);
+}
+
+function liquorsoftRateLimitClear(string $scope, string $identity): void
+{
+    $filePath = sys_get_temp_dir() . '/liquorsoft-ratelimit/' . md5($scope . '|' . $identity) . '.json';
+    if (is_file($filePath)) {
+        @unlink($filePath);
+    }
+}

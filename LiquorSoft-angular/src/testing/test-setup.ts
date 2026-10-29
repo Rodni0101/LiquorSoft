@@ -34,5 +34,7 @@ function responseFor(url: string): object {
       recentProducts: [],
     };
   }
+  if (url.endsWith('/api/admin/orders.php')) return { orders: [] };
+  if (url.endsWith('/api/admin/sales.php')) return { sales: [] };
   return { products: [], items: [], movements: [], sales: [] };
 }

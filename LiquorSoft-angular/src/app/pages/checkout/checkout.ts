@@ -57,6 +57,8 @@ export class Checkout implements OnInit {
   private readonly paypalOrderStorageKey = 'liquorsoft-paypal-order-id';
   private readonly paypalStatusStorageKey = 'liquorsoft-paypal-order-status';
   private readonly restoredPayPalAttempt = this.readPayPalAttempt();
+  private readonly checkoutDraftStorageKey = 'liquorsoft-checkout-draft';
+  private readonly restoredCheckoutDraft = this.readCheckoutDraft();
   protected method: PaymentMethod = this.restoredPayPalAttempt.orderId ? 'paypal' : 'nequi_simulado';
   protected simulationOutcome = 'approved';
   protected simulatorEnabled = false;
@@ -69,9 +71,9 @@ export class Checkout implements OnInit {
   protected message = '';
   protected stockError = '';
   protected purchaseSubmitting = false;
-  protected notes = '';
-  protected deliveryAddress = '';
-  protected birthDate = '';
+  protected notes = this.restoredCheckoutDraft.notes;
+  protected deliveryAddress = this.restoredCheckoutDraft.deliveryAddress;
+  protected birthDate = this.restoredCheckoutDraft.birthDate;
   protected orderNumber = '';
   protected orderId: number | null = null;
   protected invoiceUrl = '';
@@ -104,6 +106,67 @@ export class Checkout implements OnInit {
     sessionStorage.removeItem(this.paypalIdempotencyStorageKey);
     sessionStorage.removeItem(this.paypalOrderStorageKey);
     sessionStorage.removeItem(this.paypalStatusStorageKey);
+  }
+
+  private readCheckoutDraft(): { deliveryAddress: string; birthDate: string; notes: string } {
+    try {
+      const stored = localStorage.getItem(this.checkoutDraftStorageKey);
+      if (!stored) {
+        return { deliveryAddress: '', birthDate: '', notes: '' };
+      }
+      const parsed: unknown = JSON.parse(stored);
+      const draft = (parsed ?? {}) as Partial<{ deliveryAddress: string; birthDate: string; notes: string }>;
+      return {
+        deliveryAddress: typeof draft.deliveryAddress === 'string' ? draft.deliveryAddress : '',
+        birthDate: typeof draft.birthDate === 'string' ? draft.birthDate : '',
+        notes: typeof draft.notes === 'string' ? draft.notes : '',
+      };
+    } catch {
+      return { deliveryAddress: '', birthDate: '', notes: '' };
+    }
+  }
+
+  private saveCheckoutDraft(): void {
+    try {
+      localStorage.setItem(this.checkoutDraftStorageKey, JSON.stringify({
+        deliveryAddress: this.deliveryAddress,
+        birthDate: this.birthDate,
+        notes: this.notes,
+      }));
+    } catch {
+    }
+  }
+
+  private clearCheckoutDraft(): void {
+    try {
+      localStorage.removeItem(this.checkoutDraftStorageKey);
+    } catch {
+    }
+  }
+
+  protected onDeliveryAddressChange(value: string): void {
+    this.deliveryAddress = value ?? '';
+    this.saveCheckoutDraft();
+    this.message = '';
+  }
+
+  protected onBirthDateChange(value: string): void {
+    this.birthDate = value ?? '';
+    this.saveCheckoutDraft();
+    this.message = '';
+  }
+
+  protected onNotesChange(value: string): void {
+    this.notes = value ?? '';
+    this.saveCheckoutDraft();
+    this.message = '';
+  }
+
+  private focusCheckoutField(id: string): void {
+    const element = document.getElementById(id);
+    if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
+      element.focus();
+    }
   }
 
   ngOnInit(): void {
@@ -178,6 +241,25 @@ export class Checkout implements OnInit {
     });
   }
 
+  protected submitPurchase(): void {
+    if (this.purchaseSubmitting) return;
+    if (this.stockError) {
+      this.message = this.stockError;
+      return;
+    }
+    if (!this.deliveryAddress.trim()) {
+      this.message = 'Indica la dirección de entrega para registrar tu compra.';
+      this.focusCheckoutField('deliveryAddress');
+      return;
+    }
+    if (!this.birthDate) {
+      this.message = 'Selecciona la fecha de nacimiento para confirmar que eres mayor de 18 años.';
+      this.focusCheckoutField('birthDate');
+      return;
+    }
+    this.registerPurchase();
+  }
+
   protected registerPurchase(): void {
     if (
       this.purchaseSubmitting ||
@@ -219,6 +301,7 @@ export class Checkout implements OnInit {
     if (response.success) {
       this.cart.clear();
       this.clearPayPalAttempt();
+      this.clearCheckoutDraft();
     } else if (response.paymentMethod !== 'paypal') this.idempotencyKey = crypto.randomUUID();
     this.changeDetector.markForCheck();
   }

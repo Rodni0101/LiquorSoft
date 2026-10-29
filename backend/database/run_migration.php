@@ -3,7 +3,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../api/config/database.php';
 
 $connection = databaseConnection();
-$sql = file_get_contents(__DIR__ . '/migrations/012_notifications_system.sql');
+$sql = file_get_contents(__DIR__ . '/migrations/013_notifications_system.sql');
 
 if (!$sql) {
     echo "No se pudo leer el archivo de migración.\n";
@@ -30,7 +30,7 @@ if ($error !== null) {
     exit(1);
 }
 
-echo "Migración 012 ejecutada correctamente.\n";
+echo "Migración 013 ejecutada correctamente.\n";
 
 $connection->close();
 

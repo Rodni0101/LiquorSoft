@@ -107,7 +107,7 @@ import { AuthService } from './auth.service';
                             (click)="$event.stopPropagation(); service.markAsRead(item.id)"
                             title="Marcar como leída"
                           >
-                            ✓ Leída
+                            <i class="bi bi-check-lg"></i> Leída
                           </button>
                         }
                       </div>

@@ -2,7 +2,7 @@
 <section class="global-notices" aria-label="Notificaciones" aria-live="polite">
   @for (notice of notifications.notices(); track notice.id) {
     <article class="global-notice" [class]="'global-notice ' + notice.kind" role="status">
-      <span aria-hidden="true">{{ notice.kind === 'success' ? '✓' : notice.kind === 'error' ? '!' : notice.kind === 'warning' ? '⚠' : 'i' }}</span>
+      <span aria-hidden="true" class="notice-icon"><i [class]="'bi bi-' + (notice.kind === 'success' ? 'check-circle' : notice.kind === 'error' ? 'x-circle' : notice.kind === 'warning' ? 'exclamation-triangle' : 'info-circle')"></i></span>
       <p>{{ notice.message }}</p>
       <button type="button" aria-label="Cerrar aviso" (click)="notifications.close(notice.id)">×</button>
     </article>

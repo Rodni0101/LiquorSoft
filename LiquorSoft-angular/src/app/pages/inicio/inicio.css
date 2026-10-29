@@ -390,6 +390,7 @@ main {
   background: linear-gradient(145deg, rgba(34, 25, 30, .95), rgba(20, 15, 18, .96));
   box-shadow: 0 30px 90px rgba(0, 0, 0, .48), inset 0 1px rgba(255, 255, 255, .045);
   backdrop-filter: blur(16px);
+  margin-inline: 3rem;
 }
 
 .dashboard-topline,
@@ -665,13 +666,13 @@ main {
 }
 
 .stat-top {
-  top: 17%;
-  right: -1rem;
+  top: 1rem;
+  left: 1rem;
 }
 
 .stat-bottom {
-  bottom: 12%;
-  left: -1rem;
+  bottom: 1rem;
+  right: 1rem;
 }
 
 .check-icon {

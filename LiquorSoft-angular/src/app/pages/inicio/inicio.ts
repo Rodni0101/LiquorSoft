@@ -15,6 +15,7 @@ interface PublicSummary {
 }
 
 interface PublicProduct {
+  id?: number;
   name: string;
   category: string;
   price: number;
@@ -94,5 +95,14 @@ export class Inicio implements OnInit {
 
   protected formatPrice(value: number): string {
     return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(value);
+  }
+
+  protected get featuredProduct(): PublicProduct | null {
+    return this.products.find(product => product.featured) ?? this.products[0] ?? null;
+  }
+
+  protected get secondaryProducts(): PublicProduct[] {
+    const featured = this.featuredProduct;
+    return this.products.filter(product => product !== featured).slice(0, 4);
   }
 }

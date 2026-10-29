@@ -1,6 +1,19 @@
 <?php
 declare(strict_types=1);
 
+// Cabeceras de seguridad comunes a todas las respuestas de la API.
+if (PHP_SAPI !== 'cli' && !headers_sent()) {
+    header_remove('X-Powered-By');
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: DENY');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
+    header('Cross-Origin-Opener-Policy: same-origin');
+    if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+        header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
+    }
+}
+
 function databaseConnection(): mysqli
 {
     mysqli_report(MYSQLI_REPORT_OFF);
@@ -179,13 +192,20 @@ function requireCsrfToken(): void
 
 function productIcon(string $category): string
 {
-    return match (mb_strtolower(trim($category))) {
-        'vino', 'vinos' => 'bi bi-wine',
-        'cerveza', 'cervezas' => 'bi bi-cup-straw',
-        'mixer', 'mixers' => 'bi bi-droplet-half',
-        'gin', 'ginebra' => 'bi bi-cup-hot',
-        default => 'bi bi-cup',
-    };
+    $normalized = mb_strtolower(trim($category));
+    if (str_contains($normalized, 'vino') || str_contains($normalized, 'espumoso')) {
+        return 'bi bi-wine';
+    }
+    if (str_contains($normalized, 'cerveza')) {
+        return 'bi bi-cup-straw';
+    }
+    if (str_contains($normalized, 'mixer') || str_contains($normalized, 'complemento')) {
+        return 'bi bi-droplet-half';
+    }
+    if (str_contains($normalized, 'crema')) {
+        return 'bi bi-cup-hot';
+    }
+    return 'bi bi-cup';
 }
 
 function requireRole(mysqli $connection, array $allowedRoles): array
@@ -197,6 +217,41 @@ function requireRole(mysqli $connection, array $allowedRoles): array
     $role = mb_strtolower(trim((string) ($user['rol'] ?? '')));
     $allowed = array_map(static fn (string $value): string => mb_strtolower(trim($value)), $allowedRoles);
     if (!in_array($role, $allowed, true)) {
+        jsonResponse(403, ['message' => 'No tienes permisos para acceder a esta sección.']);
+    }
+    return $user;
+}
+
+/**
+ * Matriz única de permisos por rol. Debe coincidir con el frontend (AuthService).
+ * Permisos de vista/operación: dashboard, productos, categorias, inventario,
+ * ventas, compras, proveedores, usuarios.
+ */
+function rolePermissions(string $roleName): array
+{
+    $all = ['dashboard', 'productos', 'categorias', 'inventario', 'ventas', 'compras', 'proveedores', 'usuarios'];
+    return match (mb_strtolower(trim($roleName))) {
+        'administrador' => $all,
+        'supervisor' => ['dashboard', 'productos', 'categorias', 'inventario', 'ventas', 'compras', 'proveedores'],
+        'vendedor' => ['dashboard', 'productos', 'categorias', 'ventas'],
+        'bodega' => ['dashboard', 'productos', 'categorias', 'inventario', 'compras', 'proveedores'],
+        'trabajador' => ['productos', 'ventas'],
+        default => [],
+    };
+}
+
+function userPermissions(array $user): array
+{
+    return rolePermissions((string) ($user['rol'] ?? ''));
+}
+
+function requirePermission(mysqli $connection, string $permission): array
+{
+    $user = currentUser($connection);
+    if (!$user) {
+        jsonResponse(401, ['message' => 'Debes iniciar sesión para acceder.']);
+    }
+    if (!in_array($permission, userPermissions($user), true)) {
         jsonResponse(403, ['message' => 'No tienes permisos para acceder a esta sección.']);
     }
     return $user;

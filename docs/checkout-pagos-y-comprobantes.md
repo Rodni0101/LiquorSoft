@@ -2,7 +2,7 @@
 
 ## Estado de la integración
 
-El checkout calcula los precios desde MySQL y soporta **Nequi simulado** en desarrollo y **PayPal Checkout Sandbox** cuando el servidor tiene credenciales y tasa COP/USD configuradas. PayPal crea y captura la orden desde el backend; el secreto no se envía al navegador. La integración Sandbox usa dinero de prueba y no equivale a habilitar pagos reales.
+El checkout calcula los precios desde MySQL y soporta **Nequi simulado** en desarrollo y **PayPal Checkout** cuando el servidor tiene credenciales y tasa COP/USD configuradas. PayPal crea y captura la orden desde el backend; el secreto no se envía al navegador. Con `PAYPAL_ENVIRONMENT=sandbox` usa dinero de prueba; con `live` procesa cobros reales y la interfaz muestra “PayPal” en lugar de “PayPal Sandbox”.
 
 ## Activar la simulación local
 
@@ -26,30 +26,38 @@ El checkout calcula los precios desde MySQL y soporta **Nequi simulado** en desa
 4. Inicia el backend con `php -S 127.0.0.1:8000 -t backend` y Angular con el proxy habitual del proyecto.
 5. Inicia sesión, añade productos al carrito, completa la dirección y elige un resultado. Usa “Pago aprobado” para verificar compra, inventario, historial y PDF.
 
-La simulación se apaga si el entorno no es exactamente `development` y el indicador no es exactamente `1`. PayPal se habilita de manera independiente solo con credenciales Sandbox, `PAYPAL_ENVIRONMENT=sandbox`, extensión PHP cURL y tasa COP/USD positiva. Las credenciales Live se rechazan; esta implementación no procesa dinero real.
+La simulación se apaga si el entorno no es exactamente `development` y el indicador no es exactamente `1`. PayPal se habilita de manera independiente con credenciales válidas, `PAYPAL_ENVIRONMENT=sandbox` o `live`, extensión PHP cURL y tasa COP/USD positiva. En `sandbox` no se mueve dinero real; en `live` sí, así que exige HTTPS, credenciales Live, webhook configurado y una prueba con importe pequeño antes de abrir la tienda.
 
-## Configurar PayPal Sandbox
+## Configurar PayPal
 
-1. En PayPal Developer crea una aplicación en **Sandbox** y copia el Client ID y Secret de esa misma aplicación.
-2. En `backend/.env` configura las credenciales y una tasa fija manual:
+1. En PayPal Developer crea una aplicación **Sandbox** (pruebas) o **Live** (cobros reales) y copia el Client ID y Secret de esa misma aplicación. No mezcles credenciales de ambientes distintos.
+2. En `backend/.env` configura las credenciales, el ambiente y una tasa fija manual:
 
    ```dotenv
-   PAYPAL_CLIENT_ID=tu_client_id_sandbox
-   PAYPAL_CLIENT_SECRET=tu_secret_sandbox
+   PAYPAL_CLIENT_ID=tu_client_id
+   PAYPAL_CLIENT_SECRET=tu_secret
    PAYPAL_ENVIRONMENT=sandbox
    PAYPAL_COP_PER_USD=4000
+   PAYPAL_WEBHOOK_ID=tu_webhook_id
    ```
 
    `PAYPAL_COP_PER_USD` es un ejemplo, no una cotización recomendada. Ajusta y revisa la tasa que LiquorSoft usará. Los precios se mantienen en COP; el total se convierte a USD, se redondea a centavos y se presenta antes de aprobar en PayPal. La tasa y el importe se vuelven a validar al capturar el pago.
-3. Instala la extensión PHP cURL y reinicia el servidor PHP. El endpoint `/api/payment-config.php` solo publica el Client ID y el estado del método; nunca devuelve el Secret.
-4. Aplica la migración después de respaldar la base de datos:
+3. Crea un webhook en PayPal Developer apuntando a
+   `https://TU-DOMINIO/api/paypal/webhook.php`, con los eventos
+   `PAYMENT.CAPTURE.COMPLETED`, `PAYMENT.CAPTURE.DENIED` y
+   `PAYMENT.CAPTURE.REFUNDED`. Copia su ID en `PAYPAL_WEBHOOK_ID`. El webhook
+   verifica la firma con PayPal y registra cada evento en
+   `paypal_webhook_events`; si el ID falta, responde 503 y PayPal reintenta.
+4. Instala la extensión PHP cURL y reinicia el servidor PHP. `/api/payment-config.php` publica el Client ID, el ambiente y el estado del método; nunca devuelve el Secret.
+5. Aplica las migraciones después de respaldar la base de datos:
 
    ```bash
    mysql -u liquorsoft_app -p liquorsoft < backend/database/migrations/011_paypal_checkout_intents.sql
+   mysql -u liquorsoft_app -p liquorsoft < backend/database/migrations/018_paypal_webhook_events.sql
    ```
 
-5. Usa cuentas Sandbox de comprador para probar. Para pasar a Live hace falta una implementación y revisión específica; cambiar el valor de `PAYPAL_ENVIRONMENT` a `live` no habilita cobros reales.
-6. Un administrador autenticado puede comprobar el OAuth desde `GET /api/admin/paypal/diagnostics.php`. La respuesta solo indica el estado, ambiente y HTTP; no devuelve el Client Secret ni token.
+6. Usa cuentas Sandbox de comprador para probar. Para pasar a Live usa credenciales Live, `PAYPAL_ENVIRONMENT=live`, `LIQUORSOFT_APP_ENV=production`, `LIQUORSOFT_COOKIE_SECURE=1`, un webhook Live y una tasa revisada; haz primero una compra real pequeña.
+7. Un administrador autenticado puede comprobar el OAuth desde `GET /api/admin/paypal/diagnostics.php`. La respuesta solo indica el estado, ambiente y HTTP; no devuelve el Client Secret ni token.
 
 ## Probar OAuth y Orders API con cURL
 
@@ -190,9 +198,11 @@ Importa `docs/postman/PayPal-Sandbox.postman_collection.json` y `docs/postman/Pa
 
 ## Persistencia y consistencia
 
-`POST /api/purchase.php` requiere sesión autenticada, clave idempotente UUID, artículos, dirección y fecha de nacimiento que cumpla 18 años. La fecha se valida en el backend y no se persiste. Esta declaración no sustituye la comprobación de identidad/edad al entregar la compra. La ley colombiana prohíbe vender bebidas alcohólicas a menores de edad ([Ley 124 de 1994](https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php/norma_pdf.php?i=291)). Para PayPal, `POST /api/paypal/create-order.php` valida productos, stock y precios, y persiste una intención ligada al usuario, carrito, dirección y clave idempotente. El navegador recibe el ID de PayPal, nunca el Secret. Al aprobar, el backend vuelve a bloquear y calcular el inventario, verifica usuario, carrito, importe USD y moneda; prepara los registros de pedido, venta y stock en una transacción, captura PayPal y confirma todo localmente únicamente después de validar la captura.
+`POST /api/purchase.php` requiere sesión autenticada, clave idempotente UUID, artículos, dirección y fecha de nacimiento que cumpla 18 años. La fecha se valida en el backend y no se persiste. Esta declaración no sustituye la comprobación de identidad/edad al entregar la compra. La ley colombiana prohíbe vender bebidas alcohólicas a menores de edad ([Ley 124 de 1994](https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php/norma_pdf.php?i=291)). Para PayPal, `POST /api/paypal/create-order.php` valida productos, stock y precios, crea la orden en PayPal fuera de la transacción y persiste una intención ligada al usuario, carrito, dirección y clave idempotente. El navegador recibe el ID de PayPal, nunca el Secret.
 
-Solo un cobro completado por PayPal o el resultado simulado `approved` confirma el pedido, crea la venta y sus detalles, actualiza el stock de forma condicional y registra los movimientos en la transacción local. Rechazo, pendiente, cancelación y error no crean venta ni descuentan inventario. No hay reservas de stock: el inventario se verifica de nuevo al aprobar. Si se pierde la respuesta o falla la persistencia tras un cobro remoto, el checkout conserva el ID PayPal y la clave idempotente; “Volver a verificar” consulta la misma orden y no inicia otro pago. Si la base de datos continúa indisponible, no vuelvas a pagar hasta que se haya reconciliado el mismo pedido.
+Al aprobar, `purchase.php` valida la intención, el carrito, el importe USD y la moneda sin abrir transacción; después obtiene o captura el cobro en PayPal, también fuera de la base de datos. Solo entonces abre una transacción local corta, bloquea producto y pedido, revalida precios/stock, crea pedido, venta, detalle y movimientos, y marca la intención como `COMPLETED`. Si esa transacción falla después de una captura, el backend intenta reembolsar la captura automáticamente; si el reembolso también falla, registra un log crítico y notifica a los administradores para reembolso manual.
+
+Solo un cobro completado por PayPal o el resultado simulado `approved` confirma el pedido, crea la venta y sus detalles, actualiza el stock de forma condicional y registra los movimientos en la transacción local. Rechazo, pendiente, cancelación y error no crean venta ni descuentan inventario. No hay reservas de stock: el inventario se verifica de nuevo dentro de la transacción final. Si se pierde la respuesta o falla la persistencia tras un cobro remoto, el checkout conserva el ID PayPal y la clave idempotente; “Volver a verificar” consulta la misma orden y no inicia otro pago. Si la base de datos continúa indisponible, no vuelvas a pagar hasta que se haya reconciliado el mismo pedido.
 
 ## Verificación adicional del checkout (2026-10-17)
 
@@ -211,6 +221,23 @@ Solo un cobro completado por PayPal o el resultado simulado `approved` confirma 
 
 El PDF actual es un **comprobante comercial de prueba**, no una factura electrónica ni un documento fiscal autorizado. Faltan razón social, NIT, dirección legal y cualquier integración de facturación DIAN. Los datos inexistentes se indican como pendientes y no se inventan.
 
+## Webhook y conciliación
+
+`POST /api/paypal/webhook.php` exige `PAYPAL_WEBHOOK_ID`, valida las cabeceras
+`PAYPAL-*` y verifica la firma contra PayPal antes de procesar el evento. Los
+eventos se guardan en `paypal_webhook_events` con clave única por `event_id`.
+
+- `PAYMENT.CAPTURE.COMPLETED`: si encuentra pedido local, avisa a administradores
+  cuando el pedido no estaba en `CAPTURADO`; si no lo encuentra, crea una
+  notificación de reconciliación para revisar o reembolsar en PayPal.
+- `PAYMENT.CAPTURE.DENIED`: marca el pago como `RECHAZADO` solo si seguía
+  pendiente y registra historial.
+- `PAYMENT.CAPTURE.REFUNDED`: marca el pago como `REEMBOLSADO` y registra historial.
+
+El procesamiento es transaccional: si falla, se revierte y el evento queda con
+`processed = 0`; el siguiente reintento de PayPal vuelve a procesarlo. Un evento
+ya procesado responde `duplicate: true` sin repetir efectos.
+
 ## Pruebas manuales sugeridas
 
 - Aprobado: pedido confirmado, venta, movimiento de salida y descarga del PDF.
@@ -219,6 +246,7 @@ El PDF actual es un **comprobante comercial de prueba**, no una factura electró
 - Cambiar el ID de la descarga: el endpoint debe responder 404 para pedidos de otra persona.
 - Configurar entorno production: `/api/payment-config.php` debe devolver `simulatorEnabled: false` y purchase debe rechazar la simulación.
 - Con PayPal Sandbox: validar que el botón no aparece sin configuración completa, probar aprobación/cancelación, confirmar la moneda USD y cotejar que solo una captura completada genera venta y descuento de inventario.
+- Con `PAYPAL_ENVIRONMENT=live`: la interfaz debe mostrar “PayPal”, la compra debe ser real y el webhook debe quedar registrado en `paypal_webhook_events`; prueba con un importe pequeño y reembolsa manualmente si algo falla.
 
 ## Notificaciones
 

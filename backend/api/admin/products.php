@@ -4,9 +4,12 @@ declare(strict_types=1);
 require_once __DIR__ . '/../config/database.php';
 
 $connection = databaseConnection();
-requireRole($connection, ['Administrador']);
+requirePermission($connection, 'productos');
 
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+if ($method !== 'GET') {
+    requireCsrfToken();
+}
 
 function productPayload(array $body, mysqli $connection): array
 {
@@ -53,6 +56,10 @@ function productPayload(array $body, mysqli $connection): array
     $active = array_key_exists('active', $body)
         ? (int) (bool) $body['active']
         : 1;
+
+    $featured = array_key_exists('featured', $body)
+        ? (int) (bool) $body['featured']
+        : 0;
 
     if (mb_strlen($name) < 2 || mb_strlen($name) > 150) {
         jsonResponse(422, [
@@ -153,6 +160,7 @@ function productPayload(array $body, mysqli $connection): array
         'maxStock' => max(100, (int) $stock * 2, (int) $minStock * 3),
         'image' => $image !== '' ? $image : null,
         'active' => $active,
+        'featured' => $featured,
     ];
 }
 
@@ -225,7 +233,7 @@ if ($method === 'GET') {
             p.stock_minimo AS minStock,
             p.descripcion AS description,
             p.imagen AS image,
-            0 AS featured,
+            p.destacado AS featured,
             p.estado AS active,
             p.categoria_id AS categoryId,
             c.nombre AS category
@@ -330,8 +338,8 @@ if ($method === 'POST') {
         INSERT INTO productos (
             categoria_id, marca_id, proveedor_id, codigo, nombre, descripcion,
             presentacion, grado_alcohol, stock, stock_minimo, stock_maximo,
-            costo, precio, imagen, estado
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            costo, precio, imagen, estado, destacado
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ";
 
     $statement = $connection->prepare($sql);
@@ -344,7 +352,7 @@ if ($method === 'POST') {
     }
 
     $statement->bind_param(
-        'iiissssdiiiddsi',
+        'iiissssdiiiddsii',
         $data['categoryId'],
         $data['brandId'],
         $data['providerId'],
@@ -359,7 +367,8 @@ if ($method === 'POST') {
         $data['purchasePrice'],
         $data['price'],
         $data['image'],
-        $data['active']
+        $data['active'],
+        $data['featured']
     );
 
     if (!$statement->execute()) {
@@ -400,7 +409,7 @@ $sql = "
         categoria_id = ?, marca_id = ?, proveedor_id = ?, codigo = ?, nombre = ?,
         descripcion = ?, presentacion = ?, grado_alcohol = ?, stock = ?,
         stock_minimo = ?, stock_maximo = ?, costo = ?, precio = ?, imagen = ?,
-        estado = ?
+        estado = ?, destacado = ?
     WHERE id = ?
 ";
 
@@ -411,25 +420,26 @@ if (!$statement) {
     jsonResponse(500, ['message' => 'No fue posible preparar la actualización.']);
 }
 
-$statement->bind_param(
-    'iiissssdiiiddsii',
-    $data['categoryId'],
-    $data['brandId'],
-    $data['providerId'],
-    $data['sku'],
-    $data['name'],
-    $data['description'],
-    $data['presentation'],
-    $data['graduation'],
-    $data['stock'],
-    $data['minStock'],
-    $data['maxStock'],
-    $data['purchasePrice'],
-    $data['price'],
-    $data['image'],
-    $data['active'],
-    $id
-);
+    $statement->bind_param(
+        'iiissssdiiiddsiii',
+        $data['categoryId'],
+        $data['brandId'],
+        $data['providerId'],
+        $data['sku'],
+        $data['name'],
+        $data['description'],
+        $data['presentation'],
+        $data['graduation'],
+        $data['stock'],
+        $data['minStock'],
+        $data['maxStock'],
+        $data['purchasePrice'],
+        $data['price'],
+        $data['image'],
+        $data['active'],
+        $data['featured'],
+        $id
+    );
 
 if (!$statement->execute()) {
     $errno = $statement->errno;

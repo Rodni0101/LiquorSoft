@@ -662,3 +662,25 @@ td small {
   background: #f8e9ed;
   border-color: #e5cbd3;
 }
+
+/* Búsqueda y filtros del catálogo */
+.filter-bar { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+.filter-bar input,
+.filter-bar select {
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1px solid #49303A;
+  border-radius: 8px;
+  color: #F8F1F3;
+  background: #21171C;
+  font: inherit;
+  font-size: .82rem;
+}
+.filter-bar input { flex: 1; min-width: 200px; }
+.filter-bar .btn-secondary { min-height: 38px; }
+
+.no-results { padding: 26px; color: #D0C0C6; text-align: center; }
+
+:host-context(html[data-theme='light']) .filter-bar input,
+:host-context(html[data-theme='light']) .filter-bar select { background: #fff; border-color: #DFCBD3; color: #29151C; }
+:host-context(html[data-theme='light']) .no-results { color: #62515A; }

@@ -20,7 +20,7 @@ if (isset($_GET['id'])) {
     $stmt = $connection->prepare(
         "SELECT p.id, p.nombre AS name, COALESCE(c.nombre, 'Sin categoría') AS category,
                 COALESCE(p.descripcion, '') AS description, p.precio AS price, p.stock, p.imagen AS image,
-                0 AS featured
+                p.destacado AS featured
          FROM productos p
          LEFT JOIN categorias c ON c.id = p.categoria_id
          WHERE p.id = ? AND p.estado = 1
@@ -49,19 +49,14 @@ if (isset($_GET['id'])) {
         ? (string) $product['image']
         : null;
     $product['featured'] = (bool) $product['featured'];
-    $product['icon'] = match ($product['category']) {
-        'Vinos' => 'bi bi-wine',
-        'Cervezas' => 'bi bi-cup-straw',
-        'Mixers' => 'bi bi-droplet-half',
-        default => 'bi bi-cup',
-    };
+    $product['icon'] = productIcon((string) $product['category']);
 
     // Productos relacionados de la misma categoría
     $related = [];
     $relStmt = $connection->prepare(
         "SELECT p.id, p.nombre AS name, COALESCE(c.nombre, 'Sin categoría') AS category,
                 COALESCE(p.descripcion, '') AS description, p.precio AS price, p.stock, p.imagen AS image,
-                0 AS featured
+                p.destacado AS featured
          FROM productos p
          LEFT JOIN categorias c ON c.id = p.categoria_id
          WHERE p.id != ? AND p.estado = 1 AND COALESCE(c.nombre, '') = ?
@@ -80,12 +75,7 @@ if (isset($_GET['id'])) {
                 ? (string) $rel['image']
                 : null;
             $rel['featured'] = (bool) $rel['featured'];
-            $rel['icon'] = match ($rel['category']) {
-                'Vinos' => 'bi bi-wine',
-                'Cervezas' => 'bi bi-cup-straw',
-                'Mixers' => 'bi bi-droplet-half',
-                default => 'bi bi-cup',
-            };
+            $rel['icon'] = productIcon((string) $rel['category']);
             $related[] = $rel;
         }
         $relStmt->close();
@@ -99,10 +89,10 @@ if (isset($_GET['id'])) {
 $result = $connection->query(
     "SELECT p.id, p.nombre AS name, COALESCE(c.nombre, 'Sin categoría') AS category,
             COALESCE(p.descripcion, '') AS description, p.precio AS price, p.stock, p.imagen AS image,
-            0 AS featured
+            p.destacado AS featured
      FROM productos p
      LEFT JOIN categorias c ON c.id = p.categoria_id
-     WHERE p.estado = 1 ORDER BY p.nombre ASC"
+     WHERE p.estado = 1 ORDER BY p.destacado DESC, p.nombre ASC"
 );
 if (!$result) {
     error_log('LiquorSoft products query failed: ' . $connection->error);
@@ -118,12 +108,7 @@ while ($product = $result->fetch_assoc()) {
         ? (string) $product['image']
         : null;
     $product['featured'] = (bool) $product['featured'];
-    $product['icon'] = match ($product['category']) {
-        'Vinos' => 'bi bi-wine',
-        'Cervezas' => 'bi bi-cup-straw',
-        'Mixers' => 'bi bi-droplet-half',
-        default => 'bi bi-cup',
-    };
+    $product['icon'] = productIcon((string) $product['category']);
     $products[] = $product;
 }
 $connection->close();

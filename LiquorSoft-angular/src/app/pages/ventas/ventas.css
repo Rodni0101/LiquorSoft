@@ -530,6 +530,25 @@ padding: 17px;
   border-color: rgba(239, 68, 68, 0.3);
 }
 
+/* Estados de ventas (ventas.estado en minúsculas) */
+.status-pill.status-completada {
+  background: rgba(34, 197, 94, 0.15);
+  color: #86efac;
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.status-pill.status-pendiente {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fde68a;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.status-pill.status-cancelada {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
 .manage-btn {
   padding: 6px 14px;
   border: 1px solid var(--rose, #b83d5b);

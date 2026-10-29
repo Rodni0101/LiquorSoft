@@ -1,1 +1,110 @@
-<app-admin-shell><section class="admin-page providers-page"><header class="page-heading"><div><span class="eyebrow">CADENA DE ABASTECIMIENTO</span><h1>Proveedores</h1><p>Administra los aliados que abastecen tu inventario.</p></div></header>@if (errorMessage) { <p class="notice error" role="alert">{{ errorMessage }}</p> } @if (successMessage) { <p class="notice success" role="status">{{ successMessage }}</p> }<div class="providers-grid"><section class="panel"><div class="panel-heading"><div><span class="eyebrow">NUEVO PROVEEDOR</span><h2>Registrar proveedor</h2></div></div><form (ngSubmit)="save()"><label>Empresa<input [(ngModel)]="form.name" name="name" required /></label><label>NIT / identificación<input [(ngModel)]="form.identification" name="identification" /></label><label>Contacto<input [(ngModel)]="form.contact" name="contact" /></label><label>Teléfono<input [(ngModel)]="form.phone" name="phone" /></label><label>Correo<input type="email" [(ngModel)]="form.email" name="email" /></label><label>Dirección<input [(ngModel)]="form.address" name="address" /></label><button class="primary-action" type="submit" [disabled]="saving">{{ saving ? 'Guardando…' : 'Guardar proveedor' }}</button></form></section><section class="panel"><div class="panel-heading"><div><span class="eyebrow">REGISTRO</span><h2>Proveedores activos</h2></div><span class="record-count">{{ providers.length }} registros</span></div>@if (loading) { <p class="empty-state">Cargando proveedores…</p> } @else if (!providers.length) { <p class="empty-state">No hay proveedores registrados.</p> } @else { <div class="table-wrap"><table><thead><tr><th>Empresa</th><th>Contacto</th><th>Correo</th><th>Estado</th></tr></thead><tbody>@for (provider of providers; track provider.id) { <tr><td><strong>{{ provider.name }}</strong><small>{{ provider.identification || 'Sin identificación' }}</small></td><td>{{ provider.contact || '—' }}<small>{{ provider.phone || '—' }}</small></td><td>{{ provider.email || '—' }}</td><td><span class="status">{{ provider.active ? 'Activo' : 'Inactivo' }}</span></td></tr> }</tbody></table></div> }</section></div></section></app-admin-shell>
+<app-admin-shell>
+  <section class="admin-page providers-page">
+    <header class="page-heading">
+      <div>
+        <span class="eyebrow">CADENA DE ABASTECIMIENTO</span>
+        <h1>Proveedores</h1>
+        <p>Administra los aliados que abastecen tu inventario.</p>
+      </div>
+    </header>
+
+    @if (errorMessage) { <p class="notice error" role="alert">{{ errorMessage }}</p> }
+    @if (successMessage) { <p class="notice success" role="status">{{ successMessage }}</p> }
+
+    <div class="providers-layout">
+      <section class="panel">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">{{ editingId === null ? 'NUEVO PROVEEDOR' : 'EDITANDO PROVEEDOR' }}</span>
+            <h2>{{ editingId === null ? 'Registrar proveedor' : 'Actualizar proveedor' }}</h2>
+          </div>
+        </div>
+        <form (ngSubmit)="save()">
+          <label>Empresa
+            <input [(ngModel)]="form.name" name="name" required maxlength="120" />
+          </label>
+          <label>NIT / identificación
+            <input [(ngModel)]="form.identification" name="identification" maxlength="40" />
+          </label>
+          <label>Contacto
+            <input [(ngModel)]="form.contact" name="contact" maxlength="100" />
+          </label>
+          <label>Teléfono
+            <input type="tel" [(ngModel)]="form.phone" name="phone" maxlength="20" />
+          </label>
+          <label>Correo
+            <input type="email" [(ngModel)]="form.email" name="email" maxlength="120" />
+          </label>
+          <label>Dirección
+            <input [(ngModel)]="form.address" name="address" maxlength="200" />
+          </label>
+          <div class="form-actions">
+            @if (editingId !== null) {
+              <button class="secondary-action" type="button" (click)="cancelEdit()" [disabled]="saving">Cancelar</button>
+            }
+            <button class="primary-action" type="submit" [disabled]="saving">
+              {{ saving ? 'Guardando…' : (editingId === null ? 'Guardar proveedor' : 'Guardar cambios') }}
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">REGISTRO</span>
+            <h2>Proveedores</h2>
+          </div>
+          <span class="record-count">{{ activeCount }} activos / {{ providers.length }}</span>
+        </div>
+
+        @if (loading) {
+          <p class="empty-state">Cargando proveedores…</p>
+        } @else if (!providers.length) {
+          <p class="empty-state">No hay proveedores registrados.</p>
+        } @else {
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Empresa</th><th>Contacto</th><th>Correo</th><th>Estado</th><th>Acciones</th></tr>
+              </thead>
+              <tbody>
+                @for (provider of providers; track provider.id) {
+                  <tr [class.inactive-row]="!provider.active">
+                    <td>
+                      <strong class="provider-name">{{ provider.name }}</strong>
+                      <small>{{ provider.identification || 'Sin identificación' }}</small>
+                    </td>
+                    <td>
+                      {{ provider.contact || '—' }}
+                      <small>{{ provider.phone || '—' }}</small>
+                    </td>
+                    <td>{{ provider.email || '—' }}</td>
+                    <td>
+                      <span class="status-badge" [class.inactive]="!provider.active">{{ provider.active ? 'Activo' : 'Inactivo' }}</span>
+                    </td>
+                    <td>
+                      <div class="row-actions">
+                        <button type="button" class="btn-icon" title="Editar" (click)="edit(provider)">
+                          <i class="bi bi-pencil"></i>
+                        </button>
+                        <button type="button" class="btn-icon" title="{{ provider.active ? 'Desactivar' : 'Activar' }}" (click)="toggle(provider)">
+                          <i class="bi" [class.bi-toggle-on]="provider.active" [class.bi-toggle-off]="!provider.active"></i>
+                        </button>
+                        @if (provider.active) {
+                          <button type="button" class="btn-icon danger" title="Dar de baja" (click)="deactivate(provider)">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    </div>
+  </section>
+</app-admin-shell>

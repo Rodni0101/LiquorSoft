@@ -20,6 +20,7 @@ interface PaymentConfig {
   simulatorEnabled: boolean;
   paypalEnabled: boolean;
   paypalStatus: string;
+  paypalEnvironment?: 'sandbox' | 'live';
   paypalClientId: string | null;
   paypalCurrency: 'USD';
   paypalCopPerUsd: number | null;
@@ -64,6 +65,7 @@ export class Checkout implements OnInit {
   protected simulatorEnabled = false;
   protected paypalEnabled = false;
   protected paypalStatus = 'missing_credentials';
+  protected paypalEnvironment: 'sandbox' | 'live' = 'sandbox';
   protected paypalClientId: string | null = null;
   protected paypalCopPerUsd: number | null = null;
   protected paypalOrderApproved = this.restoredPayPalAttempt.status === 'approved';
@@ -176,6 +178,7 @@ export class Checkout implements OnInit {
         this.simulatorEnabled = config.simulatorEnabled;
         this.paypalEnabled = config.paypalEnabled;
         this.paypalStatus = config.paypalStatus;
+        this.paypalEnvironment = config.paypalEnvironment ?? 'sandbox';
         this.paypalClientId = config.paypalClientId;
         this.paypalCopPerUsd = config.paypalCopPerUsd;
         if (this.paypalEnabled && !this.simulatorEnabled) this.method = 'paypal';
@@ -203,11 +206,11 @@ export class Checkout implements OnInit {
   protected paypalUnavailableMessage(): string {
     return ({
       missing_credentials: 'faltan las credenciales del servidor.',
-      invalid_environment: 'PAYPAL_ENVIRONMENT debe ser exactamente sandbox.',
+      invalid_environment: 'PAYPAL_ENVIRONMENT debe ser sandbox o live.',
       invalid_exchange_rate: 'falta una tasa COP por USD positiva en backend/.env.',
       curl_unavailable: 'PHP necesita la extensión cURL.',
     } as Record<string, string>)[this.paypalStatus]
-      ?? 'revisa la configuración Sandbox del servidor.';
+      ?? 'revisa la configuración de PayPal del servidor.';
   }
 
   protected selectPaymentMethod(method: PaymentMethod): void {

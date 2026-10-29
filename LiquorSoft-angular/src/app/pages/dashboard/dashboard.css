@@ -569,3 +569,44 @@ nav a.active {
   color: #991B1B;
   border-color: #E5A0A0;
 }
+/* Revisión de productos con stock <= 10 */
+.low-stock-panel { margin-bottom: 20px; }
+.low-stock-hint { margin: 0 0 10px; color: #D0C0C6; font-size: .8rem; line-height: 1.5; }
+.low-stock-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0 22px;
+}
+.low-stock-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 4px;
+  border-bottom: 1px solid #38252D;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 6px;
+}
+.low-stock-row:hover { background: #302027; }
+.low-stock-info { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.low-stock-info strong { color: #FFFFFF; font-size: .84rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.low-stock-info small { color: #D0C0C6; font-size: .72rem; }
+.low-stock-row .stock { flex-shrink: 0; font-weight: 750; }
+.stock.empty { color: #FCA5A5; }
+.low-stock-empty {
+  margin: 0;
+  padding: 18px;
+  border: 1px dashed #49303A;
+  border-radius: 10px;
+  color: #D0C0C6;
+  font-size: .82rem;
+  text-align: center;
+}
+
+:host-context([data-theme="light"]) .low-stock-hint,
+:host-context([data-theme="light"]) .low-stock-info small { color: #62515A; }
+:host-context([data-theme="light"]) .low-stock-row { border-bottom-color: #E7CCD5; }
+:host-context([data-theme="light"]) .low-stock-row:hover { background: #F9EDF1; }
+:host-context([data-theme="light"]) .low-stock-info strong { color: #29151C; }
+:host-context([data-theme="light"]) .low-stock-empty { border-color: #DFCBD3; color: #62515A; }
+:host-context([data-theme="light"]) .stock.empty { color: #B91C1C; }

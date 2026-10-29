@@ -24,7 +24,7 @@
         <article class="metric-card">
           <span class="metric-icon green bi bi-check2-circle"></span><small>Productos disponibles</small
           ><strong>{{ dashboard.stats.availableProducts }}</strong
-          ><em>Sobre el mínimo</em>
+          ><em>Con existencias</em>
         </article>
         <article class="metric-card">
           <span class="metric-icon blue bi bi-box-seam"></span><small>Unidades en stock</small
@@ -39,7 +39,7 @@
         <article class="metric-card">
           <span class="metric-icon red bi bi-exclamation-triangle"></span><small>Stock bajo</small
           ><strong>{{ dashboard.stats.lowStock }}</strong
-          ><em>Requieren atención</em>
+          ><em>Con 10 unidades o menos</em>
         </article>
         <article class="metric-card">
           <span class="metric-icon red bi bi-x-circle"></span><small>Agotados</small
@@ -56,6 +56,34 @@
           ><strong>{{ dashboard.stats.activeUsers }}</strong
           ><em>Con acceso al sistema</em>
         </article>
+      </section>
+      <section class="panel low-stock-panel">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">REVISIÓN DE INVENTARIO</span>
+            <h2>Productos con stock ≤ 10</h2>
+          </div>
+          <a routerLink="/admin/inventario">Reabastecer →</a>
+        </div>
+        @if (dashboard.lowStockProducts.length) {
+          <p class="low-stock-hint">Verifica estos productos y registra entradas de inventario antes de que se agoten.</p>
+          <div class="low-stock-list">
+            @for (product of dashboard.lowStockProducts; track product.id) {
+              <a routerLink="/admin/inventario" class="low-stock-row">
+                <span class="product-avatar"><i class="bi bi-bottle"></i></span>
+                <span class="low-stock-info">
+                  <strong>{{ product.name }}</strong>
+                  <small>{{ product.category }} · mínimo {{ product.minStock }} und.</small>
+                </span>
+                <span class="stock" [class.low]="product.stock > 0" [class.empty]="product.stock === 0">
+                  {{ product.stock === 0 ? 'Agotado' : product.stock + ' und.' }}
+                </span>
+              </a>
+            }
+          </div>
+        } @else {
+          <p class="low-stock-empty">Todo el inventario supera las 10 unidades. No hay productos por revisar.</p>
+        }
       </section>
       <section class="content-grid">
         <article class="panel recent-panel">
@@ -74,7 +102,7 @@
                   <strong>{{ product.name }}</strong
                   ><small>{{ product.category }}</small>
                 </div>
-                <span class="stock" [class.low]="product.stock <= 5">{{ product.stock }} und.</span
+                <span class="stock" [class.low]="product.stock > 0 && product.stock <= 10" [class.empty]="product.stock === 0">{{ product.stock }} und.</span
                 ><b>{{ formatPrice(product.price) }}</b>
               </div>
             }

@@ -13,6 +13,7 @@ jsonResponse(200, [
     'simulatorEnabled' => paymentSimulatorEnabled(),
     'paypalEnabled' => $paypal['enabled'],
     'paypalStatus' => $paypal['configurationStatus'],
+    'paypalEnvironment' => $paypal['environment'],
     'paypalClientId' => $paypal['enabled'] ? $paypal['clientId'] : null,
     'paypalCurrency' => $paypal['currency'],
     'paypalCopPerUsd' => $paypal['enabled'] ? $paypal['copPerUsd'] : null,

@@ -4,7 +4,7 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../notifications-helper.php';
 
 $connection = databaseConnection();
-$actor = requireRole($connection, ['Administrador', 'Trabajador']);
+$actor = requirePermission($connection, 'ventas');
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $result = $connection->query(
@@ -114,7 +114,7 @@ try {
     $transitions = [
         'CONFIRMADO' => ['PREPARANDO'],
         'PREPARANDO' => ['LISTO_PARA_COORDINAR'],
-        'LISTO_PARA_COORDINAR' => ['COMPLETADO'],
+        'LISTO_PARA_COORDINAR' => ['COMPLETADO', 'ENVIADO'],
         'ENVIADO' => ['ENTREGADO'],
     ];
     $previousStatus = (string) $current['estado'];
@@ -130,6 +130,9 @@ try {
     }
     if ($nextStatus === 'COMPLETADO' && $nextMethod === 'POR_COORDINAR') {
         throw new DomainException('Acuerda primero si será domicilio o recogida y registra el punto correspondiente.');
+    }
+    if ($nextStatus === 'ENVIADO' && $nextMethod !== 'DOMICILIO') {
+        throw new DomainException('Para marcar el pedido como enviado selecciona entrega a domicilio y registra la dirección.');
     }
     if (!$statusChanged && !$methodChanged) throw new DomainException('No hay cambios para guardar.');
 

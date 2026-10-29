@@ -101,8 +101,9 @@ if (paypalConfiguration()['enabled']) {
 }
 putenv('PAYPAL_COP_PER_USD=4000');
 putenv('PAYPAL_ENVIRONMENT=live');
-if (paypalConfiguration()['enabled']) {
-    fwrite(STDERR, "Live PayPal must remain disabled until explicitly implemented.\n");
+$liveConfiguration = paypalConfiguration();
+if (!$liveConfiguration['enabled'] || $liveConfiguration['apiUrl'] !== 'https://api-m.paypal.com') {
+    fwrite(STDERR, "Live PayPal must use the live API when explicitly configured.\n");
     exit(1);
 }
 putenv('PAYPAL_CLIENT_ID=');

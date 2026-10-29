@@ -48,7 +48,7 @@ export class Login {
               void this.router.navigateByUrl(returnUrl);
               return;
             }
-            void this.router.navigate([this.auth.isAdmin() ? '/admin/dashboard' : '/inicio']);
+            void this.router.navigateByUrl(this.auth.homeUrl());
           },
           error: () => {
             this.submitting = false;

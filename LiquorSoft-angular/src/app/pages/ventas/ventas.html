@@ -130,7 +130,7 @@
                     </td>
                     <td>
                       <span class="badge-payment" [class.paid]="order.paymentStatus === 'APROBADO' || order.paymentStatus === 'CAPTURADO'">
-                        {{ order.paymentStatus }}
+                        {{ paymentStatusLabel(order.paymentStatus) }}
                       </span>
                     </td>
                     <td>
@@ -223,7 +223,7 @@
                     <td>{{ sale.paymentMethod || '—' }}</td>
                     <td><strong class="order-total">{{ formatPrice(sale.total) }}</strong></td>
                     <td>
-                      <span class="status-pill" [class.cancelled]="sale.status !== 'completada'">
+                      <span class="status-pill status-{{ sale.status }}">
                         {{ statusLabel(sale.status) }}
                       </span>
                     </td>
@@ -262,7 +262,7 @@
               </div>
               <div class="summary-line">
                 <span>Total pagado:</span>
-                <strong>{{ formatPrice(selectedOrder.total) }} ({{ selectedOrder.paymentStatus }})</strong>
+                <strong>{{ formatPrice(selectedOrder.total) }} ({{ paymentStatusLabel(selectedOrder.paymentStatus) }})</strong>
               </div>
               <div class="summary-line">
                 <span>Estado actual:</span>
@@ -282,9 +282,9 @@
             <form class="status-form" (submit)="$event.preventDefault(); updateOrderStatus()">
               <div class="form-group">
                 <label for="next-status">Nuevo estado del pedido</label>
-                @if (getAllowedTransitions(selectedOrder.status).length > 0) {
+                @if (getAllowedTransitions(selectedOrder.status, selectedOrder.paymentStatus).length > 0) {
                   <select id="next-status" [(ngModel)]="nextStatus" name="nextStatus" class="form-select">
-                    @for (st of getAllowedTransitions(selectedOrder.status); track st) {
+                    @for (st of getAllowedTransitions(selectedOrder.status, selectedOrder.paymentStatus); track st) {
                       <option [value]="st">{{ statusLabel(st) }}</option>
                     }
                   </select>
@@ -295,7 +295,7 @@
                 }
               </div>
 
-              @if (getAllowedTransitions(selectedOrder.status).length > 0) {
+              @if (getAllowedTransitions(selectedOrder.status, selectedOrder.paymentStatus).length > 0) {
                 <div class="form-group">
                   <label for="next-method">Método de entrega / despacho</label>
                   <select id="next-method" [(ngModel)]="nextMethod" name="nextMethod" class="form-select">
@@ -344,7 +344,7 @@
                 <button type="button" class="btn-cancel" (click)="closeOrderModal()">
                   <i class="bi bi-x-lg"></i> Cancelar
                 </button>
-                @if (getAllowedTransitions(selectedOrder.status).length > 0) {
+                @if (getAllowedTransitions(selectedOrder.status, selectedOrder.paymentStatus).length > 0) {
                   <button
                     type="submit"
                     class="btn-save"

@@ -65,7 +65,8 @@ términos). El agente no puede crear cuentas ni aceptar condiciones legales.
      seleccionada.
    - No ejecutar las migraciones de `backend/database/migrations/` en una
      instalación nueva; ya están reflejadas en `schema.sql`.
-   - Crea roles, categorías, marcas, un proveedor y 7 productos de ejemplo.
+   - Crea roles, 5 categorías, 27 marcas, 3 proveedores y 29 productos con
+     imágenes locales.
 
 ## 4. Subir los archivos
 
@@ -118,26 +119,46 @@ crea `admin@liquorsoft.com` / `Admin1234*` y `cliente@liquorsoft.com` /
    curl -I https://TU-SUBDOMINIO/
    curl -s https://TU-SUBDOMINIO/api/products.php | head -c 300
    curl -s https://TU-SUBDOMINIO/api/payment-config.php
+   curl -s https://TU-SUBDOMINIO/api/site-config.php
    ```
-   La última debe responder con `"simulatorEnabled":true` y
-   `"methods":["nequi_simulado"]` en modo demo.
+   `payment-config.php` debe responder con `"simulatorEnabled":true` y
+   `"methods":["nequi_simulado"]` en modo demo. `site-config.php` debe incluir
+   el número de WhatsApp configurado; si está vacío, el botón no se muestra.
 4. Recorrido manual:
    - Inicio, catálogo, detalle de producto, carrito.
    - Checkout con el simulador (aprobado, rechazado, pendiente).
    - Registro e inicio de sesión.
    - Panel admin: dashboard, productos, inventario, ventas, usuarios.
+   - Botón de WhatsApp y enlaces de contacto.
    - Recargar una ruta interna (p. ej. `/catalogo`) para comprobar el rewrite.
    - `https://TU-SUBDOMINIO/.env` debe devolver **403**.
+   - La API debe incluir `X-Content-Type-Options`, `X-Frame-Options` y
+     `Referrer-Policy`; compruébalo con `curl -I`.
 
 ## 7. Pagos y servicios externos
 
 - **Modo demo:** `LIQUORSOFT_APP_ENV=development` + `LIQUORSOFT_PAYMENT_SIMULATOR=1`.
   Es la única forma de tener checkout sin credenciales de PayPal. No procesa
   dinero real.
-- **PayPal Sandbox (opcional):** completar `PAYPAL_CLIENT_ID` y
-  `PAYPAL_CLIENT_SECRET`, mantener `PAYPAL_ENVIRONMENT=sandbox`, y cambiar
+- **PayPal Sandbox (opcional):** completar `PAYPAL_CLIENT_ID`,
+  `PAYPAL_CLIENT_SECRET`, `PAYPAL_ENVIRONMENT=sandbox`,
+  `PAYPAL_COP_PER_USD` y `PAYPAL_WEBHOOK_ID`; cambiar
   `LIQUORSOFT_APP_ENV=production`. Sin credenciales, el checkout queda sin
   métodos de pago si el simulador está apagado.
+- **PayPal Live (cobros reales):** usar credenciales de una app Live, poner
+  `PAYPAL_ENVIRONMENT=live`, `LIQUORSOFT_APP_ENV=production`,
+  `LIQUORSOFT_COOKIE_SECURE=1` y una tasa COP/USD revisada. El botón mostrará
+  “PayPal” y procesará dinero real; prueba primero con un importe pequeño.
+- **Webhook de PayPal:** en PayPal Developer crea un webhook apuntando a
+  `https://TU-DOMINIO/api/paypal/webhook.php`, suscribe los eventos
+  `PAYMENT.CAPTURE.COMPLETED`, `PAYMENT.CAPTURE.DENIED` y
+  `PAYMENT.CAPTURE.REFUNDED`, y copia el ID en `PAYPAL_WEBHOOK_ID`. Sin ese ID
+  el endpoint responde 503 y PayPal reintenta. El webhook verifica la firma
+  contra la API de PayPal y guarda cada evento en `paypal_webhook_events`.
+- **WhatsApp y contacto:** `LIQUORSOFT_WHATSAPP_NUMBER` en formato
+  internacional sin signos (ej. `573001234567`), `LIQUORSOFT_WHATSAPP_MESSAGE`,
+  `LIQUORSOFT_BUSINESS_NAME` y `LIQUORSOFT_SUPPORT_EMAIL`. Si el número está
+  vacío, el botón flotante se oculta.
 - **Asistente IA (opcional):** `LIQUORSOFT_OPENAI_API_KEY`. Si falta o es inválida,
   `chat.php` responde con el asistente local; no rompe la tienda.
 - Nunca subir `backend/.env` ni claves reales al repositorio.
@@ -161,4 +182,6 @@ crea `admin@liquorsoft.com` / `Admin1234*` y `cliente@liquorsoft.com` /
 - Para volver atrás: restaurar los archivos anteriores y, si cambió el esquema,
   importar el respaldo.
 - Los cambios de esquema futuros deben reflejarse en `schema.sql` y, si aplica,
-  en una migración nueva.
+  en una migración nueva. Las migraciones `017_real_catalog_refresh.sql` y
+  `018_paypal_webhook_events.sql` ya están incluidas en `schema.sql`; no las
+  ejecutes por separado en una instalación nueva.

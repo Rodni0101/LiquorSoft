@@ -3,7 +3,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../config/database.php';
 
 $connection = databaseConnection();
-requireRole($connection, ['Administrador']);
+requirePermission($connection, 'ventas');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     $connection->close();

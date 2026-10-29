@@ -1,7 +1,6 @@
 import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { RouterLink } from '@angular/router';
 import { AdminShell } from '../../admin-shell';
 import { NotificationService } from '../../notification.service';
 
@@ -12,7 +11,7 @@ type ModalMode = 'create' | 'edit';
 
 @Component({
   standalone: true,
-  imports: [FormsModule, AdminShell, RouterLink],
+  imports: [FormsModule, AdminShell],
   selector: 'app-usuarios',
   styleUrl: './usuarios.css',
   templateUrl: './usuarios.html'
@@ -66,18 +65,23 @@ export class Usuarios implements OnInit {
     this.modalMode = 'create';
     this.editingUserId = null;
     this.resetForm();
+    this.errorMessage = '';
+    this.successMessage = '';
     this.modalOpen = true;
   }
 
   protected openEditModal(user: ManagedUser): void {
     this.modalMode = 'edit';
     this.editingUserId = user.id;
-    this.formName = user.name.split(' ')[0] ?? '';
-    this.formLastName = user.name.slice(user.name.indexOf(' ') + 1) ?? '';
+    const [first, ...rest] = user.name.trim().split(/\s+/);
+    this.formName = first ?? '';
+    this.formLastName = rest.join(' ');
     this.formEmail = user.email;
     this.formPhone = user.phone;
     this.formRoleId = user.roleId;
     this.formPassword = '';
+    this.errorMessage = '';
+    this.successMessage = '';
     this.modalOpen = true;
   }
 
@@ -95,7 +99,8 @@ export class Usuarios implements OnInit {
     this.formEmail = '';
     this.formPhone = '';
     this.formPassword = '';
-    this.formRoleId = this.roles.length ? this.roles[0].id : null;
+    const preferred = this.roles.find(role => role.name.toLowerCase() === 'vendedor') ?? this.roles.find(role => role.name.toLowerCase() !== 'administrador') ?? this.roles[0];
+    this.formRoleId = preferred ? preferred.id : null;
   }
 
   protected saveUser(): void {
@@ -145,12 +150,15 @@ export class Usuarios implements OnInit {
         },
       });
     } else if (this.editingUserId) {
-      const updates: Record<string, unknown> = { userId: this.editingUserId, rol_id: this.formRoleId };
-      // Si se proporciona nombre/apellido/correo, se pueden actualizar también
-      if (this.formName.trim()) updates['nombre'] = this.formName.trim();
-      if (this.formLastName.trim()) updates['apellido'] = this.formLastName.trim();
-      if (this.formEmail.trim()) updates['correo'] = this.formEmail.trim();
-      if (this.formPhone !== undefined) updates['telefono'] = this.formPhone.trim();
+      const updates: Record<string, unknown> = {
+        userId: this.editingUserId,
+        roleId: this.formRoleId,
+        nombre: this.formName.trim(),
+        apellido: this.formLastName.trim(),
+        correo: this.formEmail.trim(),
+        telefono: this.formPhone.trim(),
+      };
+      if (this.formPassword) updates['password'] = this.formPassword;
 
       this.http.patch('/api/admin/users.php', updates, { withCredentials: true }).subscribe({
         next: () => {
@@ -171,24 +179,20 @@ export class Usuarios implements OnInit {
   }
 
   protected async deleteUser(user: ManagedUser): Promise<void> {
-    if (user.id === 1) {
-      this.errorMessage = 'No se puede eliminar el administrador del sistema.';
-      return;
-    }
     const confirmado = await this.notification.confirm({
-      title: 'Eliminar usuario',
-      message: `¿Eliminar la cuenta de "${user.name}" (${user.email})? Esta acción no se puede deshacer.`,
-      acceptLabel: 'Sí, eliminar',
+      title: 'Dar de baja usuario',
+      message: `¿Desactivar la cuenta de "${user.name}" (${user.email})? El historial se conserva y podrás reactivarla cuando quieras.`,
+      acceptLabel: 'Sí, dar de baja',
     });
     if (!confirmado) return;
 
     this.http.delete('/api/admin/users.php', { body: { userId: user.id }, withCredentials: true }).subscribe({
       next: () => {
-        this.notification.showSuccess('Usuario eliminado correctamente.');
+        this.notification.showSuccess('Usuario desactivado correctamente.');
         this.loadUsers();
       },
       error: (err) => {
-        this.errorMessage = err.error?.message ?? 'No fue posible eliminar el usuario.';
+        this.errorMessage = err.error?.message ?? 'No fue posible desactivar el usuario.';
         this.notification.showError(this.errorMessage);
         this.changeDetector.markForCheck();
       },
@@ -197,13 +201,14 @@ export class Usuarios implements OnInit {
 
   protected toggleActive(user: ManagedUser): void {
     const nuevoEstado = !user.active;
-    this.http.patch('/api/admin/users.php', { userId: user.id, rol_id: user.roleId, activo: nuevoEstado }, { withCredentials: true }).subscribe({
+    this.http.patch('/api/admin/users.php', { userId: user.id, active: nuevoEstado }, { withCredentials: true }).subscribe({
       next: () => {
         user.active = nuevoEstado;
         this.notification.showSuccess(`Usuario ${nuevoEstado ? 'activado' : 'desactivado'}.`);
+        this.changeDetector.markForCheck();
       },
-      error: () => {
-        this.notification.showError('No fue posible cambiar el estado del usuario.');
+      error: (err) => {
+        this.notification.showError(err.error?.message ?? 'No fue posible cambiar el estado del usuario.');
       },
     });
   }

@@ -4,13 +4,13 @@ require_once __DIR__ . '/database.php';
 
 function paypalConfiguration(): array
 {
-    $environment = liquorsoftEnv('PAYPAL_ENVIRONMENT', 'sandbox');
+    $environment = mb_strtolower(trim(liquorsoftEnv('PAYPAL_ENVIRONMENT', 'sandbox')));
     $rate = filter_var(liquorsoftEnv('PAYPAL_COP_PER_USD', ''), FILTER_VALIDATE_FLOAT);
     $clientId = liquorsoftEnv('PAYPAL_CLIENT_ID', '');
     $clientSecret = liquorsoftEnv('PAYPAL_CLIENT_SECRET', '');
     $configurationStatus = match (true) {
         $clientId === '' || $clientSecret === '' => 'missing_credentials',
-        $environment !== 'sandbox' => 'invalid_environment',
+        !in_array($environment, ['sandbox', 'live'], true) => 'invalid_environment',
         $rate === false || $rate <= 0 || !is_finite((float) $rate) => 'invalid_exchange_rate',
         !function_exists('curl_init') => 'curl_unavailable',
         default => 'configured',
@@ -24,7 +24,8 @@ function paypalConfiguration(): array
         'environment' => $environment,
         'currency' => 'USD',
         'copPerUsd' => $rate !== false && $rate > 0 ? (float) $rate : null,
-        'apiUrl' => 'https://api-m.sandbox.paypal.com',
+        'apiUrl' => $environment === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com',
+        'webhookId' => liquorsoftEnv('PAYPAL_WEBHOOK_ID', ''),
     ];
 }
 
@@ -32,7 +33,7 @@ function paypalOAuthConfigurationStatus(array $configuration): string
 {
     return match (true) {
         $configuration['clientId'] === '' || $configuration['clientSecret'] === '' => 'missing_credentials',
-        $configuration['environment'] !== 'sandbox' => 'invalid_environment',
+        !in_array($configuration['environment'], ['sandbox', 'live'], true) => 'invalid_environment',
         !function_exists('curl_init') => 'curl_unavailable',
         default => 'configured',
     };
@@ -132,7 +133,7 @@ function paypalCredentialDiagnostic(): array
         'status' => $oauth['status'],
         'httpStatus' => $oauth['httpStatus'],
         'authenticated' => $oauth['status'] === 'authenticated',
-        'environment' => 'sandbox',
+        'environment' => $configuration['environment'],
         'paymentEnabled' => $configuration['enabled'] && $oauth['status'] === 'authenticated',
         'paymentConfigurationStatus' => $configuration['configurationStatus'],
     ];
@@ -224,4 +225,24 @@ function paypalApiRequest(string $method, string $path, ?array $body = null, arr
         throw new RuntimeException('PayPal no pudo completar la operación.');
     }
     return $response;
+}
+
+
+/**
+ * Reembolsa una captura completa. Se usa cuando el cobro se completó en PayPal
+ * pero la transacción local no pudo finalizar (por ejemplo, cambió el stock).
+ */
+function paypalRefundCapture(string $captureId, string $idempotencyKey): string
+{
+    $response = paypalApiRequest(
+        'POST',
+        '/v2/payments/captures/' . rawurlencode($captureId) . '/refund',
+        null,
+        ['PayPal-Request-Id: ' . substr(hash('sha256', 'refund-' . $idempotencyKey), 0, 36)]
+    );
+    $status = (string) ($response['status'] ?? '');
+    if (!in_array($status, ['COMPLETED', 'PENDING'], true)) {
+        throw new RuntimeException('PayPal no confirmó el reembolso de la captura.');
+    }
+    return (string) ($response['id'] ?? '');
 }

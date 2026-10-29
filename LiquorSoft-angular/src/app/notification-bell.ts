@@ -12,6 +12,7 @@ import { AuthService } from './auth.service';
     <div class="bell-container" (keydown.escape)="service.closePanel()">
       <button
         type="button"
+        #bellBtn
         class="bell-button"
         [attr.aria-expanded]="service.isOpen()"
         [attr.aria-label]="service.unreadCount() > 0 ? 'Notificaciones: ' + service.unreadCount() + ' sin leer' : 'Notificaciones'"
@@ -120,11 +121,11 @@ import { AuthService } from './auth.service';
 
           <footer class="dropdown-footer">
             <a
-              [routerLink]="auth.isAdmin() ? '/admin/ventas' : '/pedidos'"
+              [routerLink]="auth.can('ventas') ? '/admin/ventas' : auth.can('dashboard') ? '/admin/dashboard' : '/pedidos'"
               (click)="service.closePanel()"
               class="footer-link"
             >
-              {{ auth.isAdmin() ? 'Ver panel de pedidos' : 'Ver todos mis pedidos' }} →
+              {{ auth.can('ventas') ? 'Ver panel de pedidos' : auth.can('dashboard') ? 'Ver resumen' : 'Ver todos mis pedidos' }} →
             </a>
           </footer>
         </section>
@@ -218,8 +219,10 @@ export class NotificationBell implements AfterViewInit, OnDestroy {
     }
     this.service.closePanel();
 
-    if (this.auth.isAdmin()) {
+    if (this.auth.can('ventas')) {
       void this.router.navigate(['/admin/ventas']);
+    } else if (this.auth.can('dashboard')) {
+      void this.router.navigate(['/admin/dashboard']);
     } else {
       void this.router.navigate(['/pedidos']);
     }

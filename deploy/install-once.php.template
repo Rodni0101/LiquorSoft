@@ -165,8 +165,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 . "PAYPAL_CLIENT_SECRET=\n"
                 . "PAYPAL_ENVIRONMENT=sandbox\n"
                 . "PAYPAL_COP_PER_USD=4000\n"
+                . "PAYPAL_WEBHOOK_ID=\n"
                 . "LIQUORSOFT_OPENAI_API_KEY=\n"
-                . "LIQUORSOFT_OPENAI_MODEL=gpt-4.1-mini\n";
+                . "LIQUORSOFT_OPENAI_MODEL=gpt-4.1-mini\n"
+                . "LIQUORSOFT_WHATSAPP_NUMBER=\n"
+                . "LIQUORSOFT_WHATSAPP_MESSAGE=Hola LiquorSoft, quiero información sobre sus productos.\n"
+                . "LIQUORSOFT_BUSINESS_NAME=LiquorSoft\n"
+                . "LIQUORSOFT_SUPPORT_EMAIL=\n";
 
             $temporary = $envFile . '.tmp';
             if (file_put_contents($temporary, $env) === false || !rename($temporary, $envFile)) {

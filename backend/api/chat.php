@@ -96,9 +96,9 @@ if (preg_match('/\b(envios?|domicilio|entregas?|horarios?|devoluciones?|direccio
     $types = '';
     $values = [];
     if ($category !== null) {
-        $sql .= ' AND LOWER(c.nombre) = ?';
+        $sql .= ' AND LOWER(c.nombre) LIKE ?';
         $types .= 's';
-        $values[] = $category;
+        $values[] = '%' . $category . '%';
     }
     if ($budget !== null) {
         $sql .= ' AND p.precio <= ?';
@@ -178,8 +178,18 @@ function chatExtractBudget(string $message): ?float
 
 function chatExtractCategory(string $normalized): ?string
 {
-    foreach (['whisky', 'ron', 'vodka', 'tequila', 'vinos', 'cervezas', 'gin', 'mixers'] as $category) {
-        if (preg_match('/\b' . preg_quote($category, '/') . '\b/', $normalized) === 1) {
+    $map = [
+        'whisky' => 'licor', 'whiski' => 'licor', 'ron' => 'licor', 'vodka' => 'licor',
+        'aguardiente' => 'licor', 'licor' => 'licor', 'licores' => 'licor',
+        'gin' => 'ginebra', 'ginebra' => 'ginebra', 'ginebras' => 'ginebra',
+        'tequila' => 'tequila', 'tequilas' => 'tequila',
+        'vino' => 'vino', 'vinos' => 'vino', 'espumoso' => 'vino', 'champan' => 'vino', 'champagne' => 'vino',
+        'cerveza' => 'cerveza', 'cervezas' => 'cerveza',
+        'mixer' => 'mixer', 'mixers' => 'mixer',
+        'crema' => 'crema', 'cremas' => 'crema',
+    ];
+    foreach ($map as $term => $category) {
+        if (preg_match('/\b' . preg_quote($term, '/') . '\b/', $normalized) === 1) {
             return $category;
         }
     }

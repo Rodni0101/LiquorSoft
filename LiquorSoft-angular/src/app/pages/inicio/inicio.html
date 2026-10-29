@@ -189,17 +189,17 @@
             <p class="catalog-state" role="status">Cargando selección…</p>
           } @else if (productsError) {
             <p class="catalog-state" role="alert">No fue posible cargar el catálogo en este momento.</p>
-          } @else if (products.length) {
+          } @else if (featuredProduct; as featured) {
             <div class="product-layout">
-              <a routerLink="/productos" class="featured-product">
+              <a [routerLink]="['/productos', featured.id]" class="featured-product">
                 <span class="product-tag">DESTACADO</span>
-                <app-product-visual class="featured-image" [category]="products[0].category" [imageUrl]="products[0].image || null" [altText]="products[0].name" />
-                <div class="featured-info"><span>{{ products[0].category }}</span><h3>{{ products[0].name }}</h3><strong>{{ formatPrice(products[0].price) }}</strong></div>
+                <app-product-visual class="featured-image" [category]="featured.category" [imageUrl]="featured.image || null" [altText]="featured.name" />
+                <div class="featured-info"><span>{{ featured.category }}</span><h3>{{ featured.name }}</h3><strong>{{ formatPrice(featured.price) }}</strong></div>
                 <span class="round-arrow" aria-hidden="true"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
               </a>
               <div class="product-list">
-                @for (product of products.slice(1, 5); track product.name) {
-                  <a routerLink="/productos" class="product-row">
+                @for (product of secondaryProducts; track product.name) {
+                  <a [routerLink]="['/productos', product.id]" class="product-row">
                     <app-product-visual class="row-icon" [category]="product.category" [imageUrl]="product.image || null" [altText]="product.name" />
                     <span><small>{{ product.category }}</small><b>{{ product.name }}</b></span>
                     <strong>{{ formatPrice(product.price) }}</strong>

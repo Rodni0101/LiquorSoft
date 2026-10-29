@@ -17,7 +17,8 @@
       <span class="eyebrow">FINALIZAR COMPRA</span>
       <h1>Completa tu pedido</h1>
       <p>
-        Los importes e inventario se verifican en el servidor. PayPal Sandbox usa dinero de prueba.
+        Los importes e inventario se verifican en el servidor.
+        {{ paypalEnvironment === 'live' ? 'El pago con PayPal se procesa en USD.' : 'PayPal Sandbox usa dinero de prueba.' }}
       </p>
     </div>
     <ol class="checkout-steps" aria-label="Progreso de compra">
@@ -99,7 +100,8 @@
                 }
                 @if (paypalEnabled) {
                   <button type="button" [class.selected]="method === 'paypal'" [attr.aria-pressed]="method === 'paypal'" (click)="selectPaymentMethod('paypal')">
-                    <strong>PayPal Sandbox</strong><small>Pago de prueba en USD · No es un cobro real</small>
+                    <strong>{{ paypalEnvironment === 'live' ? 'PayPal' : 'PayPal Sandbox' }}</strong>
+                    <small>{{ paypalEnvironment === 'live' ? 'Pago seguro en USD' : 'Pago de prueba en USD · No es un cobro real' }}</small>
                   </button>
                 }
               </div>
@@ -140,12 +142,12 @@
               }
               @if (!paypalEnabled) {
                 <p class="pending-copy" role="status">
-                  PayPal Sandbox no está disponible: {{ paypalUnavailableMessage() }}
+                  {{ paypalEnvironment === 'live' ? 'PayPal' : 'PayPal Sandbox' }} no está disponible: {{ paypalUnavailableMessage() }}
                 </p>
               }
             } @else {
               <p class="checkout-error" role="status">
-                No hay métodos de pago habilitados. PayPal Sandbox: {{ paypalUnavailableMessage() }}
+                No hay métodos de pago habilitados. PayPal: {{ paypalUnavailableMessage() }}
               </p>
             }
           </section>
@@ -159,7 +161,7 @@
           @for (item of cart.items(); track item.id || item.name) {
             <div class="summary-product">
               <span
-                >{{ item.icon }} {{ item.name }} <small>× {{ item.quantity }}</small></span
+                ><i [class]="item.icon" aria-hidden="true"></i> {{ item.name }} <small>× {{ item.quantity }}</small></span
               >
               <div class="summary-prices">
                 <strong>{{ formatPrice(item.price * item.quantity) }}</strong>

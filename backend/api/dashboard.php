@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 }
 
 $connection = databaseConnection();
-requireRole($connection, ['Administrador']);
+requirePermission($connection, 'dashboard');
 
 function dashboardQuery(mysqli $connection, string $sql): mysqli_result
 {
@@ -22,11 +22,11 @@ function dashboardQuery(mysqli $connection, string $sql): mysqli_result
 
 $stats = dashboardQuery($connection,
     'SELECT COUNT(*) AS total_products,
-            COALESCE(SUM(stock > stock_minimo), 0) AS available_products,
+            COALESCE(SUM(stock > 0), 0) AS available_products,
             COALESCE(SUM(stock = 0), 0) AS out_of_stock,
             COALESCE(SUM(stock), 0) AS total_units,
             COALESCE(SUM(stock * precio), 0) AS inventory_value,
-            COALESCE(SUM(stock > 0 AND stock <= stock_minimo), 0) AS low_stock
+            COALESCE(SUM(stock <= 10), 0) AS low_stock
      FROM productos WHERE estado = 1'
 )->fetch_assoc() ?: [];
 
@@ -81,6 +81,30 @@ while ($product = $recentResult->fetch_assoc()) {
     $product['price'] = (float) $product['price'];
     $recent[] = $product;
 }
+
+// Productos que requieren revisión: stock de 10 unidades o menos.
+$lowStockSql = ($hasCategories && $hasCategories->num_rows)
+    ? 'SELECT p.id, p.nombre AS name, COALESCE(c.nombre, \'Sin categoría\') AS category,
+              p.stock, p.stock_minimo AS minStock, p.precio AS price
+       FROM productos p LEFT JOIN categorias c ON c.id = p.categoria_id
+       WHERE p.estado = 1 AND p.stock <= 10
+       ORDER BY p.stock ASC, p.nombre ASC LIMIT 50'
+    : 'SELECT p.id, p.nombre AS name, \'Sin categoría\' AS category,
+              p.stock, p.stock_minimo AS minStock, p.precio AS price
+       FROM productos p WHERE p.estado = 1 AND p.stock <= 10
+       ORDER BY p.stock ASC, p.nombre ASC LIMIT 50';
+$lowStockResult = dashboardQuery($connection, $lowStockSql);
+$lowStockProducts = [];
+while ($product = $lowStockResult->fetch_assoc()) {
+    $lowStockProducts[] = [
+        'id' => (int) $product['id'],
+        'name' => (string) $product['name'],
+        'category' => (string) $product['category'],
+        'stock' => (int) $product['stock'],
+        'minStock' => (int) ($product['minStock'] ?? 0),
+        'price' => (float) $product['price'],
+    ];
+}
 $connection->close();
 
 jsonResponse(200, [
@@ -99,4 +123,5 @@ jsonResponse(200, [
         'activeUsers' => (int) ($users['active_users'] ?? 0),
     ],
     'recentProducts' => $recent,
+    'lowStockProducts' => $lowStockProducts,
 ]);

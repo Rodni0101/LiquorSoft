@@ -7,6 +7,9 @@ $connection->close();
 if (!$user) {
     jsonResponse(401, ['message' => 'No hay una sesión activa.']);
 }
+// Renueva la cookie CSRF mientras la sesión siga activa para no bloquear
+// las acciones del panel cuando expire el token de 2 horas.
+issueCsrfCookie();
 jsonResponse(200, [
     'user' => [
         'id' => (int) $user['id'],
@@ -14,5 +17,6 @@ jsonResponse(200, [
         'email' => $user['correo'],
         'role' => (string) ($user['rol'] ?? ''),
         'roleId' => (int) ($user['rol_id'] ?? 0),
+        'permissions' => userPermissions($user),
     ],
 ]);

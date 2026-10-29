@@ -51,6 +51,7 @@ interface ProductForm {
   minStock: number;
   image: string;
   featured: boolean;
+  active: boolean;
 }
 
 @Component({
@@ -74,6 +75,8 @@ export class Productos implements OnInit {
   protected editingId: number | null = null;
   protected errorMessage = '';
   protected successMessage = '';
+  protected search = '';
+  protected statusFilter: 'all' | 'active' | 'inactive' | 'bajo' | 'agotado' = 'active';
 
   protected form: ProductForm = this.emptyForm();
 
@@ -96,7 +99,8 @@ export class Productos implements OnInit {
       stock: 0,
       minStock: 5,
       image: '',
-      featured: false
+      featured: false,
+      active: true
     };
   }
 
@@ -158,7 +162,8 @@ export class Productos implements OnInit {
       stock: product.stock ?? 0,
       minStock: product.minStock ?? 5,
       image: product.image ?? '',
-      featured: Boolean(product.featured)
+      featured: Boolean(product.featured),
+      active: product.active !== false
     };
 
     this.editingId = product.id;
@@ -234,7 +239,7 @@ export class Productos implements OnInit {
       minStock: this.form.minStock,
       image: this.form.image.trim() || null,
       featured: this.form.featured,
-      active: true
+      active: this.form.active
     };
 
     this.saving = true;
@@ -274,9 +279,9 @@ export class Productos implements OnInit {
 
   protected async deleteProduct(product: Product): Promise<void> {
     const confirmed = await this.notifications.confirm({
-      title: 'Eliminar producto',
-      message: `¿Seguro que deseas eliminar "${product.name}"?`,
-      acceptLabel: 'Eliminar',
+      title: 'Dar de baja producto',
+      message: `¿Dar de baja "${product.name}"? Dejará de verse en el catálogo público, pero se conserva el historial de ventas e inventario.`,
+      acceptLabel: 'Sí, dar de baja',
     });
 
     if (!confirmed) {
@@ -295,7 +300,7 @@ export class Productos implements OnInit {
         next: (response) => {
           this.saving = false;
           this.successMessage =
-            response.message || 'Producto eliminado correctamente.';
+            response.message || 'Producto dado de baja correctamente.';
           this.loadProducts();
           this.changeDetector.markForCheck();
         },
@@ -308,6 +313,30 @@ export class Productos implements OnInit {
           this.changeDetector.markForCheck();
         }
       });
+  }
+
+  protected get filteredProducts(): Product[] {
+    const term = this.search.trim().toLowerCase();
+    return this.products.filter(product => {
+      const matchesTerm = !term
+        || product.name.toLowerCase().includes(term)
+        || product.category.toLowerCase().includes(term)
+        || (product.sku ?? '').toLowerCase().includes(term)
+        || (product.brand ?? '').toLowerCase().includes(term);
+      if (!matchesTerm) return false;
+      switch (this.statusFilter) {
+        case 'active': return product.active !== false;
+        case 'inactive': return product.active === false;
+        case 'bajo': return product.stock > 0 && product.stock <= (product.minStock ?? 5);
+        case 'agotado': return product.stock < 1;
+        default: return true;
+      }
+    });
+  }
+
+  protected clearFilters(): void {
+    this.search = '';
+    this.statusFilter = 'all';
   }
 
   protected formatPrice(value: number): string {

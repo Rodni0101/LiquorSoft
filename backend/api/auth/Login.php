@@ -22,6 +22,10 @@ if (!filter_var($correo, FILTER_VALIDATE_EMAIL) || $password === '') {
     loginResponse(422, ['message' => 'Ingresa un correo y una contraseña válidos.']);
 }
 
+if (!liquorsoftRateLimitCheck('login', $correo, 5, 300)) {
+    loginResponse(429, ['message' => 'Demasiados intentos fallidos. Inténtalo más tarde.']);
+}
+
 mysqli_report(MYSQLI_REPORT_OFF);
 $connection = new mysqli(
     liquorsoftEnv('LIQURSOFT_DB_HOST', '127.0.0.1'),
@@ -48,8 +52,10 @@ $statement->close();
 $connection->close();
 
 if (!$user || !password_verify($password, $user['password_hash'])) {
+    liquorsoftRateLimitHit('login', $correo, 300);
     loginResponse(401, ['message' => 'El correo o la contraseña son incorrectos.']);
 }
+liquorsoftRateLimitClear('login', $correo);
 
 liquorsoftSessionStart();
 session_regenerate_id(true);

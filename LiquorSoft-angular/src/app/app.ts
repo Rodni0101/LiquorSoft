@@ -5,6 +5,7 @@ import { filter } from 'rxjs';
 import { CartService } from './cart.service';
 import { ProductVisual } from './product-visual';
 import { NotificationService } from './notification.service';
+import { SiteConfigService } from './site-config.service';
 
 interface ChatProduct {
   id: number; name: string; category: string; description: string;
@@ -39,6 +40,7 @@ export class App {
   private readonly http = inject(HttpClient);
   private readonly cart = inject(CartService);
   protected readonly notifications = inject(NotificationService);
+  protected readonly site = inject(SiteConfigService);
   @ViewChild('chatMessages') private chatMessages?: ElementRef<HTMLElement>;
   protected readonly chatOpen = signal(false);
   protected readonly chatBusy = signal(false);
@@ -99,9 +101,22 @@ export class App {
       matches = products.filter(product => product.stock > 0 && product.price < amount).slice(0, 3);
       answer = matches.length ? 'Estas opciones disponibles están dentro de ese presupuesto:' : 'No encontré productos disponibles dentro de ese presupuesto.';
     } else if (normalized.startsWith('buscar ')) {
-      const category = normalized.slice('buscar '.length).trim();
-      matches = products.filter(product => product.stock > 0 && this.normalizeCategory(product.category) === this.normalizeCategory(category)).slice(0, 3);
-      answer = matches.length ? `Estas opciones de ${category} están disponibles:` : `No encontré productos disponibles en la categoría ${category}.`;
+      const query = normalized.slice('buscar '.length).trim();
+      const synonyms: Record<string, string[]> = {
+        whisky: ['licor'], ron: ['licor'], vodka: ['licor'], aguardiente: ['licor'], licor: ['licor'],
+        gin: ['ginebra'], ginebra: ['ginebra'],
+        tequila: ['tequila'],
+        vino: ['vino', 'espumoso'], espumoso: ['vino', 'espumoso'], champan: ['vino', 'espumoso'], champagne: ['vino', 'espumoso'],
+        cerveza: ['cerveza'], mixer: ['mixer', 'complemento'], crema: ['crema'],
+      };
+      const terms = synonyms[query] ?? [query];
+      matches = products.filter(product => {
+        if (product.stock <= 0) return false;
+        const category = this.normalizeCategory(product.category);
+        const name = this.normalizeCategory(product.name);
+        return terms.some(term => category.includes(term) || name.includes(term));
+      }).slice(0, 3);
+      answer = matches.length ? `Estas opciones de ${query} están disponibles:` : `No encontré productos disponibles para "${query}".`;
     } else if (normalized.includes('productos disponibles')) {
       matches = products.filter(product => product.stock > 0).slice(0, 3);
       answer = matches.length ? 'Estos productos tienen existencias disponibles:' : 'No hay productos disponibles en este momento.';

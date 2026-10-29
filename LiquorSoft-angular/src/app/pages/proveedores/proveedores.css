@@ -157,6 +157,7 @@ border-radius: 12px;
 table {
 width: 100%;
 border-collapse: collapse;
+table-layout: fixed;
 text-align: left;
 }
 
@@ -172,12 +173,20 @@ font-weight: 800;
 white-space: nowrap;
 }
 
+/* Reparte el ancho para que la tabla quepa sin scroll horizontal en escritorio. */
+th:nth-child(1) { width: 24%; }
+th:nth-child(2) { width: 18%; }
+th:nth-child(3) { width: 22%; }
+th:nth-child(4) { width: 13%; }
+th:nth-child(5) { width: 23%; }
+
 td {
 padding: 14px;
 border-top: 1px solid #38252D;
 color: #F8F1F3;
 font-size: .85rem;
 vertical-align: middle;
+overflow-wrap: anywhere;
 }
 
 tbody tr {
@@ -335,3 +344,32 @@ padding: 24px 14px;
 padding: 17px;
 }
 }
+
+/* Acciones de gestión */
+.record-count { color: #D0C0C6; font-size: .8rem; white-space: nowrap; }
+.notice.success { border-color: #2f7d54; color: #b6f0cf; background: #123528; }
+.inactive-row td { opacity: .62; }
+.status-badge.inactive { border-color: #6b4a55; color: #d7b8c2; background: #2a1a20; }
+
+.form-actions { display: flex; gap: 10px; margin-top: 6px; }
+.form-actions .primary-action { flex: 1; }
+
+.row-actions { display: inline-flex; gap: 6px; }
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #60404C;
+  border-radius: 8px;
+  color: #F0DDE3;
+  background: #302027;
+  cursor: pointer;
+}
+.btn-icon:hover { border-color: #B83D5B; color: #fff; background: #3A1722; }
+.btn-icon.danger:hover { border-color: #ef4444; color: #fca5a5; }
+
+:host-context([data-theme='light']) .record-count { color: #62515A; }
+:host-context([data-theme='light']) .btn-icon { background: #fff; border-color: #CBB3BD; color: #6D0F1A; }
+:host-context([data-theme='light']) .status-badge.inactive { border-color: #CBB3BD; color: #6d5560; background: #f1e6ea; }

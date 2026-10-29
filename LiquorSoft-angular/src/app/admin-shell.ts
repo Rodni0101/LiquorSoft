@@ -16,7 +16,7 @@ template: ` <div class="admin-shell"> <aside class="sidebar"> <a routerLink="/in
       <span class="status-dot" aria-hidden="true"></span>
       <div class="identity-info">
         <strong>{{ auth.user()?.name }}</strong>
-        <small>Administrador</small>
+        <small>{{ auth.user()?.role || 'Usuario' }}</small>
       </div>
       <app-notification-bell class="admin-bell"></app-notification-bell>
     </div>

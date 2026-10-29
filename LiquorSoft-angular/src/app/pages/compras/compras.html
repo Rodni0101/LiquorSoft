@@ -1,1 +1,159 @@
-<app-admin-shell><section class="admin-page purchases-page"><header class="page-heading"><div><span class="eyebrow">ABASTECIMIENTO</span><h1>Compras</h1><p>Registra entradas con proveedor, costo, lote y vencimiento.</p></div></header>@if (errorMessage) { <p class="notice error" role="alert">{{ errorMessage }}</p> } @if (successMessage) { <p class="notice success" role="status">{{ successMessage }}</p> }<div class="purchases-grid"><section class="panel"><div class="panel-heading"><div><span class="eyebrow">NUEVA COMPRA</span><h2>Recibir mercancía</h2></div></div><form (ngSubmit)="save()"><label>Proveedor<select [(ngModel)]="supplierId" name="supplier" required><option [ngValue]="0">Selecciona proveedor</option>@for (provider of providers; track provider.id) { <option [ngValue]="provider.id">{{ provider.name }}</option> }</select></label><label>Producto<select [(ngModel)]="productId" name="product" required><option [ngValue]="0">Selecciona producto</option>@for (product of products; track product.id) { <option [ngValue]="product.id">{{ product.name }}</option> }</select></label><div class="two-columns"><label>Cantidad<input type="number" min="1" [(ngModel)]="quantity" name="quantity" required /></label><label>Costo unitario<input type="number" min="0" [(ngModel)]="cost" name="cost" required /></label></div><div class="two-columns"><label>Lote<input [(ngModel)]="batch" name="batch" placeholder="Opcional" /></label><label>Vencimiento<input type="date" [(ngModel)]="expiryDate" name="expiry" /></label></div><label>Factura<input [(ngModel)]="invoice" name="invoice" placeholder="Número de factura" /></label><button class="primary-action" type="submit" [disabled]="saving">{{ saving ? 'Registrando…' : 'Registrar compra y entrada' }}</button></form></section><section class="panel"><div class="panel-heading"><div><span class="eyebrow">HISTORIAL</span><h2>Compras recientes</h2></div><span class="record-count">{{ purchases.length }}</span></div>@if (loading) { <p class="empty-state">Cargando compras…</p> } @else if (!purchases.length) { <p class="empty-state">No hay compras registradas.</p> } @else { <div class="table-wrap"><table><thead><tr><th>Factura</th><th>Proveedor</th><th>Fecha</th><th>Total</th></tr></thead><tbody>@for (purchase of purchases; track purchase.id) { <tr><td>{{ purchase.invoice || '—' }}</td><td>{{ purchase.supplier }}</td><td>{{ purchase.purchaseDate }}</td><td><strong>{{ formatPrice(purchase.total) }}</strong></td></tr> }</tbody></table></div> }</section></div></section></app-admin-shell>
+<app-admin-shell>
+  <section class="admin-page purchases-page">
+    <header class="page-heading">
+      <div>
+        <span class="eyebrow">ABASTECIMIENTO</span>
+        <h1>Compras</h1>
+        <p>Registra entradas con proveedor, costo, lote y vencimiento. Puedes incluir varios productos en una misma compra.</p>
+      </div>
+    </header>
+
+    @if (errorMessage) { <p class="notice error" role="alert">{{ errorMessage }}</p> }
+    @if (successMessage) { <p class="notice success" role="status">{{ successMessage }}</p> }
+
+    <div class="purchases-layout">
+      <section class="panel">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">NUEVA COMPRA</span>
+            <h2>Recibir mercancía</h2>
+          </div>
+        </div>
+
+        <form (ngSubmit)="save()">
+          <label>Proveedor
+            <select [(ngModel)]="supplierId" name="supplier" required>
+              <option [ngValue]="0">Selecciona proveedor</option>
+              @for (provider of activeProviders; track provider.id) {
+                <option [ngValue]="provider.id">{{ provider.name }}</option>
+              }
+            </select>
+          </label>
+
+          <div class="two-columns">
+            <label>Factura
+              <input [(ngModel)]="invoice" name="invoice" maxlength="60" placeholder="Número de factura" />
+            </label>
+            <label>Fecha de compra
+              <input type="date" [(ngModel)]="purchaseDate" name="purchaseDate" required />
+            </label>
+          </div>
+
+          <div class="line-builder">
+            <span class="eyebrow">AGREGAR PRODUCTO</span>
+            <label>Producto
+              <select [(ngModel)]="productId" name="product" (ngModelChange)="onProductChange()">
+                <option [ngValue]="0">Selecciona producto</option>
+                @for (product of activeProducts; track product.id) {
+                  <option [ngValue]="product.id">{{ product.name }}</option>
+                }
+              </select>
+            </label>
+
+            <div class="two-columns">
+              <label>Cantidad
+                <input type="number" min="1" step="1" [(ngModel)]="quantity" name="quantity" />
+              </label>
+              <label>Costo unitario
+                <input type="number" min="0" step="1" [(ngModel)]="cost" name="cost" />
+              </label>
+            </div>
+
+            <div class="two-columns">
+              <label>Lote
+                <input [(ngModel)]="batch" name="batch" placeholder="Opcional" maxlength="60" />
+              </label>
+              <label>Vencimiento
+                <input type="date" [(ngModel)]="expiryDate" name="expiry" />
+              </label>
+            </div>
+
+            <button type="button" class="secondary-action add-line" (click)="addLine()">+ Agregar a la compra</button>
+          </div>
+
+          @if (lines.length) {
+            <div class="lines-wrap">
+              <table>
+                <thead>
+                  <tr><th>Producto</th><th>Cant.</th><th>Costo</th><th>Subtotal</th><th></th></tr>
+                </thead>
+                <tbody>
+                  @for (line of lines; track line.productId; let index = $index) {
+                    <tr>
+                      <td>
+                        <strong>{{ line.name }}</strong>
+                        @if (line.batch) { <small>Lote {{ line.batch }}</small> }
+                        @if (line.expiryDate) { <small>Vence {{ formatDate(line.expiryDate) }}</small> }
+                      </td>
+                      <td>{{ line.quantity }}</td>
+                      <td>{{ formatPrice(line.cost) }}</td>
+                      <td><strong>{{ formatPrice(line.cost * line.quantity) }}</strong></td>
+                      <td>
+                        <button type="button" class="btn-icon danger" title="Quitar línea" (click)="removeLine(index)">
+                          <i class="bi bi-x-lg"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+              <div class="lines-total">
+                <span>{{ lines.length }} producto(s)</span>
+                <strong>{{ formatPrice(purchaseTotal) }}</strong>
+              </div>
+            </div>
+          } @else {
+            <p class="line-hint">Aún no has agregado productos a esta compra.</p>
+          }
+
+          <label>Observación
+            <textarea [(ngModel)]="observation" name="observation" rows="2" maxlength="300" placeholder="Opcional"></textarea>
+          </label>
+
+          <button class="primary-action" type="submit" [disabled]="saving || !lines.length">
+            {{ saving ? 'Registrando…' : 'Registrar compra y entrada' }}
+          </button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">HISTORIAL</span>
+            <h2>Compras recientes</h2>
+          </div>
+          <span class="record-count">{{ purchases.length }}</span>
+        </div>
+
+        @if (loading) {
+          <p class="empty-state">Cargando compras…</p>
+        } @else if (!purchases.length) {
+          <p class="empty-state">No hay compras registradas.</p>
+        } @else {
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Factura</th><th>Proveedor</th><th>Fecha</th><th>Total</th><th>Estado</th></tr>
+              </thead>
+              <tbody>
+                @for (purchase of purchases; track purchase.id) {
+                  <tr>
+                    <td>{{ purchase.invoice || '—' }}</td>
+                    <td>{{ purchase.supplier }}</td>
+                    <td>{{ formatDate(purchase.purchaseDate) }}</td>
+                    <td><strong class="purchase-total">{{ formatPrice(purchase.total) }}</strong></td>
+                    <td>
+                      <span class="status-badge" [class.pending]="purchase.status === 'PENDIENTE'" [class.cancelled]="purchase.status === 'CANCELADA'">
+                        {{ statusLabel(purchase.status) }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    </div>
+  </section>
+</app-admin-shell>

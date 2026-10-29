@@ -46,11 +46,11 @@ $connection = databaseConnection();
 $actor = requireRole($connection, ['Administrador', 'Cliente']);
 $userId = (int) $actor['id'];
 try {
+    // 1. Leer/crear la intención local con una transacción corta (sin llamadas externas).
     $connection->begin_transaction();
-
     $existingQuery = $connection->prepare(
         'SELECT paypal_order_id, items_json, direccion_entrega, notas, amount_usd, estado
-         FROM paypal_checkout_intents WHERE usuario_id = ? AND clave_idempotencia = ? FOR UPDATE'
+         FROM paypal_checkout_intents WHERE usuario_id = ? AND clave_idempotencia = ? LIMIT 1'
     );
     $existingQuery->bind_param('is', $userId, $key);
     $existingQuery->execute();
@@ -71,7 +71,7 @@ try {
 
     $totalCents = 0;
     foreach ($normalizedItems as $productId => $quantity) {
-        $productQuery = $connection->prepare('SELECT precio, stock FROM productos WHERE id = ? AND estado = 1 FOR UPDATE');
+        $productQuery = $connection->prepare('SELECT precio, stock FROM productos WHERE id = ? AND estado = 1 LIMIT 1');
         $productQuery->bind_param('i', $productId);
         $productQuery->execute();
         $product = $productQuery->get_result()->fetch_assoc();
@@ -83,7 +83,9 @@ try {
     $totalCop = $totalCents / 100;
     $amountUsd = paypalAmountUsd($totalCents, (float) $configuration['copPerUsd']);
     if ((float) $amountUsd <= 0) throw new DomainException('El total no es válido para PayPal.');
+    $connection->commit();
 
+    // 2. Crear la orden en PayPal fuera de la transacción de base de datos.
     $paypalOrder = paypalApiRequest('POST', '/v2/checkout/orders', [
         'intent' => 'CAPTURE',
         'purchase_units' => [[
@@ -98,20 +100,48 @@ try {
         throw new RuntimeException('PayPal devolvió una orden incompleta.');
     }
 
+    // 3. Persistir la intención. Si otra solicitud ganó la carrera, devolver la existente.
     $insert = $connection->prepare(
         "INSERT INTO paypal_checkout_intents
          (paypal_order_id, usuario_id, clave_idempotencia, amount_cop, amount_usd, items_json, direccion_entrega, notas, estado)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'CREATED')"
     );
     $insert->bind_param('sisddsss', $paypalOrderId, $userId, $key, $totalCop, $amountUsd, $itemsJson, $address, $notes);
-    if (!$insert->execute()) throw new RuntimeException('No fue posible guardar la orden de PayPal.');
+    if (!$insert->execute()) {
+        if ($insert->errno !== 1062) {
+            throw new RuntimeException('No fue posible guardar la orden de PayPal.');
+        }
+        $insert->close();
+        $existingQuery = $connection->prepare(
+            'SELECT paypal_order_id, items_json, amount_usd, estado
+             FROM paypal_checkout_intents WHERE usuario_id = ? AND clave_idempotencia = ? LIMIT 1'
+        );
+        $existingQuery->bind_param('is', $userId, $key);
+        $existingQuery->execute();
+        $existing = $existingQuery->get_result()->fetch_assoc();
+        $existingQuery->close();
+        if ($existing && $existing['items_json'] === $itemsJson && $existing['estado'] === 'CREATED') {
+            $connection->close();
+            jsonResponse(200, [
+                'orderId' => (string) $existing['paypal_order_id'],
+                'currency' => 'USD',
+                'amount' => (string) $existing['amount_usd'],
+            ]);
+        }
+        throw new DomainException('Esta clave de compra ya fue usada para otros datos.');
+    }
     $insert->close();
-    $connection->commit();
     $connection->close();
 
     jsonResponse(201, ['orderId' => $paypalOrderId, 'currency' => 'USD', 'amount' => $amountUsd]);
 } catch (Throwable $error) {
-    if ($connection->connect_errno === 0) $connection->rollback();
+    if ($connection->connect_errno === 0) {
+        try {
+            $connection->rollback();
+        } catch (Throwable) {
+            // La transacción pudo haber terminado antes del error.
+        }
+    }
     $connection->close();
     if ($error instanceof DomainException) jsonResponse(422, ['message' => $error->getMessage()]);
     error_log('LiquorSoft PayPal order creation failed: ' . $error->getMessage());

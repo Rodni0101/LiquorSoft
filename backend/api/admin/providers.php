@@ -2,11 +2,14 @@
 declare(strict_types=1);
 require_once __DIR__ . '/../config/database.php';
 $connection = databaseConnection();
-requireRole($connection, ['Administrador']);
+requirePermission($connection, 'proveedores');
 $method = $_SERVER['REQUEST_METHOD'];
+if ($method !== 'GET') {
+    requireCsrfToken();
+}
 
 if ($method === 'GET') {
-    $result = $connection->query('SELECT id, empresa AS name, nit AS identificacion, contacto, telefono, correo, direccion, estado AS active FROM proveedores ORDER BY empresa');
+    $result = $connection->query('SELECT id, empresa AS name, nit AS identificacion, contacto, telefono, correo, direccion, estado AS active FROM proveedores ORDER BY estado DESC, empresa');
     if (!$result) { $connection->close(); jsonResponse(500, ['message' => 'No fue posible cargar los proveedores.']); }
     $providers = [];
     while ($row = $result->fetch_assoc()) {
@@ -14,6 +17,19 @@ if ($method === 'GET') {
     }
     $connection->close(); jsonResponse(200, ['providers' => $providers]);
 }
+
+if ($method === 'DELETE') {
+    $body = json_decode(file_get_contents('php://input'), true);
+    $id = filter_var($body['id'] ?? null, FILTER_VALIDATE_INT);
+    if (!$id) { $connection->close(); jsonResponse(422, ['message' => 'El proveedor es obligatorio.']); }
+    $statement = $connection->prepare('UPDATE proveedores SET estado = 0 WHERE id = ?');
+    if (!$statement) { $connection->close(); jsonResponse(500, ['message' => 'No fue posible preparar la desactivación.']); }
+    $statement->bind_param('i', $id);
+    if (!$statement->execute()) { $statement->close(); $connection->close(); jsonResponse(500, ['message' => 'No fue posible desactivar el proveedor.']); }
+    $statement->close(); $connection->close();
+    jsonResponse(200, ['success' => true, 'id' => $id, 'message' => 'Proveedor desactivado correctamente.']);
+}
+
 if (!in_array($method, ['POST', 'PATCH'], true)) { $connection->close(); jsonResponse(405, ['message' => 'Método no permitido.']); }
 $body = json_decode(file_get_contents('php://input'), true);
 $id = filter_var($body['id'] ?? null, FILTER_VALIDATE_INT);

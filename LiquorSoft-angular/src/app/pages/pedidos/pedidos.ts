@@ -14,6 +14,7 @@ interface OrderItem {
 
 interface Order {
   id: number;
+  number: string;
   total: number;
   status: string;
   createdAt: string;
@@ -58,7 +59,42 @@ export class Pedidos implements OnInit {
   }
 
   protected formatDate(value: string): string {
-    return new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
+    if (!value) return '';
+    try {
+      return new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value.replace(' ', 'T')));
+    } catch {
+      return value;
+    }
+  }
+
+  protected statusLabel(status: string): string {
+    const labels: Record<string, string> = {
+      PENDIENTE: 'Pendiente',
+      CONFIRMADO: 'Confirmado',
+      PREPARANDO: 'Preparando',
+      LISTO_PARA_COORDINAR: 'Listo para coordinar',
+      COMPLETADO: 'Completado',
+      ENVIADO: 'Enviado',
+      ENTREGADO: 'Entregado',
+      CANCELADO: 'Cancelado',
+    };
+    return labels[(status ?? '').toUpperCase()] || status;
+  }
+
+  protected paymentLabel(status: string): string {
+    const labels: Record<string, string> = {
+      PENDIENTE: 'Pago pendiente',
+      APROBADO: 'Aprobado',
+      CAPTURADO: 'Pagado',
+      RECHAZADO: 'Rechazado',
+      REEMBOLSADO: 'Reembolsado',
+      CANCELADO: 'Cancelado',
+    };
+    return labels[(status ?? '').toUpperCase()] || status;
+  }
+
+  protected statusClass(status: string): string {
+    return 'status-' + (status ?? '').toLowerCase();
   }
 
   protected openInvoice(url: string): void {

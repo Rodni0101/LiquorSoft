@@ -1,7 +1,117 @@
 <app-admin-shell>
   <section class="admin-page users-page">
-    <header class="page-heading"><div><span class="eyebrow">CONTROL DE ACCESO</span><h1>Usuarios</h1><p>Administra las cuentas autorizadas para operar LiquorSoft.</p></div><a routerLink="/register" class="primary-action">＋ Nueva cuenta</a></header>
+    <header class="page-heading">
+      <div>
+        <span class="eyebrow">CONTROL DE ACCESO</span>
+        <h1>Usuarios</h1>
+        <p>Administra las cuentas y los roles autorizados para operar LiquorSoft.</p>
+      </div>
+      <button type="button" class="primary-action" (click)="openCreateModal()">＋ Nueva cuenta</button>
+    </header>
+
     @if (errorMessage) { <p class="notice error" role="alert">{{ errorMessage }}</p> }
-    <section class="panel"><div class="panel-heading"><div><span class="eyebrow">CUENTAS</span><h2>Accesos registrados</h2></div><span class="record-count">{{ users.length }} cuentas</span></div>@if (loading) { <p class="empty-state" role="status">Cargando usuarios…</p> } @else if (!users.length) { <p class="empty-state">No hay cuentas registradas.</p> } @else { <div class="table-wrap"><table><thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th></tr></thead><tbody>@for (user of users; track user.id) { <tr><td><strong>{{ user.name }}</strong></td><td>{{ user.email }}</td><td>{{ user.role }}</td><td><span class="status" [class.inactive]="!user.active">{{ user.active ? 'Activo' : 'Inactivo' }}</span></td></tr> }</tbody></table></div> }</section>
+    @if (successMessage) { <p class="notice success" role="status">{{ successMessage }}</p> }
+
+    <section class="panel">
+      <div class="panel-heading">
+        <div><span class="eyebrow">CUENTAS</span><h2>Accesos registrados</h2></div>
+        <span class="record-count">{{ users.length }} cuentas</span>
+      </div>
+
+      @if (loading) {
+        <p class="empty-state" role="status">Cargando usuarios…</p>
+      } @else if (!users.length) {
+        <p class="empty-state">No hay cuentas registradas.</p>
+      } @else {
+        <div class="table-wrap">
+          <table aria-label="Lista de usuarios">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Teléfono</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (user of users; track user.id) {
+                <tr [class.inactive-row]="!user.active">
+                  <td><strong>{{ user.name }}</strong><small>{{ user.username }}</small></td>
+                  <td>{{ user.email }}</td>
+                  <td>{{ user.phone || '—' }}</td>
+                  <td><span [class]="'role-badge ' + roleBadgeClass(user.role)">{{ formatRole(user.role) }}</span></td>
+                  <td><span class="status-badge" [class.inactive]="!user.active">{{ user.active ? 'Activo' : 'Inactivo' }}</span></td>
+                  <td>
+                    <div class="row-actions">
+                      <button type="button" class="btn-icon edit" title="Editar usuario" (click)="openEditModal(user)">
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                      <button type="button" class="btn-icon" [class.on]="!user.active" title="{{ user.active ? 'Desactivar' : 'Activar' }}" (click)="toggleActive(user)">
+                        <i class="bi" [class.bi-toggle-on]="user.active" [class.bi-toggle-off]="!user.active"></i>
+                      </button>
+                      <button type="button" class="btn-icon danger" title="Dar de baja" (click)="deleteUser(user)">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+
+    @if (modalOpen) {
+      <div class="modal-backdrop" (click)="closeModal()" role="presentation">
+        <div class="modal-card" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="user-modal-title">
+          <header class="modal-header">
+            <div>
+              <span class="eyebrow">{{ modalMode === 'create' ? 'NUEVA CUENTA' : 'EDITAR CUENTA' }}</span>
+              <h2 id="user-modal-title">{{ modalMode === 'create' ? 'Crear usuario' : 'Editar usuario' }}</h2>
+            </div>
+            <button type="button" class="modal-close" aria-label="Cerrar" (click)="closeModal()">×</button>
+          </header>
+
+          <form class="modal-body" (submit)="$event.preventDefault(); saveUser()">
+            @if (errorMessage) { <p class="notice error" role="alert">{{ errorMessage }}</p> }
+
+            <div class="form-grid">
+              <label>Nombre
+                <input type="text" [(ngModel)]="formName" name="nombre" maxlength="100" required />
+              </label>
+              <label>Apellido
+                <input type="text" [(ngModel)]="formLastName" name="apellido" maxlength="100" required />
+              </label>
+              <label>Correo
+                <input type="email" [(ngModel)]="formEmail" name="correo" maxlength="150" required />
+              </label>
+              <label>Teléfono
+                <input type="tel" [(ngModel)]="formPhone" name="telefono" maxlength="20" />
+              </label>
+              <label>Rol
+                <select [(ngModel)]="formRoleId" name="rol" required>
+                  @for (role of roles; track role.id) {
+                    <option [ngValue]="role.id">{{ formatRole(role.name) }}</option>
+                  }
+                </select>
+              </label>
+              <label>{{ modalMode === 'create' ? 'Contraseña' : 'Nueva contraseña (opcional)' }}
+                <input type="password" [(ngModel)]="formPassword" name="password" [required]="modalMode === 'create'" minlength="8" autocomplete="new-password" />
+              </label>
+            </div>
+
+            <p class="form-hint">Los permisos se asignan automáticamente según el rol seleccionado.</p>
+
+            <div class="modal-actions">
+              <button type="button" class="btn-cancel" (click)="closeModal()">Cancelar</button>
+              <button type="submit" class="btn-save" [disabled]="saving">{{ saving ? 'Guardando…' : (modalMode === 'create' ? 'Crear usuario' : 'Guardar cambios') }}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    }
   </section>
 </app-admin-shell>

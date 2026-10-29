@@ -5,7 +5,8 @@ import { AdminShell } from '../../admin-shell';
 
 interface DashboardStats { totalProducts: number; availableProducts: number; outOfStock: number; totalUnits: number; inventoryValue: number; lowStock: number; salesToday: number; salesThisMonth: number; revenueToday: number; revenueThisMonth: number; activeUsers: number; }
 interface RecentProduct { name: string; category: string; stock: number; price: number; }
-interface DashboardResponse { stats: DashboardStats; recentProducts: RecentProduct[]; }
+interface LowStockProduct { id: number; name: string; category: string; stock: number; minStock: number; price: number; }
+interface DashboardResponse { stats: DashboardStats; recentProducts: RecentProduct[]; lowStockProducts: LowStockProduct[]; }
 
 @Component({ selector: 'app-dashboard', standalone: true, imports: [RouterLink, AdminShell], styleUrl: './dashboard.css', templateUrl: './dashboard.html' })
 export class Dashboard implements OnInit {

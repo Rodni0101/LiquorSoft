@@ -118,7 +118,7 @@ export class Ventas implements OnInit {
     this.selectedOrder = order;
     this.nextMethod = order.fulfillmentMethod || 'POR_COORDINAR';
     this.nextDetails = order.fulfillmentDetails || '';
-    const available = this.getAllowedTransitions(order.status);
+    const available = this.getAllowedTransitions(order.status, order.paymentStatus);
     this.nextStatus = available[0] ?? order.status;
     this.errorMessage = '';
     this.successMessage = '';
@@ -130,8 +130,9 @@ export class Ventas implements OnInit {
     this.successMessage = '';
   }
 
-  protected getAllowedTransitions(currentStatus: string): string[] {
+  protected getAllowedTransitions(currentStatus: string, paymentStatus = ''): string[] {
     const transitions: Record<string, string[]> = {
+      PENDIENTE: ['CANCELADO'],
       CONFIRMADO: ['PREPARANDO', 'CANCELADO'],
       PREPARANDO: ['LISTO_PARA_COORDINAR', 'CANCELADO'],
       LISTO_PARA_COORDINAR: ['COMPLETADO', 'ENVIADO', 'CANCELADO'],
@@ -139,9 +140,12 @@ export class Ventas implements OnInit {
       COMPLETADO: [],
       ENTREGADO: [],
       CANCELADO: [],
-      PENDIENTE: ['CANCELADO'],
     };
-    return transitions[currentStatus] ?? [];
+    const list = transitions[currentStatus] ?? [];
+    // Un pedido con pago aprobado/capturado no se puede cancelar desde esta vista
+    // (el backend exige reembolso + ajuste de inventario). Ocultamos esa opción.
+    const paid = paymentStatus === 'APROBADO' || paymentStatus === 'CAPTURADO';
+    return paid ? list.filter(status => status !== 'CANCELADO') : list;
   }
 
   protected async updateOrderStatus(): Promise<void> {
@@ -152,7 +156,7 @@ export class Ventas implements OnInit {
       return;
     }
 
-    const transitions = this.getAllowedTransitions(this.selectedOrder.status);
+    const transitions = this.getAllowedTransitions(this.selectedOrder.status, this.selectedOrder.paymentStatus);
     if (!transitions.includes(this.nextStatus)) {
       this.errorMessage = 'La transición de estado seleccionada no es válida.';
       return;
@@ -160,7 +164,7 @@ export class Ventas implements OnInit {
 
     const confirmado = await this.notification.confirm({
       title: 'Confirmar cambio de estado',
-      message: `¿Cambiar el pedido #${this.selectedOrder.number} de "${this.selectedOrder.status}" a "${this.nextStatus}"? El cliente recibirá una notificación automática.`,
+      message: `¿Cambiar el pedido #${this.selectedOrder.number} de "${this.statusLabel(this.selectedOrder.status)}" a "${this.statusLabel(this.nextStatus)}"? El cliente recibirá una notificación automática.`,
       acceptLabel: 'Sí, cambiar estado',
     });
     if (!confirmado) return;
@@ -235,6 +239,18 @@ export class Ventas implements OnInit {
     }
   }
 
+  protected paymentStatusLabel(status: string): string {
+    const labels: Record<string, string> = {
+      PENDIENTE: 'Pago pendiente',
+      APROBADO: 'Aprobado',
+      CAPTURADO: 'Pagado',
+      RECHAZADO: 'Rechazado',
+      REEMBOLSADO: 'Reembolsado',
+      CANCELADO: 'Cancelado',
+    };
+    return labels[(status ?? '').toUpperCase()] || status;
+  }
+
   protected statusLabel(status: string): string {
     const labels: Record<string, string> = {
       PENDIENTE: 'Pendiente',
@@ -242,10 +258,12 @@ export class Ventas implements OnInit {
       PREPARANDO: 'Preparando',
       LISTO_PARA_COORDINAR: 'Listo para coordinar',
       COMPLETADO: 'Completado',
+      COMPLETADA: 'Completada',
       ENVIADO: 'Enviado',
       ENTREGADO: 'Entregado',
       CANCELADO: 'Cancelado',
+      CANCELADA: 'Cancelada',
     };
-    return labels[status] || status;
+    return labels[(status ?? '').toUpperCase()] || status;
   }
 }

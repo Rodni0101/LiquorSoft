@@ -188,3 +188,13 @@ El componente `product-visual.ts` ya manejaba correctamente:
 4. Importar `schema.sql` en phpMyAdmin
 5. Verificar que las imágenes carguen correctamente en el sitio publicado
 6. Considerar agregar más productos verificados al catálogo
+
+---
+
+## 13. ACTUALIZACIÓN 2026-10-29 — OPTIMIZACIÓN DE IMÁGENES Y PAQUETE
+
+- Se optimizaron **in situ** los 25 JPG legacy de `LiquorSoft-angular/public/images/productos/` (máx. 1200 px, JPEG calidad 85, progresivo). Pasaron de ~230 MB a ~3.5 MB.
+- Se conservaron los 29 PNG del catálogo real sin pérdida de calidad; `schema.sql` referencia exactamente esos 29 archivos.
+- El paquete reconstruido con `./deploy/build.sh` quedó en **~40 MB de carpeta y ~39 MB de ZIP**, frente a los 199–233 MB anteriores.
+- Verificación: las 29 rutas `images/productos/*.png` de `deploy/htdocs/schema.sql` existen en `deploy/htdocs/`; no se incluyeron `.env`, `.env.local`, mapas ni backups.
+- Respaldo temporal de los JPG originales: `/tmp/ls-qa/image-backup-20261029/`.

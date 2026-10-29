@@ -3,8 +3,11 @@ declare(strict_types=1);
 require_once __DIR__ . '/../config/database.php';
 
 $connection = databaseConnection();
-$actor = requireRole($connection, ['Administrador']);
+$actor = requirePermission($connection, 'inventario');
 $method = $_SERVER['REQUEST_METHOD'];
+if ($method !== 'GET') {
+    requireCsrfToken();
+}
 
 if ($method === 'GET') {
     $result = $connection->query(

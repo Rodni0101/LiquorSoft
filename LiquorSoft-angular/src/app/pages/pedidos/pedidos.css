@@ -31,3 +31,11 @@
   .order-head { align-items: flex-start; flex-direction: column; gap: .3rem; }
 }
 .invoice-download { min-height: 40px; margin-top: .75rem; padding: .55rem .8rem; border: 1px solid var(--purchase-accent, #65252b); border-radius: 5px; color: var(--purchase-accent, #65252b); background: transparent; font: inherit; font-size: .78rem; font-weight: 700; cursor: pointer; }
+.status-pill, .pay-pill { display: inline-block; padding: .12rem .5rem; border-radius: 999px; font-size: .68rem; font-weight: 800; letter-spacing: .02em; }
+.status-pill { color: #6d4b12; background: #f6e7c6; }
+.status-pill.status-confirmado { color: #14532d; background: #dcfce7; }
+.status-pill.status-preparando, .status-pill.status-listo_para_coordinar { color: #713f12; background: #fef3c7; }
+.status-pill.status-enviado, .status-pill.status-completado { color: #1e3a8a; background: #dbeafe; }
+.status-pill.status-entregado { color: #14532d; background: #bbf7d0; }
+.status-pill.status-cancelado { color: #7f1d1d; background: #fee2e2; }
+.pay-pill { color: #374151; background: #e5e7eb; }

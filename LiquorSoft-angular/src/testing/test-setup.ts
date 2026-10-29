@@ -32,7 +32,10 @@ function responseFor(url: string): object {
         revenueToday: 0, revenueThisMonth: 0, activeUsers: 0,
       },
       recentProducts: [],
+      lowStockProducts: [],
     };
   }
+  if (url.endsWith('/api/admin/orders.php')) return { orders: [] };
+  if (url.endsWith('/api/admin/sales.php')) return { sales: [] };
   return { products: [], items: [], movements: [], sales: [] };
 }

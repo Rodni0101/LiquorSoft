@@ -43,6 +43,7 @@ describe('Checkout', () => {
 
   beforeEach(async () => {
     sessionStorage.clear();
+    localStorage.clear();
     cartItems.set([{ id: 1, name: 'Producto de prueba', price: 10000, icon: '🥃', quantity: 1, stock: 2 }]);
     renderButtons.mockClear();
     createButtons.mockClear();
@@ -248,5 +249,118 @@ describe('Checkout', () => {
     expect(clearCart).toHaveBeenCalledOnce();
     expect(sessionStorage.getItem('liquorsoft-paypal-order-id')).toBeNull();
     expect(checkout.textContent).toContain('Compra confirmada');
+  });
+
+  it('prefills the delivery details from the stored checkout draft', async () => {
+    localStorage.setItem(
+      'liquorsoft-checkout-draft',
+      JSON.stringify({ deliveryAddress: 'Calle 8 #12 - 30', birthDate: '1990-05-05', notes: 'Porton rojo' }),
+    );
+    const fixture = TestBed.createComponent(Checkout);
+    const http = TestBed.inject(HttpTestingController);
+    fixture.detectChanges();
+    http.expectOne('/api/payment-config.php').flush({
+      simulatorEnabled: true,
+      paypalEnabled: false,
+      paypalStatus: 'missing_credentials',
+      paypalClientId: null,
+      paypalCurrency: 'USD',
+      paypalCopPerUsd: null,
+    });
+    http.expectOne('/api/products.php').flush({ products: [{ id: 1, stock: 2 }] });
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const checkout = fixture.nativeElement as HTMLElement;
+    const address = checkout.querySelector<HTMLInputElement>('[autocomplete="street-address"]');
+    const birthDate = checkout.querySelector<HTMLInputElement>('input[type="date"]');
+    const notes = checkout.querySelector<HTMLTextAreaElement>('textarea');
+    if (!address || !birthDate || !notes) throw new Error('Checkout delivery fields are missing.');
+    expect(address.value).toBe('Calle 8 #12 - 30');
+    expect(birthDate.value).toBe('1990-05-05');
+    expect(notes.value).toBe('Porton rojo');
+  });
+
+  it('keeps the delivery details in the checkout draft while typing', async () => {
+    const fixture = TestBed.createComponent(Checkout);
+    const http = TestBed.inject(HttpTestingController);
+    fixture.detectChanges();
+    http.expectOne('/api/payment-config.php').flush({
+      simulatorEnabled: true,
+      paypalEnabled: false,
+      paypalStatus: 'missing_credentials',
+      paypalClientId: null,
+      paypalCurrency: 'USD',
+      paypalCopPerUsd: null,
+    });
+    http.expectOne('/api/products.php').flush({ products: [{ id: 1, stock: 2 }] });
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const checkout = fixture.nativeElement as HTMLElement;
+    const address = checkout.querySelector<HTMLInputElement>('[autocomplete="street-address"]');
+    const notes = checkout.querySelector<HTMLTextAreaElement>('textarea');
+    if (!address || !notes) throw new Error('Checkout delivery fields are missing.');
+
+    address.value = 'Calle 9 #10 - 20';
+    address.dispatchEvent(new Event('input'));
+    notes.value = 'Entrega en portero';
+    notes.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    const draft = JSON.parse(localStorage.getItem('liquorsoft-checkout-draft') ?? 'null');
+    expect(draft?.deliveryAddress).toBe('Calle 9 #10 - 20');
+    expect(draft?.notes).toBe('Entrega en portero');
+  });
+
+  it('confirms the simulated purchase and clears the checkout draft', async () => {
+    const fixture = TestBed.createComponent(Checkout);
+    const http = TestBed.inject(HttpTestingController);
+    fixture.detectChanges();
+    http.expectOne('/api/payment-config.php').flush({
+      simulatorEnabled: true,
+      paypalEnabled: false,
+      paypalStatus: 'missing_credentials',
+      paypalClientId: null,
+      paypalCurrency: 'USD',
+      paypalCopPerUsd: null,
+    });
+    http.expectOne('/api/products.php').flush({ products: [{ id: 1, stock: 2 }] });
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const checkout = fixture.nativeElement as HTMLElement;
+    const address = checkout.querySelector<HTMLInputElement>('[autocomplete="street-address"]');
+    const birthDate = checkout.querySelector<HTMLInputElement>('input[type="date"]');
+    const confirmButton = Array.from(checkout.querySelectorAll('button')).find((button) =>
+      button.textContent?.includes('Confirmar compra'),
+    );
+    if (!address || !birthDate || !confirmButton) throw new Error('Checkout confirm action is missing.');
+
+    address.value = 'Calle de prueba 123';
+    address.dispatchEvent(new Event('input'));
+    birthDate.value = '1990-01-01';
+    birthDate.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    confirmButton.click();
+    fixture.detectChanges();
+    const purchaseRequest = http.expectOne('/api/purchase.php');
+    purchaseRequest.flush({
+      success: true,
+      saleId: 7,
+      orderId: 12,
+      orderNumber: 'PED-TEST',
+      total: 10000,
+      paymentMethod: 'nequi_simulado',
+      paymentStatus: 'APROBADO',
+      orderStatus: 'CONFIRMADO',
+      invoiceAvailable: true,
+      message: 'Pago de prueba aprobado por el simulador de desarrollo. El pedido fue confirmado.',
+    });
+    fixture.detectChanges();
+
+    expect(clearCart).toHaveBeenCalledOnce();
+    expect(localStorage.getItem('liquorsoft-checkout-draft')).toBeNull();
   });
 });

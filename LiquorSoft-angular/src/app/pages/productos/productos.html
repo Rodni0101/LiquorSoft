@@ -115,6 +115,11 @@
                 <input type="checkbox" name="featured" [(ngModel)]="form.featured" />
                 <span>Destacar este producto en la tienda</span>
               </label>
+
+              <label class="check-field full-width">
+                <input type="checkbox" name="active" [(ngModel)]="form.active" />
+                <span>Producto activo (visible en el catálogo)</span>
+              </label>
             </div>
 
             <div class="form-actions">
@@ -136,8 +141,22 @@
             <h2>Catálogo registrado</h2>
             <p>Consulta y administra los productos guardados.</p>
           </div>
-          <span class="count">{{ products.length }} productos</span>
+          <span class="count">{{ filteredProducts.length }} de {{ products.length }} productos</span>
         </div>
+
+        @if (!loading && products.length) {
+          <div class="filter-bar">
+            <input type="search" [(ngModel)]="search" name="search" aria-label="Buscar productos por nombre, marca, SKU o categoría" placeholder="Buscar por nombre, marca, SKU o categoría" />
+            <select [(ngModel)]="statusFilter" name="statusFilter" aria-label="Filtrar productos por estado">
+              <option value="all">Todos</option>
+              <option value="active">Activos</option>
+              <option value="inactive">Inactivos</option>
+              <option value="bajo">Stock bajo</option>
+              <option value="agotado">Agotados</option>
+            </select>
+            <button type="button" class="btn-secondary" (click)="clearFilters()">Limpiar</button>
+          </div>
+        }
 
         @if (loading) {
           <div class="state">Cargando productos…</div>
@@ -162,7 +181,7 @@
                 </tr>
               </thead>
               <tbody>
-                @for (product of products; track product.id) {
+                @for (product of filteredProducts; track product.id) {
                   <tr>
                     <td class="product-name-cell">
                       <app-product-visual [category]="product.category" [imageUrl]="product.image || null" [altText]="product.name" />
@@ -171,14 +190,14 @@
                     </td>
                     <td>{{ product.category }}</td>
                     <td class="price">{{ formatPrice(product.price) }}</td>
-                    <td [class.low]="product.stock > 0 && product.stock <= 5">{{ product.stock }} und.</td>
+                    <td [class.low]="product.stock > 0 && product.stock <= (product.minStock ?? 5)">{{ product.stock }} und.</td>
                     <td>
                       <span
                         class="status"
-                        [class.low]="product.stock > 0 && product.stock <= 5"
+                        [class.low]="product.stock > 0 && product.stock <= (product.minStock ?? 5)"
                         [class.empty]="product.stock < 1"
                       >
-                        {{ product.stock < 1 ? 'Agotado' : product.stock <= 5 ? 'Stock bajo' : 'Disponible' }}
+                        {{ product.active === false ? 'Inactivo' : product.stock < 1 ? 'Agotado' : product.stock <= (product.minStock ?? 5) ? 'Stock bajo' : 'Disponible' }}
                       </span>
                       @if (product.featured) {
                         <small>Destacado</small>
@@ -193,10 +212,14 @@
                           Editar
                         </button>
                         <button class="btn-danger" type="button" (click)="deleteProduct(product)" [disabled]="saving">
-                          Eliminar
+                          Dar de baja
                         </button>
                       </div>
                     </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="6" class="no-results">No hay productos que coincidan con la búsqueda.</td>
                   </tr>
                 }
               </tbody>
